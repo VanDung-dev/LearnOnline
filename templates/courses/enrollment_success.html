@@ -1,17 +1,52 @@
 {% extends 'base.html' %}
 
-{% block title %}Enrollment Success - Online Learning Platform{% endblock %}
+{% block title %}Enrollment Successful - {{ course.title }}{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-body text-center">
-                <h2 class="text-success">Enrollment Successful!</h2>
-                <p>You have been successfully enrolled in:</p>
-                <h3>{{ course.title }}</h3>
-                <p>{{ course.short_description }}</p>
-                <a href="{% url 'courses:course_detail' course.slug %}" class="btn btn-primary">Go to Course</a>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Enrollment Successful!</h3>
+                </div>
+                <div class="card-body">
+                    <p>You have been successfully enrolled in <strong>{{ course.title }}</strong>.</p>
+                    
+                    {% if course.opening_date or course.closing_date %}
+                    <div class="alert alert-info">
+                        <h5>Course Schedule</h5>
+                        {% if course.opening_date %}
+                        <p><strong>Opening Date:</strong> {{ course.opening_date }}</p>
+                        {% endif %}
+                        {% if course.closing_date %}
+                        <p><strong>Closing Date:</strong> {{ course.closing_date }}</p>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                    
+                    {% if course.expiration_date %}
+                    <div class="alert alert-warning">
+                        <h5>Important Deadline</h5>
+                        <p>You must complete this course by <strong>{{ course.expiration_date }}</strong> to receive a certificate.</p>
+                        {% if course.expiration_date < now %}
+                        <p class="text-danger"><strong>This course has already expired. You will not be able to receive a certificate.</strong></p>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                    
+                    <p>You can now access all course materials:</p>
+                    <ul>
+                        <li><a href="{% url 'courses:course_detail' course.slug %}">View Course Content</a></li>
+                        {% if course.modules.first and course.modules.first.lessons.first %}
+                        <li><a href="{% url 'courses:lesson_detail' course.slug course.modules.first.lessons.first.slug %}">Start First Lesson</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+                <div class="card-footer">
+                    <a href="{% url 'courses:course_detail' course.slug %}" class="btn btn-primary">Go to Course</a>
+                    <a href="{% url 'courses:home' %}" class="btn btn-secondary">Back to Home</a>
+                </div>
             </div>
         </div>
     </div>

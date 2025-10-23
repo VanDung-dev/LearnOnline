@@ -16,60 +16,75 @@
     <div class="col-md-8">
         <h1>{{ lesson.title }}</h1>
         
-        {% if lesson.lesson_type == 'video' and lesson.video_url %}
-            <div class="ratio ratio-16x9">
-                <iframe src="{{ lesson.video_url }}" title="{{ lesson.title }}" allowfullscreen></iframe>
-            </div>
-        {% elif lesson.lesson_type == 'text' %}
+        {% if course.expiration_date and course.expiration_date < now %}
+        <div class="alert alert-danger">
+            <strong>Warning:</strong> This course has expired. You can still access the materials, but you will not be able to receive a certificate.
+        </div>
+        {% elif course.expiration_date %}
+        <div class="alert alert-info">
+            <strong>Deadline:</strong> Complete this course by {{ course.expiration_date }} to receive your certificate.
+        </div>
+        {% endif %}
+        
+        {% if lesson.lesson_type == 'text' %}
             <div class="lesson-content">
                 {{ lesson.content|linebreaks }}
             </div>
+        {% elif lesson.lesson_type == 'video' %}
+            {% if lesson.video_url %}
+                <div class="video-container mb-4">
+                    <iframe width="100%" height="400" src="{{ lesson.video_url }}" frameborder="0" allowfullscreen></iframe>
+                </div>
+            {% endif %}
+            {% if lesson.content %}
+                <div class="lesson-content">
+                    {{ lesson.content|linebreaks }}
+                </div>
+            {% endif %}
         {% elif lesson.lesson_type == 'quiz' %}
-            <div class="alert alert-info">
-                <h4>Quiz Content</h4>
-                <p>Quiz functionality would be implemented here.</p>
+            <div class="lesson-content">
+                {{ lesson.content|linebreaks }}
             </div>
+            <!-- Quiz functionality would go here -->
         {% endif %}
-        
-        <div class="mt-4 d-flex justify-content-between">
-            {% if prev_lesson and course.slug and prev_lesson.slug %}
-                <a href="{% url 'courses:lesson_detail' course.slug prev_lesson.slug %}" class="btn btn-outline-primary">Previous: {{ prev_lesson.title }}</a>
-            {% else %}
-                <div></div>
-            {% endif %}
-            
-            {% if next_lesson and course.slug and next_lesson.slug %}
-                <a href="{% url 'courses:lesson_detail' course.slug next_lesson.slug %}" class="btn btn-primary">Next: {{ next_lesson.title }}</a>
-            {% else %}
-                <div></div>
-            {% endif %}
-        </div>
     </div>
     
     <div class="col-md-4">
         <div class="card">
-            <div class="card-header">
-                <h5>Course Content</h5>
-            </div>
             <div class="card-body">
-                {% for module in course.modules.all %}
-                    <h6>{{ module.title }}</h6>
-                    <ul class="list-unstyled ps-3">
-                        {% for lesson_item in module.lessons.all %}
-                            <li>
-                                {% if lesson_item.id == lesson.id %}
-                                    <strong>{{ lesson_item.title }}</strong>
-                                {% else %}
-                                    {% if course.slug and lesson_item.slug %}
-                                        <a href="{% url 'courses:lesson_detail' course.slug lesson_item.slug %}">{{ lesson_item.title }}</a>
-                                    {% else %}
-                                        {{ lesson_item.title }}
-                                    {% endif %}
-                                {% endif %}
-                            </li>
-                        {% endfor %}
-                    </ul>
-                {% endfor %}
+                <h5 class="card-title">Course Navigation</h5>
+                <p class="card-text">Progress through the lessons in this course.</p>
+                
+                <div class="d-grid gap-2">
+                    {% if prev_lesson %}
+                        <a href="{% url 'courses:lesson_detail' course.slug prev_lesson.slug %}" class="btn btn-outline-primary">Previous: {{ prev_lesson.title }}</a>
+                    {% endif %}
+                    
+                    {% if next_lesson %}
+                        <a href="{% url 'courses:lesson_detail' course.slug next_lesson.slug %}" class="btn btn-primary">Next: {{ next_lesson.title }}</a>
+                    {% else %}
+                        <a href="{% url 'courses:course_detail' course.slug %}" class="btn btn-success">Return to Course</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-body">
+                <h5 class="card-title">Course Modules</h5>
+                <div class="list-group">
+                    {% for module in course.modules.all %}
+                        <div class="list-group-item list-group-item-action">
+                            <h6>{{ module.title }}</h6>
+                            {% for lesson_item in module.lessons.all %}
+                                <a href="{% url 'courses:lesson_detail' course.slug lesson_item.slug %}" 
+                                   class="list-group-item list-group-item-action {% if lesson_item.id == lesson.id %}active{% endif %}">
+                                    {{ lesson_item.title }}
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                </div>
             </div>
         </div>
     </div>

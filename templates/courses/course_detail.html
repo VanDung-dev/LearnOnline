@@ -16,6 +16,27 @@
         <h1>{{ course.title }}</h1>
         <p class="text-muted">{{ course.category }}</p>
         
+        {% if course.opening_date or course.closing_date %}
+        <div class="alert alert-info">
+            <h5>Course Schedule</h5>
+            {% if course.opening_date %}
+            <p><strong>Opening Date:</strong> {{ course.opening_date }}</p>
+            {% endif %}
+            {% if course.closing_date %}
+            <p><strong>Closing Date:</strong> {{ course.closing_date }}</p>
+            {% endif %}
+        </div>
+        {% endif %}
+        
+        {% if course.expiration_date %}
+        <div class="alert alert-warning">
+            <strong>Important:</strong> This course must be completed by {{ course.expiration_date }} to receive a certificate.
+            {% if course.expiration_date < now %}
+                This course has expired and certificates are no longer available.
+            {% endif %}
+        </div>
+        {% endif %}
+        
         <p>{{ course.description }}</p>
         
         <h3>Course Modules</h3>
@@ -55,6 +76,15 @@
                 <h5 class="card-title">Course Details</h5>
                 <p class="card-text">Instructor: {{ course.instructor.get_full_name|default:course.instructor.username }}</p>
                 <p class="card-text">Price: ${{ course.price }}</p>
+                {% if course.opening_date %}
+                <p class="card-text">Opens: {{ course.opening_date }}</p>
+                {% endif %}
+                {% if course.closing_date %}
+                <p class="card-text">Closes: {{ course.closing_date }}</p>
+                {% endif %}
+                {% if course.expiration_date %}
+                <p class="card-text">Complete by: {{ course.expiration_date }}</p>
+                {% endif %}
                 
                 {% if user.is_authenticated %}
                     {% if user == course.instructor %}
@@ -69,17 +99,33 @@
                         {% if user|has_certificate:course %}
                             <a href="{% url 'courses:course_certificate' course.slug %}" class="btn btn-success">View Certificate</a>
                         {% else %}
-                            <a href="#" class="btn btn-success disabled">Enrolled</a>
+                            {% if course.expiration_date and course.expiration_date < now %}
+                                <a href="#" class="btn btn-secondary disabled">Course Expired - No Certificate Available</a>
+                            {% else %}
+                                <a href="#" class="btn btn-success disabled">Enrolled</a>
+                            {% endif %}
                         {% endif %}
                     {% else %}
                         {% if course.slug %}
-                            <a href="{% url 'courses:enroll_course' course.slug %}" class="btn btn-primary">Enroll Now</a>
+                            {% if course.opening_date and now < course.opening_date %}
+                                <a href="#" class="btn btn-secondary disabled">Enrollment opens {{ course.opening_date }}</a>
+                            {% elif course.closing_date and now > course.closing_date %}
+                                <a href="#" class="btn btn-secondary disabled">Enrollment closed</a>
+                            {% else %}
+                                <a href="{% url 'courses:enroll_course' course.slug %}" class="btn btn-primary">Enroll Now</a>
+                            {% endif %}
                         {% else %}
                             <a href="#" class="btn btn-primary disabled">Enroll Now</a>
                         {% endif %}
                     {% endif %}
                 {% else %}
-                    <a href="{% url 'accounts:login' %}" class="btn btn-primary">Login to Enroll</a>
+                    {% if course.opening_date and now < course.opening_date %}
+                        <a href="#" class="btn btn-secondary disabled">Enrollment opens {{ course.opening_date }}</a>
+                    {% elif course.closing_date and now > course.closing_date %}
+                        <a href="#" class="btn btn-secondary disabled">Enrollment closed</a>
+                    {% else %}
+                        <a href="{% url 'accounts:login' %}" class="btn btn-primary">Login to Enroll</a>
+                    {% endif %}
                 {% endif %}
             </div>
         </div>
