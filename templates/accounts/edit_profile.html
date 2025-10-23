@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Profile - Online Learning Platform{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Edit Profile</h1>
+    
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+    
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Personal Information</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="{{ u_form.first_name.id_for_label }}" class="form-label">First Name:</label>
+                            {{ u_form.first_name }}
+                            {% if u_form.first_name.errors %}
+                                <div class="text-danger">{{ u_form.first_name.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ u_form.last_name.id_for_label }}" class="form-label">Last Name:</label>
+                            {{ u_form.last_name }}
+                            {% if u_form.last_name.errors %}
+                                <div class="text-danger">{{ u_form.last_name.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ u_form.email.id_for_label }}" class="form-label">Email:</label>
+                            {{ u_form.email }}
+                            {% if u_form.email.errors %}
+                                <div class="text-danger">{{ u_form.email.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ p_form.bio.id_for_label }}" class="form-label">Bio:</label>
+                            {{ p_form.bio }}
+                            {% if p_form.bio.errors %}
+                                <div class="text-danger">{{ p_form.bio.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ p_form.location.id_for_label }}" class="form-label">Location:</label>
+                            {{ p_form.location }}
+                            {% if p_form.location.errors %}
+                                <div class="text-danger">{{ p_form.location.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ p_form.birth_date.id_for_label }}" class="form-label">Birth Date:</label>
+                            {{ p_form.birth_date }}
+                            {% if p_form.birth_date.errors %}
+                                <div class="text-danger">{{ p_form.birth_date.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ p_form.website.id_for_label }}" class="form-label">Website:</label>
+                            {{ p_form.website }}
+                            {% if p_form.website.errors %}
+                                <div class="text-danger">{{ p_form.website.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ p_form.profile_picture.id_for_label }}" class="form-label">Profile Picture:</label>
+                            {{ p_form.profile_picture }}
+                            {% if p_form.profile_picture.errors %}
+                                <div class="text-danger">{{ p_form.profile_picture.errors }}</div>
+                            {% endif %}
+                            
+                            {% if user.profile.profile_picture %}
+                                <div class="mt-2">
+                                    <img src="{{ user.profile.profile_picture.url }}" alt="Current Profile Picture" class="img-thumbnail" style="max-height: 150px;">
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">Update Profile</button>
+                        <a href="{% url 'accounts:profile' %}" class="btn btn-secondary">Cancel</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Current Profile Information</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Username:</strong> {{ user.username }}</p>
+                    <p><strong>Full Name:</strong> {{ user.first_name }} {{ user.last_name }}</p>
+                    <p><strong>Email:</strong> {{ user.email }}</p>
+                    {% if user.profile.bio %}
+                        <p><strong>Bio:</strong> {{ user.profile.bio }}</p>
+                    {% endif %}
+                    {% if user.profile.location %}
+                        <p><strong>Location:</strong> {{ user.profile.location }}</p>
+                    {% endif %}
+                    {% if user.profile.birth_date %}
+                        <p><strong>Birth Date:</strong> {{ user.profile.birth_date }}</p>
+                    {% endif %}
+                    {% if user.profile.website %}
+                        <p><strong>Website:</strong> <a href="{{ user.profile.website }}" target="_blank">{{ user.profile.website }}</a></p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block title %}Student Dashboard - Online Learning Platform{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Student Dashboard</h1>
+            
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Profile Information</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Username:</strong> {{ user.username }}</p>
+                    <p><strong>Full Name:</strong> {{ user.first_name }} {{ user.last_name }}</p>
+                    <p><strong>Email:</strong> {{ user.email }}</p>
+                    <a href="{% url 'accounts:edit_profile' %}" class="btn btn-primary">Edit Profile</a>
+                </div>
+            </div>
+            
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>My Certificates</h5>
+                </div>
+                <div class="card-body">
+                    {% if user.certificates.all %}
+                        <div class="row">
+                            {% for certificate in user.certificates.all %}
+                            <div class="col-md-6 mb-3">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ certificate.course.title }}</h5>
+                                        <p class="card-text">
+                                            <small class="text-muted">
+                                                Issued on: {{ certificate.issued_at|date:"M d, Y" }}
+                                            </small>
+                                        </p>
+                                        <a href="{% url 'courses:course_certificate' certificate.course.slug %}" class="btn btn-sm btn-primary">View Certificate</a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p>You haven't earned any certificates yet. Complete courses to earn certificates!</p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h5>My Enrollments</h5>
+                </div>
+                <div class="card-body">
+                    {% if enrollments %}
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Course</th>
+                                        <th>Instructor</th>
+                                        <th>Enrollment Date</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for enrollment in enrollments %}
+                                        <tr>
+                                            <td>{{ enrollment.course.title }}</td>
+                                            <td>{{ enrollment.course.instructor.get_full_name }}</td>
+                                            <td>{{ enrollment.enrollment_date|date:"M d, Y" }}</td>
+                                            <td>
+                                                {% if enrollment.is_completed %}
+                                                    <span class="badge bg-success">Completed</span>
+                                                {% else %}
+                                                    <span class="badge bg-warning">In Progress</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if enrollment.course.slug %}
+                                                    {% if enrollment.is_completed %}
+                                                        <a href="{% url 'courses:course_certificate' enrollment.course.slug %}" class="btn btn-sm btn-success">View Certificate</a>
+                                                    {% endif %}
+                                                    <a href="{% url 'courses:course_detail' enrollment.course.slug %}" class="btn btn-sm btn-outline-primary">View Course</a>
+                                                {% else %}
+                                                    <span class="text-muted">Course not available</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p>You haven't enrolled in any courses yet.</p>
+                        <a href="{% url 'courses:course_list' %}" class="btn btn-primary">Browse Courses</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
