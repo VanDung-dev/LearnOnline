@@ -1,15 +1,23 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseForbidden, Http404
 from django.contrib import messages
 from django.db import transaction
+from django.utils import timezone
 from .models import Category, Course, Lesson, Enrollment, Progress, Module, Certificate
 from .forms import CourseForm, ModuleForm, LessonForm
 
 
 def home(request):
     categories = Category.objects.all()
-    courses = Course.objects.filter(is_active=True)[:6]
+    # Only show courses that are currently open
+    now = timezone.now()
+    courses = Course.objects.filter(is_active=True).filter(
+        opening_date__lte=now
+    ).filter(
+        closing_date__gte=now
+    )[:6] if now else Course.objects.filter(is_active=True)[:6]
+    
     context = {
         'categories': categories,
         'courses': courses,
@@ -18,7 +26,14 @@ def home(request):
 
 
 def course_list(request):
-    courses = Course.objects.filter(is_active=True)
+    # Only show courses that are currently open
+    now = timezone.now()
+    courses = Course.objects.filter(is_active=True).filter(
+        opening_date__lte=now
+    ).filter(
+        closing_date__gte=now
+    ) if now else Course.objects.filter(is_active=True)
+    
     context = {
         'courses': courses,
     }
@@ -27,6 +42,13 @@ def course_list(request):
 
 def course_detail(request, slug):
     course = get_object_or_404(Course, slug=slug, is_active=True)
+    
+    # Check if course is currently open
+    now = timezone.now()
+    if ((course.opening_date and now < course.opening_date) or 
+        (course.closing_date and now > course.closing_date)):
+        # Course is not currently available
+        raise Http404("Course is not currently available")
     
     # Check if user is enrolled in the course
     is_enrolled = False
@@ -44,11 +66,23 @@ def course_detail(request, slug):
 def enroll_course(request, slug):
     course = get_object_or_404(Course, slug=slug, is_active=True)
     
+    # Check if course is currently open for enrollment
+    now = timezone.now()
+    if ((course.opening_date and now < course.opening_date) or 
+        (course.closing_date and now > course.closing_date)):
+        messages.error(request, "Enrollment for this course is not currently open.")
+        return redirect('courses:course_detail', slug=slug)
+    
     # Check if user is already enrolled
     enrollment, created = Enrollment.objects.get_or_create(
         user=request.user,
         course=course
     )
+    
+    if created:
+        messages.success(request, "You have been successfully enrolled in this course.")
+    else:
+        messages.info(request, "You are already enrolled in this course.")
     
     return render(request, 'courses/enrollment_success.html', {'course': course})
 
@@ -57,6 +91,12 @@ def enroll_course(request, slug):
 def lesson_detail(request, course_slug, lesson_slug):
     course = get_object_or_404(Course, slug=course_slug, is_active=True)
     lesson = get_object_or_404(Lesson, slug=lesson_slug, module__course=course)
+    
+    # Check if course is currently open
+    now = timezone.now()
+    if ((course.opening_date and now < course.opening_date) or 
+        (course.closing_date and now > course.closing_date)):
+        raise Http404("Course is not currently available")
     
     # Check if user is enrolled in the course
     is_enrolled = Enrollment.objects.filter(user=request.user, course=course).exists()
@@ -126,7 +166,12 @@ def check_and_issue_certificate(user, course):
             enrollment.is_completed = True
             enrollment.save()
         
-        # Create certificate if it doesn't exist
+        # Check if the course has expired
+        if course.expiration_date and timezone.now() > course.expiration_date:
+            # Course has expired, don't issue certificate
+            return
+        
+        # Create certificate if it doesn't exist and course hasn't expired
         certificate, created = Certificate.objects.get_or_create(
             user=user,
             course=course,

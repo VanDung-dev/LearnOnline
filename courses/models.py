@@ -32,6 +32,21 @@ class Course(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True)
+    expiration_date = models.DateTimeField(
+        null=True, 
+        blank=True,
+        help_text="Students must complete the course before this date to receive a certificate"
+    )
+    opening_date = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="Date and time when the course becomes available for enrollment"
+    )
+    closing_date = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="Date and time when the course enrollment closes"
+    )
 
     class Meta:
         ordering = ['-created_at']
