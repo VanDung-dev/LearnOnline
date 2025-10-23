@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ..:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=1
+      - DJANGO_SETTINGS_MODULE=DjangoProject.settings_docker
+    depends_on:
+      - db
+
+  db:
+    image: postgres:13
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+   environment:
+      - POSTGRES_DB=learnonline
+      - POSTGRES_USER=learnonline_user
+      - POSTGRES_PASSWORD=learnonline_password
+
+volumes:
+  postgres_data:
