@@ -12,7 +12,6 @@ class AdminAccessMiddleware:
         if request.path.startswith('/admin/'):
             # Check if user is authenticated
             if not request.user.is_authenticated:
-                messages.error(request, 'You need to be logged in to access the admin interface.')
                 return redirect('accounts:login')
             
             # Check if user is a superuser or has a profile and is an admin

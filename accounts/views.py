@@ -24,8 +24,17 @@ class CustomLoginView(LoginView):
 
 class CustomLogoutView(View):
     def get(self, request):
+        return self.post(request)
+        
+    def post(self, request):
         logout(request)
-        return HttpResponseRedirect(reverse_lazy('courses:home'))
+        # Check if user is admin (superuser or admin role)
+        if (hasattr(request.user, 'is_superuser') and request.user.is_superuser) or (
+                hasattr(request.user, 'profile') and request.user.profile.is_admin()):
+            # Redirect admin to home page
+            return HttpResponseRedirect('/')
+        else:
+            return HttpResponseRedirect(reverse_lazy('courses:home'))
 
 
 def register(request):
