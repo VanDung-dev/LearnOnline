@@ -1,0 +1,28 @@
+import django.db.models.deletion
+from django.conf import settings
+from django.db import migrations, models
+
+
+class Migration(migrations.Migration):
+
+    dependencies = [
+        ('courses', '0002_auto_20251023_0319'),
+        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+    ]
+
+    operations = [
+        migrations.CreateModel(
+            name='Certificate',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('issued_at', models.DateTimeField(auto_now_add=True)),
+                ('certificate_number', models.CharField(max_length=50, unique=True)),
+                ('course', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='certificates', to='courses.course')),
+                ('enrollment', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='certificates', to='courses.enrollment')),
+                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='certificates', to=settings.AUTH_USER_MODEL)),
+            ],
+            options={
+                'unique_together': {('user', 'course')},
+            },
+        ),
+    ]
