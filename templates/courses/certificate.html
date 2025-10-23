@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block title %}Certificate - {{ certificate.course.title }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card certificate-card">
+                <div class="card-body text-center">
+                    <div class="certificate-header mb-4">
+                        <h1 class="certificate-title">Certificate of Completion</h1>
+                        <p class="certificate-subtitle">This is to certify that</p>
+                    </div>
+                    
+                    <div class="recipient-name mb-4">
+                        <h2>{{ certificate.user.get_full_name|default:certificate.user.username }}</h2>
+                    </div>
+                    
+                    <div class="certificate-content mb-4">
+                        <p>has successfully completed the course</p>
+                        <h3 class="course-title">{{ certificate.course.title }}</h3>
+                        <p>offered by Online Learning Platform</p>
+                    </div>
+                    
+                    <div class="certificate-details mb-4">
+                        <div class="row">
+                            <div class="col-6">
+                                <p><strong>Certificate ID:</strong><br>{{ certificate.certificate_number }}</p>
+                            </div>
+                            <div class="col-6">
+                                <p><strong>Date Issued:</strong><br>{{ certificate.issued_at|date:"F d, Y" }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="certificate-footer">
+                        <div class="signature-section">
+                            <p>___________________________</p>
+                            <p>Course Instructor<br>
+                            {{ certificate.course.instructor.get_full_name|default:certificate.course.instructor.username }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-4">
+                <a href="{% url 'courses:course_detail' certificate.course.slug %}" class="btn btn-primary">Back to Course</a>
+                <button class="btn btn-secondary" onclick="window.print()">Print Certificate</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.certificate-card {
+    border: 2px solid #007bff;
+    box-shadow: 0 0 20px rgba(0, 123, 255, 0.2);
+    background: #fff;
+    margin-top: 2rem;
+}
+
+.certificate-title {
+    color: #007bff;
+    font-size: 2.5rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+}
+
+.certificate-subtitle {
+    font-size: 1.2rem;
+    color: #6c757d;
+}
+
+.recipient-name h2 {
+    color: #28a745;
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.course-title {
+    color: #007bff;
+    font-size: 1.8rem;
+    font-weight: bold;
+}
+
+.certificate-details {
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 5px;
+}
+
+.signature-section {
+    margin-top: 2rem;
+}
+</style>
+{% endblock %}

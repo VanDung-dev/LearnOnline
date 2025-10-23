@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Course - Instructor Dashboard{% endblock %}
+
+{% block content %}
+<h1>Edit Course: {{ course.title }}</h1>
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="mb-3">
+        <label for="{{ form.title.id_for_label }}" class="form-label">Course Title</label>
+        <input type="text" class="form-control" id="{{ form.title.id_for_label }}" name="{{ form.title.html_name }}" value="{{ form.title.value|default:'' }}">
+        {% if form.title.errors %}
+            <div class="text-danger">{{ form.title.errors }}</div>
+        {% endif %}
+    </div>
+    
+    <div class="mb-3">
+        <label for="{{ form.short_description.id_for_label }}" class="form-label">Short Description</label>
+        <textarea class="form-control" id="{{ form.short_description.id_for_label }}" name="{{ form.short_description.html_name }}" rows="3">{{ form.short_description.value|default:'' }}</textarea>
+        {% if form.short_description.errors %}
+            <div class="text-danger">{{ form.short_description.errors }}</div>
+        {% endif %}
+    </div>
+    
+    <div class="mb-3">
+        <label for="{{ form.description.id_for_label }}" class="form-label">Full Description</label>
+        <textarea class="form-control" id="{{ form.description.id_for_label }}" name="{{ form.description.html_name }}" rows="5">{{ form.description.value|default:'' }}</textarea>
+        {% if form.description.errors %}
+            <div class="text-danger">{{ form.description.errors }}</div>
+        {% endif %}
+    </div>
+    
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label for="{{ form.category.id_for_label }}" class="form-label">Category</label>
+            <select class="form-control" id="{{ form.category.id_for_label }}" name="{{ form.category.html_name }}">
+                <option value="">Select a category</option>
+                {% for choice in form.category.field.queryset %}
+                    <option value="{{ choice.id }}" {% if form.category.value == choice.id %}selected{% endif %}>
+                        {{ choice.name }}
+                    </option>
+                {% endfor %}
+            </select>
+            {% if form.category.errors %}
+                <div class="text-danger">{{ form.category.errors }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="col-md-6 mb-3">
+            <label for="{{ form.price.id_for_label }}" class="form-label">Price ($)</label>
+            <input type="number" class="form-control" id="{{ form.price.id_for_label }}" name="{{ form.price.html_name }}" step="0.01" min="0" value="{{ form.price.value|default:'0' }}">
+            {% if form.price.errors %}
+                <div class="text-danger">{{ form.price.errors }}</div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="mb-3">
+        <label for="{{ form.thumbnail.id_for_label }}" class="form-label">Thumbnail Image</label>
+        <input type="file" class="form-control" id="{{ form.thumbnail.id_for_label }}" name="{{ form.thumbnail.html_name }}">
+        {% if form.thumbnail.errors %}
+            <div class="text-danger">{{ form.thumbnail.errors }}</div>
+        {% endif %}
+        {% if course.thumbnail %}
+            <small class="form-text text-muted">Current thumbnail: {{ course.thumbnail.name }}</small>
+        {% endif %}
+    </div>
+    
+    <div class="mb-3 form-check">
+        <input type="checkbox" class="form-check-input" id="{{ form.is_active.id_for_label }}" name="{{ form.is_active.html_name }}" {% if form.is_active.value %}checked{% endif %}>
+        <label class="form-check-label" for="{{ form.is_active.id_for_label }}">Is Active</label>
+        {% if form.is_active.errors %}
+            <div class="text-danger">{{ form.is_active.errors }}</div>
+        {% endif %}
+    </div>
+    
+    <div class="d-flex justify-content-between">
+        <a href="{% url 'courses:instructor_courses' %}" class="btn btn-secondary">Cancel</a>
+        <button type="submit" class="btn btn-primary">Update Course</button>
+    </div>
+</form>
+
+<hr>
+
+<h3>Course Modules</h3>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4>Modules and Lessons</h4>
+    {% if course.slug %}
+        <a href="{% url 'courses:create_module' course_slug=course.slug %}" class="btn btn-sm btn-primary">Add Module</a>
+    {% else %}
+        <a href="#" class="btn btn-sm btn-primary disabled">Add Module</a>
+    {% endif %}
+</div>
+
+{% if course.modules.all %}
+    {% for module in course.modules.all %}
+        <div class="card mb-3">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">{{ module.title }}</h5>
+                <div>
+                    {% if course.slug %}
+                        <a href="{% url 'courses:create_lesson' course_slug=course.slug module_id=module.id %}" class="btn btn-sm btn-outline-primary">Add Lesson</a>
+                    {% else %}
+                        <a href="#" class="btn btn-sm btn-outline-primary disabled">Add Lesson</a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="card-body">
+                <p>{{ module.description }}</p>
+                {% if module.lessons.all %}
+                    <ul class="list-group">
+                        {% for lesson in module.lessons.all %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>{{ lesson.title }}</strong>
+                                    <span class="badge bg-secondary ms-2">{{ lesson.lesson_type }}</span>
+                                    {% if not lesson.is_published %}
+                                        <span class="badge bg-warning ms-2">Draft</span>
+                                    {% endif %}
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-muted">No lessons in this module yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    {% endfor %}
+{% else %}
+    <div class="alert alert-info">
+        <p>This course doesn't have any modules yet.</p>
+        {% if course.slug %}
+            <a href="{% url 'courses:create_module' course_slug=course.slug %}" class="btn btn-primary">Create Your First Module</a>
+        {% else %}
+            <a href="#" class="btn btn-primary disabled">Create Your First Module</a>
+        {% endif %}
+    </div>
+{% endif %}
+{% endblock %}

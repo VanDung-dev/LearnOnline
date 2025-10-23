@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}My Courses - Instructor Dashboard{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1>My Courses</h1>
+    <a href="{% url 'courses:create_course' %}" class="btn btn-primary">Create New Course</a>
+</div>
+
+{% if courses %}
+    <div class="row">
+        {% for course in courses %}
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                {% if course.thumbnail %}
+                    <img src="{{ course.thumbnail.url }}" class="card-img-top" alt="{{ course.title }}">
+                {% else %}
+                    <div class="bg-secondary" style="height: 200px;"></div>
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ course.title }}</h5>
+                    <p class="card-text">{{ course.short_description|truncatewords:15 }}</p>
+                    <p class="text-muted">Price: ${{ course.price }}</p>
+                    <div class="d-flex justify-content-between">
+                        {% if course.slug %}
+                            <a href="{% url 'courses:edit_course' slug=course.slug %}" class="btn btn-sm btn-outline-primary">Edit</a>
+                            <a href="{% url 'courses:course_detail' slug=course.slug %}" class="btn btn-sm btn-outline-secondary">View</a>
+                            <a href="{% url 'courses:delete_course' slug=course.slug %}" class="btn btn-sm btn-outline-danger">Delete</a>
+                        {% else %}
+                            <a href="#" class="btn btn-sm btn-outline-primary disabled">Edit</a>
+                            <a href="#" class="btn btn-sm btn-outline-secondary disabled">View</a>
+                            <a href="#" class="btn btn-sm btn-outline-danger disabled">Delete</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="alert alert-info">
+        <p>You haven't created any courses yet.</p>
+        <a href="{% url 'courses:create_course' %}" class="btn btn-primary">Create Your First Course</a>
+    </div>
+{% endif %}
+{% endblock %}

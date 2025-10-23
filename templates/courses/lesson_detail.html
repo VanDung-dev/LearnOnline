@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ lesson.title }} - {{ course.title }} - Online Learning Platform{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'courses:home' %}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'courses:course_list' %}">Courses</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'courses:course_detail' course.slug %}">{{ course.title }}</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{ lesson.title }}</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-md-8">
+        <h1>{{ lesson.title }}</h1>
+        
+        {% if lesson.lesson_type == 'video' and lesson.video_url %}
+            <div class="ratio ratio-16x9">
+                <iframe src="{{ lesson.video_url }}" title="{{ lesson.title }}" allowfullscreen></iframe>
+            </div>
+        {% elif lesson.lesson_type == 'text' %}
+            <div class="lesson-content">
+                {{ lesson.content|linebreaks }}
+            </div>
+        {% elif lesson.lesson_type == 'quiz' %}
+            <div class="alert alert-info">
+                <h4>Quiz Content</h4>
+                <p>Quiz functionality would be implemented here.</p>
+            </div>
+        {% endif %}
+        
+        <div class="mt-4 d-flex justify-content-between">
+            {% if prev_lesson and course.slug and prev_lesson.slug %}
+                <a href="{% url 'courses:lesson_detail' course.slug prev_lesson.slug %}" class="btn btn-outline-primary">Previous: {{ prev_lesson.title }}</a>
+            {% else %}
+                <div></div>
+            {% endif %}
+            
+            {% if next_lesson and course.slug and next_lesson.slug %}
+                <a href="{% url 'courses:lesson_detail' course.slug next_lesson.slug %}" class="btn btn-primary">Next: {{ next_lesson.title }}</a>
+            {% else %}
+                <div></div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5>Course Content</h5>
+            </div>
+            <div class="card-body">
+                {% for module in course.modules.all %}
+                    <h6>{{ module.title }}</h6>
+                    <ul class="list-unstyled ps-3">
+                        {% for lesson_item in module.lessons.all %}
+                            <li>
+                                {% if lesson_item.id == lesson.id %}
+                                    <strong>{{ lesson_item.title }}</strong>
+                                {% else %}
+                                    {% if course.slug and lesson_item.slug %}
+                                        <a href="{% url 'courses:lesson_detail' course.slug lesson_item.slug %}">{{ lesson_item.title }}</a>
+                                    {% else %}
+                                        {{ lesson_item.title }}
+                                    {% endif %}
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
