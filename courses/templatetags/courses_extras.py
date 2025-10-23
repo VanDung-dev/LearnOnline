@@ -1,4 +1,5 @@
 from django import template
+from django.utils import timezone
 from ..models import Certificate
 
 register = template.Library()
@@ -33,3 +34,12 @@ def is_course_completed(user, course):
     ).count()
     
     return completed_lessons == all_lessons.count()
+
+@register.filter
+def is_course_expired(course):
+    """
+    Check if a course has expired
+    """
+    if not course.expiration_date:
+        return False
+    return timezone.now() > course.expiration_date
