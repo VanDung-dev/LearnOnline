@@ -2,10 +2,12 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib import messages
-from django.contrib.auth import login, update_session_auth_hash
+from django.contrib.auth import logout
 from django.contrib.auth.views import LoginView
 from django.urls import reverse_lazy
-from courses.models import Course, Enrollment
+from django.views import View
+from django.http import HttpResponseRedirect
+from courses.models import Course
 from .forms import UserRegistrationForm, UserUpdateForm, ProfileUpdateForm
 
 
@@ -18,6 +20,12 @@ class CustomLoginView(LoginView):
             return reverse_lazy('accounts:profile')
         else:
             return reverse_lazy('courses:home')
+
+
+class CustomLogoutView(View):
+    def get(self, request):
+        logout(request)
+        return HttpResponseRedirect(reverse_lazy('courses:home'))
 
 
 def register(request):
@@ -88,7 +96,6 @@ def edit_profile(request):
     
     context = {
         'u_form': u_form,
-        'p_form': p_form
-    }
+        'p_form': p_form}
     
     return render(request, 'accounts/edit_profile.html', context)
