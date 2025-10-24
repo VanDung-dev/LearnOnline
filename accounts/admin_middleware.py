@@ -1,6 +1,5 @@
 from django.shortcuts import redirect
 from django.urls import reverse
-from django.contrib import messages
 
 
 class AdminAccessMiddleware:
@@ -8,15 +7,11 @@ class AdminAccessMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        # Check if the request is for the admin interface
+        # Check if the request path starts with /admin/
         if request.path.startswith('/admin/'):
-            # Check if user is authenticated
-            if not request.user.is_authenticated:
-                return redirect('accounts:login')
-            
-            # Check if user is a superuser or has a profile and is an admin
-            if not request.user.is_superuser and (not hasattr(request.user, 'profile') or not request.user.profile.is_admin()):
-                messages.error(request, 'You do not have permission to access the admin interface.')
+            # Check if user is authenticated and is staff (admin)
+            if not (request.user.is_authenticated and request.user.is_staff):
+                # Redirect to home page if not admin
                 return redirect('courses:home')
         
         response = self.get_response(request)
