@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden, Http404
 from django.contrib import messages
-from django.db import transaction
+from django.db import models
 from django.utils import timezone
 from .models import Category, Course, Lesson, Enrollment, Progress, Module, Certificate
 from .forms import CourseForm, ModuleForm, LessonForm
@@ -12,11 +12,13 @@ def home(request):
     categories = Category.objects.all()
     # Only show courses that are currently open
     now = timezone.now()
-    courses = Course.objects.filter(is_active=True).filter(
-        opening_date__lte=now
+    courses = Course.objects.filter(is_active=True)
+    # Filter courses based on opening/closing dates if they exist
+    courses = courses.filter(
+        models.Q(opening_date__isnull=True) | models.Q(opening_date__lte=now)
     ).filter(
-        closing_date__gte=now
-    )[:6] if now else Course.objects.filter(is_active=True)[:6]
+        models.Q(closing_date__isnull=True) | models.Q(closing_date__gte=now)
+    )[:6]
     
     context = {
         'categories': categories,
@@ -28,12 +30,13 @@ def home(request):
 def course_list(request):
     # Only show courses that are currently open
     now = timezone.now()
-    courses = Course.objects.filter(is_active=True).filter(
-        opening_date__lte=now
+    courses = Course.objects.filter(is_active=True)
+# Filter courses based on opening/closing dates if they exist
+    courses = courses.filter(
+        models.Q(opening_date__isnull=True) | models.Q(opening_date__lte=now)
     ).filter(
-        closing_date__gte=now
-    ) if now else Course.objects.filter(is_active=True)
-    
+        models.Q(closing_date__isnull=True) | models.Q(closing_date__gte=now)
+    )
     context = {
         'courses': courses,
     }
