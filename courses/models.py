@@ -74,12 +74,45 @@ class Module(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
     order = models.PositiveIntegerField(default=0)
+    duration_days = models.PositiveIntegerField(
+        default=7,
+        help_text="Number of days students have to complete this module"
+    )
 
     class Meta:
         ordering = ['order']
 
     def __str__(self):
         return f'{self.course.title} - {self.title}'
+    
+    def get_deadline(self, enrollment_date=None):
+        """
+        Calculate the deadline for this module based on the enrollment date and 
+        the cumulative duration of preceding modules.
+        If no enrollment_date is provided, use the course opening date.
+        """
+        # If no enrollment date provided, try to use course opening date
+        if not enrollment_date:
+            if not self.course.opening_date:
+                return None
+            start_date = self.course.opening_date
+        else:
+            start_date = enrollment_date
+        
+        # Get all modules in the course ordered by their order
+        modules = Module.objects.filter(course=self.course).order_by('order')
+        
+        # Calculate cumulative days up to this module
+        cumulative_days = 0
+        for module in modules:
+            cumulative_days += module.duration_days
+            if module.id == self.id:
+                break
+        
+        # Calculate deadline
+        from django.utils import timezone
+        from datetime import timedelta
+        return start_date + timedelta(days=cumulative_days)
 
 
 class Lesson(models.Model):
@@ -128,6 +161,12 @@ class Enrollment(models.Model):
 
     def __str__(self):
         return f'{self.user.username} enrolled in {self.course.title}'
+    
+    def get_enrollment_date(self):
+        """
+        Get the enrollment date for this enrollment
+        """
+        return self.enrolled_at
 
 
 class Progress(models.Model):

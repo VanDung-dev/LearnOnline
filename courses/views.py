@@ -97,9 +97,8 @@ def lesson_detail(request, course_slug, lesson_slug):
         raise Http404("Course is not currently available")
     
     # Check if user is enrolled in the course
-    is_enrolled = Enrollment.objects.filter(user=request.user, course=course).exists()
-    if not is_enrolled:
-        return HttpResponseForbidden("You must be enrolled in the course to view lessons.")
+    enrollment = get_object_or_404(Enrollment, user=request.user, course=course)
+    is_enrolled = True
     
     # Mark lesson as completed
     progress, created = Progress.objects.get_or_create(
@@ -132,6 +131,7 @@ def lesson_detail(request, course_slug, lesson_slug):
         'lesson': lesson,
         'prev_lesson': prev_lesson,
         'next_lesson': next_lesson,
+        'enrollment': enrollment,
     }
     return render(request, 'courses/lesson_detail.html', context)
 
@@ -272,6 +272,28 @@ def create_module(request, course_slug):
         'course': course,
     }
     return render(request, 'courses/create_module.html', context)
+
+
+@login_required
+def edit_module(request, course_slug, module_id):
+    course = get_object_or_404(Course, slug=course_slug, instructor=request.user)
+    module = get_object_or_404(Module, id=module_id, course=course)
+    
+    if request.method == 'POST':
+        form = ModuleForm(request.POST, instance=module)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Module updated successfully!')
+            return redirect('courses:edit_course', slug=course.slug)
+    else:
+        form = ModuleForm(instance=module)
+    
+    context = {
+        'form': form,
+        'course': course,
+        'module': module,
+    }
+    return render(request, 'courses/edit_module.html', context)
 
 
 @login_required

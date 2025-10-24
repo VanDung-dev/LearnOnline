@@ -18,7 +18,7 @@ class CourseForm(forms.ModelForm):
 class ModuleForm(forms.ModelForm):
     class Meta:
         model = Module
-        fields = ['title', 'description', 'order']
+        fields = ['title', 'description', 'order', 'duration_days']
         widgets = {
             'description': forms.Textarea(attrs={'rows': 3}),
         }
