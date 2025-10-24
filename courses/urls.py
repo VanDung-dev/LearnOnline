@@ -9,7 +9,7 @@ urlpatterns = [
     path('courses/<slug:slug>/', views.course_detail, name='course_detail'),
     path('courses/<slug:slug>/enroll/', views.enroll_course, name='enroll_course'),
     path('courses/<slug:course_slug>/lessons/<slug:lesson_slug>/', views.lesson_detail, name='lesson_detail'),
-    path('courses/<slug:course_slug>/certificate/', views.course_certificate, name='course_certificate'),
+    path('certificate/<str:certificate_id>/', views.public_certificate, name='course_certificate'),
     
     # Instructor URLs
     path('instructor/courses/', views.instructor_courses, name='instructor_courses'),

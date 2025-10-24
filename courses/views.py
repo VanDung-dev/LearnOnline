@@ -8,6 +8,20 @@ from .models import Category, Course, Lesson, Enrollment, Progress, Module, Cert
 from .forms import CourseForm, ModuleForm, LessonForm
 
 
+def public_certificate(request, certificate_id):
+    """
+    Public view for certificate verification.
+    Anyone with the certificate ID can view the certificate.
+    """
+    certificate = get_object_or_404(Certificate, certificate_number=certificate_id)
+    
+    context = {
+        'certificate': certificate,
+        'is_public': True,
+    }
+    return render(request, 'courses/certificate.html', context)
+
+
 def home(request):
     categories = Category.objects.all()
     # Show all active courses (regardless of opening date) but respect closing date
@@ -320,12 +334,19 @@ def create_lesson(request, course_slug, module_id):
     return render(request, 'courses/create_lesson.html', context)
 
 
-@login_required
-def course_certificate(request, course_slug):
-    course = get_object_or_404(Course, slug=course_slug)
-    certificate = get_object_or_404(Certificate, user=request.user, course=course)
+def course_certificate(request, certificate_id):
+    """
+    View for certificate verification.
+    If user is authenticated, they can view their own certificate.
+    For public access, anyone with the certificate ID can view the certificate.
+    """
+    certificate = get_object_or_404(Certificate, certificate_number=certificate_id)
+    
+    # Check if user is authenticated and owns this certificate
+    is_owner = request.user.is_authenticated and certificate.user == request.user
     
     context = {
         'certificate': certificate,
+        'is_public': not is_owner,
     }
     return render(request, 'courses/certificate.html', context)
