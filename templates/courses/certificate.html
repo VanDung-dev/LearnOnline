@@ -6,7 +6,7 @@
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-lg-8">
-            <div class="card certificate-card">
+            <div class="card certificate-card"  id="print-section">
                 <div class="card-body text-center">
                     <div class="certificate-header mb-4">
                         <h1 class="certificate-title">Certificate of Completion</h1>
@@ -48,7 +48,7 @@
                 {% if not is_public %}
                 <a href="{% url 'courses:course_detail' certificate.course.slug %}" class="btn btn-primary">Back to Course</a>
                 {% endif %}
-                <button class="btn btn-secondary" onclick="window.print()">Print Certificate</button>
+                <button class="btn btn-secondary" onclick="printCertificate()">Print Certificate</button>
             </div>
         </div>
     </div>
@@ -96,5 +96,41 @@
 .signature-section {
     margin-top: 2rem;
 }
+
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    #print-section {
+        visibility: visible;
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        text-align: center;
+    }
+    #print-section * {
+        visibility: visible;
+    }
+    
+    /* Try to minimize what appears in headers */
+    title {
+        display: none;
+    }
+}
 </style>
+
+<script>
+function printCertificate() {
+    // Temporarily change the title to reduce what appears in print header
+    var originalTitle = document.title;
+    document.title = "Certificate";
+    
+    // Print the document
+    window.print();
+    
+    // Restore the original title
+    document.title = originalTitle;
+}
+</script>
 {% endblock %}
