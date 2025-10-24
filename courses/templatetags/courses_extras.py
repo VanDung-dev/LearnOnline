@@ -1,6 +1,6 @@
 from django import template
 from django.utils import timezone
-from ..models import Certificate
+from ..models import Certificate, Enrollment
 
 register = template.Library()
 
@@ -43,3 +43,17 @@ def is_course_expired(course):
     if not course.expiration_date:
         return False
     return timezone.now() > course.expiration_date
+
+@register.simple_tag
+def module_deadline(module, user):
+    """
+    Get the deadline for a module based on user's enrollment date
+    """
+    if not user.is_authenticated:
+        return None
+    
+    try:
+        enrollment = Enrollment.objects.get(user=user, course=module.course)
+        return module.get_deadline(enrollment.enrolled_at)
+    except Enrollment.DoesNotExist:
+        return module.get_deadline()
