@@ -1,9 +1,9 @@
 {% extends 'base.html' %}
 
-{% block title %}Create Module - Instructor Dashboard{% endblock %}
+{% block title %}Edit Module - Instructor Dashboard{% endblock %}
 
 {% block content %}
-<h1>Create Module for Course: {{ course.title }}</h1>
+<h1>Edit Module: {{ module.title }}</h1>
 
 <form method="post">
     {% csrf_token %}
@@ -46,7 +46,7 @@
         {% else %}
             <a href="{% url 'courses:instructor_courses' %}" class="btn btn-secondary">Cancel</a>
         {% endif %}
-        <button type="submit" class="btn btn-primary">Create Module</button>
+        <button type="submit" class="btn btn-primary">Update Module</button>
     </div>
 </form>
 {% endblock %}

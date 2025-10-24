@@ -16,13 +16,25 @@
     <div class="col-md-8">
         <h1>{{ lesson.title }}</h1>
         
+        {% load courses_extras %}
+        {% module_deadline lesson.module user as deadline %}
+        {% if deadline and deadline < now %}
+        <div class="alert alert-danger">
+            <strong>Warning:</strong> The deadline for this module was {{ deadline }}. You can still access the materials, but you are behind schedule.
+        </div>
+        {% elif deadline %}
+        <div class="alert alert-info">
+            <strong>Module Deadline:</strong> Complete this module by {{ deadline }}.
+        </div>
+        {% endif %}
+        
         {% if course.expiration_date and course.expiration_date < now %}
         <div class="alert alert-danger">
             <strong>Warning:</strong> This course has expired. You can still access the materials, but you will not be able to receive a certificate.
         </div>
         {% elif course.expiration_date %}
         <div class="alert alert-info">
-            <strong>Deadline:</strong> Complete this course by {{ course.expiration_date }} to receive your certificate.
+            <strong>Course Deadline:</strong> Complete this course by {{ course.expiration_date }} to receive your certificate.
         </div>
         {% endif %}
         
@@ -76,6 +88,10 @@
                     {% for module in course.modules.all %}
                         <div class="list-group-item list-group-item-action">
                             <h6>{{ module.title }}</h6>
+                            {% module_deadline module user as module_deadline %}
+                            {% if module_deadline %}
+                                <small class="text-muted">Deadline: {{ module_deadline }}</small>
+                            {% endif %}
                             {% for lesson_item in module.lessons.all %}
                                 <a href="{% url 'courses:lesson_detail' course.slug lesson_item.slug %}" 
                                    class="list-group-item list-group-item-action {% if lesson_item.id == lesson.id %}active{% endif %}">

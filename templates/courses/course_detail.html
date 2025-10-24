@@ -51,6 +51,14 @@
                 <div id="collapse{{ forloop.counter }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" data-bs-parent="#modulesAccordion">
                     <div class="accordion-body">
                         <p>{{ module.description }}</p>
+                        {% load courses_extras %}
+                        {% module_deadline module user as deadline %}
+                        {% if deadline %}
+                        <div class="alert alert-info">
+                            <strong>Duration:</strong> {{ module.duration_days }} days
+                            <br><strong>Your Deadline:</strong> {{ deadline }}
+                        </div>
+                        {% endif %}
                         <ul class="list-group">
                             {% for lesson in module.lessons.all %}
                             <li class="list-group-item">
