@@ -10,13 +10,11 @@ from .forms import CourseForm, ModuleForm, LessonForm
 
 def home(request):
     categories = Category.objects.all()
-    # Only show courses that are currently open
+    # Show all active courses (regardless of opening date) but respect closing date
     now = timezone.now()
     courses = Course.objects.filter(is_active=True)
-    # Filter courses based on opening/closing dates if they exist
+    # Filter courses to exclude those that have closed
     courses = courses.filter(
-        models.Q(opening_date__isnull=True) | models.Q(opening_date__lte=now)
-    ).filter(
         models.Q(closing_date__isnull=True) | models.Q(closing_date__gte=now)
     )[:6]
     
@@ -31,10 +29,9 @@ def course_list(request):
     # Only show courses that are currently open
     now = timezone.now()
     courses = Course.objects.filter(is_active=True)
-# Filter courses based on opening/closing dates if they exist
+
+    # Filter courses to exclude those that have closed
     courses = courses.filter(
-        models.Q(opening_date__isnull=True) | models.Q(opening_date__lte=now)
-    ).filter(
         models.Q(closing_date__isnull=True) | models.Q(closing_date__gte=now)
     )
     context = {
@@ -46,11 +43,10 @@ def course_list(request):
 def course_detail(request, slug):
     course = get_object_or_404(Course, slug=slug, is_active=True)
     
-    # Check if course is currently open
+    # Check if course is currently available for viewing (not closed)
     now = timezone.now()
-    if ((course.opening_date and now < course.opening_date) or 
-        (course.closing_date and now > course.closing_date)):
-        # Course is not currently available
+    if course.closing_date and now > course.closing_date:
+        # Course has closed
         raise Http404("Course is not currently available")
     
     # Check if user is enrolled in the course
@@ -71,9 +67,8 @@ def enroll_course(request, slug):
     
     # Check if course is currently open for enrollment
     now = timezone.now()
-    if ((course.opening_date and now < course.opening_date) or 
-        (course.closing_date and now > course.closing_date)):
-        messages.error(request, "Enrollment for this course is not currently open.")
+    if course.closing_date and now > course.closing_date:
+        messages.error(request, "Enrollment for this course is closed.")
         return redirect('courses:course_detail', slug=slug)
     
     # Check if user is already enrolled
