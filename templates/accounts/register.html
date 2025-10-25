@@ -56,14 +56,24 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="{{ form.password1.id_for_label }}" class="form-label">Password</label>
-                            <input type="password" class="form-control" id="{{ form.password1.id_for_label }}" name="{{ form.password1.html_name }}" required>
+                            <div class="input-group">
+                                <input type="password" class="form-control password-field" id="{{ form.password1.id_for_label }}" name="{{ form.password1.html_name }}" required>
+                                <button class="btn btn-outline-secondary toggle-password" type="button" data-target="{{ form.password1.id_for_label }}" data-confirm="{{ form.password2.id_for_label }}" tabindex="-1">
+                                    <i class="bi bi-eye-slash"></i>
+                                </button>
+                            </div>
                             {% if form.password1.errors %}
                                 <div class="text-danger">{{ form.password1.errors }}</div>
                             {% endif %}
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="{{ form.password2.id_for_label }}" class="form-label">Confirm Password</label>
-                            <input type="password" class="form-control" id="{{ form.password2.id_for_label }}" name="{{ form.password2.html_name }}" required>
+                            <div class="input-group">
+                                <input type="password" class="form-control password-field" id="{{ form.password2.id_for_label }}" name="{{ form.password2.html_name }}" required>
+                                <button class="btn btn-outline-secondary toggle-password" type="button" data-target="{{ form.password2.id_for_label }}" data-confirm="{{ form.password1.id_for_label }}" tabindex="-1">
+                                    <i class="bi bi-eye-slash"></i>
+                                </button>
+                            </div>
                             {% if form.password2.errors %}
                                 <div class="text-danger">{{ form.password2.errors }}</div>
                             {% endif %}
@@ -78,4 +88,47 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_css %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Toggle password visibility
+        document.querySelectorAll('.toggle-password').forEach(function(button) {
+            button.addEventListener('click', function() {
+                // Get the target and confirm password fields
+                const targetId = this.getAttribute('data-target');
+                const confirmId = this.getAttribute('data-confirm');
+                
+                const targetInput = document.getElementById(targetId);
+                const confirmInput = document.getElementById(confirmId);
+                
+                // Get icons for both buttons
+                const targetIcon = this.querySelector('i');
+                const confirmButton = document.querySelector(`[data-target="${confirmId}"]`);
+                const confirmIcon = confirmButton.querySelector('i');
+                
+                // Toggle password visibility for both fields
+                if (targetInput.type === 'password') {
+                    targetInput.type = 'text';
+                    confirmInput.type = 'text';
+                    targetIcon.classList.remove('bi-eye-slash');
+                    targetIcon.classList.add('bi-eye');
+                    confirmIcon.classList.remove('bi-eye-slash');
+                    confirmIcon.classList.add('bi-eye');
+                } else {
+                    targetInput.type = 'password';
+                    confirmInput.type = 'password';
+                    targetIcon.classList.remove('bi-eye');
+                    targetIcon.classList.add('bi-eye-slash');
+                    confirmIcon.classList.remove('bi-eye');
+                    confirmIcon.classList.add('bi-eye-slash');
+                }
+            });
+        });
+    });
+</script>
 {% endblock %}
