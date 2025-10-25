@@ -4,6 +4,7 @@ from django.http import HttpResponseForbidden, Http404
 from django.contrib import messages
 from django.db import models
 from django.utils import timezone
+from django.db.models import Q
 from .models import Category, Course, Lesson, Enrollment, Progress, Module, Certificate
 from .forms import CourseForm, ModuleForm, LessonForm
 
@@ -48,8 +49,23 @@ def course_list(request):
     courses = courses.filter(
         models.Q(closing_date__isnull=True) | models.Q(closing_date__gte=now)
     )
+    
+    # Handle search
+    query = request.GET.get('q')
+    if query:
+        courses = courses.filter(
+            Q(title__icontains=query) |
+            Q(short_description__icontains=query) |
+            Q(description__icontains=query) |
+            Q(category__name__icontains=query) |
+            Q(instructor__username__icontains=query) |
+            Q(instructor__first_name__icontains=query) |
+            Q(instructor__last_name__icontains=query)
+        ).distinct()
+    
     context = {
         'courses': courses,
+        'query': query,
     }
     return render(request, 'courses/course_list.html', context)
 
