@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddField(
             model_name='module',
-            name='deadline',
-            field=models.DateTimeField(blank=True, help_text='Date and time when this module closes for students', null=True),
+            name='duration_days',
+            field=models.PositiveIntegerField(default=7, help_text='Number of days students have to complete this module'),
         ),
     ]
