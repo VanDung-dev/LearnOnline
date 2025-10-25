@@ -93,6 +93,9 @@
                 {% if course.expiration_date %}
                 <p class="card-text">Complete by: {{ course.expiration_date }}</p>
                 {% endif %}
+                <!-- Display course duration in weeks -->
+                {% load courses_extras %}
+                <p class="card-text">Duration: {{ course|course_duration_weeks }} week{{ course|course_duration_weeks|pluralize }}</p>
                 
                 {% if user.is_authenticated %}
                     {% if user == course.instructor %}

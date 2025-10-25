@@ -44,6 +44,15 @@ def is_course_expired(course):
         return False
     return timezone.now() > course.expiration_date
 
+@register.filter
+def course_duration_weeks(course):
+    """
+    Calculate the total duration of a course in weeks based on module durations
+    """
+    total_days = sum(module.duration_days for module in course.modules.all())
+    weeks = total_days / 7.0
+    return round(weeks, 1) if weeks % 1 != 0 else int(weeks)
+
 @register.simple_tag
 def module_deadline(module, user):
     """
