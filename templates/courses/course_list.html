@@ -5,29 +5,56 @@
 {% block content %}
 <h1>All Courses</h1>
 
+{% if query %}
+<div class="alert alert-info">
+    Search results for: <strong>{{ query }}</strong>
+    <span class="float-end">{{ courses|length }} course{{ courses|length|pluralize }} found</span>
+</div>
+{% endif %}
+
 <div class="row">
     {% for course in courses %}
     <div class="col-md-4 mb-4">
-        <div class="card">
+        <div class="card h-100">
             {% if course.thumbnail %}
-                <img src="{{ course.thumbnail.url }}" class="card-img-top" alt="{{ course.title }}">
+                <img src="{{ course.thumbnail.url }}" class="card-img-top" alt="{{ course.title }}" style="height: 200px; object-fit: cover;">
             {% else %}
                 <div class="bg-secondary" style="height: 200px;"></div>
             {% endif %}
-            <div class="card-body">
+            <div class="card-body d-flex flex-column">
                 <h5 class="card-title">{{ course.title }}</h5>
                 <p class="card-text">{{ course.short_description|truncatewords:20 }}</p>
                 <p class="text-muted">{{ course.category }}</p>
-                {% if course.slug %}
-                    <a href="{% url 'courses:course_detail' course.slug %}" class="btn btn-primary">View Details</a>
-                {% else %}
-                    <a href="#" class="btn btn-primary disabled">View Details</a>
-                {% endif %}
+                <p class="text-muted">Instructor: {{ course.instructor.get_full_name|default:course.instructor.username }}</p>
+                <div class="mt-auto">
+                    {% if course.price == 0 %}
+                        <span class="badge bg-success">FREE</span>
+                    {% else %}
+                        <span class="badge bg-primary">${{ course.price }}</span>
+                    {% endif %}
+                    {% if course.slug %}
+                        <a href="{% url 'courses:course_detail' course.slug %}" class="btn btn-primary">View Details</a>
+                    {% else %}
+                        <a href="#" class="btn btn-primary disabled">View Details</a>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>
     {% empty %}
-    <p>No courses available at the moment.</p>
+    <div class="col-12">
+        <div class="alert alert-warning text-center">
+            <h4>No courses found</h4>
+            <p>
+                {% if query %}
+                    No courses match your search query "{{ query }}". 
+                    <a href="{% url 'courses:course_list' %}">View all courses</a>
+                {% else %}
+                    No courses available at the moment.
+                {% endif %}
+            </p>
+        </div>
+    </div>
     {% endfor %}
 </div>
 {% endblock %}
