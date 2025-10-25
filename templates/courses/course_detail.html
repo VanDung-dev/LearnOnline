@@ -108,7 +108,9 @@
                         <!-- Check if user has a certificate for this course -->
                         {% load courses_extras %}
                         {% if user|has_certificate:course %}
-                            <a href="{% url 'courses:course_certificate' course.slug %}" class="btn btn-success">View Certificate</a>
+                            {% with certificate=user|get_certificate:course %}
+                            <a href="{% url 'courses:course_certificate' certificate.certificate_number %}" class="btn btn-success">View Certificate</a>
+                            {% endwith %}
                         {% else %}
                             {% if course.expiration_date and course.expiration_date < now %}
                                 <a href="#" class="btn btn-secondary disabled">Course Expired - No Certificate Available</a>

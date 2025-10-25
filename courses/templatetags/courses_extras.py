@@ -14,6 +14,18 @@ def has_certificate(user, course):
     return Certificate.objects.filter(user=user, course=course).exists()
 
 @register.filter
+def get_certificate(user, course):
+    """
+    Get the certificate object for a user in a specific course
+    """
+    if not user.is_authenticated:
+        return None
+    try:
+        return Certificate.objects.get(user=user, course=course)
+    except Certificate.DoesNotExist:
+        return None
+
+@register.filter
 def is_course_completed(user, course):
     """
     Check if user has completed a course (all lessons)
