@@ -7,7 +7,7 @@
     <div class="container">
         <h1 class="display-4">Welcome to LearnOnline</h1>
         <p class="lead">Discover and learn new skills with our online courses from expert instructors.</p>
-        <a class="btn btn-light btn-lg" href="{% url 'courses:course_list' %}" role="button">Browse Courses</a>
+        <a class="btn btn-light btn-lg" href="{% url 'courses:course_list' %}" role="button">Browse All Courses</a>
     </div>
 </div>
 
@@ -17,20 +17,28 @@
         <div class="row">
             {% for course in courses %}
             <div class="col-md-6 mb-4">
-                <div class="card">
+                <div class="card h-100">
                     {% if course.thumbnail %}
-                        <img src="{{ course.thumbnail.url }}" class="card-img-top" alt="{{ course.title }}">
+                        <img src="{{ course.thumbnail.url }}" class="card-img-top" alt="{{ course.title }}" style="height: 200px; object-fit: cover;">
                     {% else %}
                         <div class="bg-secondary" style="height: 200px;"></div>
                     {% endif %}
-                    <div class="card-body">
+                    <div class="card-body d-flex flex-column">
                         <h5 class="card-title">{{ course.title }}</h5>
                         <p class="card-text">{{ course.short_description|truncatewords:20 }}</p>
-                        {% if course.slug %}
-                            <a href="{% url 'courses:course_detail' course.slug %}" class="btn btn-primary">View Details</a>
-                        {% else %}
-                            <a href="#" class="btn btn-primary disabled">View Details</a>
-                        {% endif %}
+                        <p class="text-muted">Instructor: {{ course.instructor.get_full_name|default:course.instructor.username }}</p>
+                        <div class="mt-auto">
+                            {% if course.price == 0 %}
+                                <span class="badge bg-success">FREE</span>
+                            {% else %}
+                                <span class="badge bg-primary">${{ course.price }}</span>
+                            {% endif %}
+                            {% if course.slug %}
+                                <a href="{% url 'courses:course_detail' course.slug %}" class="btn btn-primary">View Details</a>
+                            {% else %}
+                                <a href="#" class="btn btn-primary disabled">View Details</a>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -44,8 +52,18 @@
         <h2>Categories</h2>
         <div class="list-group">
             {% for category in categories %}
-                <a href="#" class="list-group-item list-group-item-action">{{ category.name }}</a>
+                <a href="{% url 'courses:course_list' %}?q={{ category.name }}" class="list-group-item list-group-item-action">{{ category.name }}</a>
             {% endfor %}
+        </div>
+        
+        <div class="mt-4">
+            <h3>Popular Search Terms</h3>
+            <div class="d-flex flex-wrap gap-2">
+                <a href="{% url 'courses:course_list' %}?q=python" class="btn btn-outline-secondary btn-sm">Python</a>
+                <a href="{% url 'courses:course_list' %}?q=web development" class="btn btn-outline-secondary btn-sm">Web Development</a>
+                <a href="{% url 'courses:course_list' %}?q=data science" class="btn btn-outline-secondary btn-sm">Data Science</a>
+                <a href="{% url 'courses:course_list' %}?q=machine learning" class="btn btn-outline-secondary btn-sm">Machine Learning</a>
+            </div>
         </div>
     </div>
 </div>
