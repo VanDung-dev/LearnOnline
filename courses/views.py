@@ -350,3 +350,10 @@ def course_certificate(request, certificate_id):
         'is_public': not is_owner,
     }
     return render(request, 'courses/certificate.html', context)
+
+
+# Custom 404 view
+def custom_page_not_found(request, exception):
+    print("Custom 404 view called")  # Debug print
+    print(f"Exception: {exception}")  # Debug print
+    return render(request, '404.html', status=404)
