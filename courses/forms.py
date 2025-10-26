@@ -29,7 +29,7 @@ class CourseForm(forms.ModelForm):
 class ModuleForm(forms.ModelForm):
     class Meta:
         model = Module
-        fields = ['title', 'description', 'order', 'duration_days']
+        fields = ['title', 'description', 'order', 'duration_days', 'is_locked']
         widgets = {
             'description': forms.Textarea(attrs={'rows': 3}),
         }
@@ -38,7 +38,7 @@ class ModuleForm(forms.ModelForm):
 class LessonForm(forms.ModelForm):
     class Meta:
         model = Lesson
-        fields = ['title', 'lesson_type', 'content', 'video_url', 'order', 'is_published']
+        fields = ['title', 'lesson_type', 'content', 'video_url', 'order', 'is_published', 'is_locked']
         widgets = {
             'content': forms.Textarea(attrs={'rows': 5}),
         }

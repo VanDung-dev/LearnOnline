@@ -172,6 +172,14 @@ def lesson_detail(request, course_slug, lesson_slug):
     enrollment = get_object_or_404(Enrollment, user=request.user, course=course)
     is_enrolled = True
     
+    # Check if lesson or module is locked
+    has_certificate = Certificate.objects.filter(user=request.user, course=course).exists()
+    
+    if (lesson.is_locked or lesson.module.is_locked) and not has_certificate:
+        # Lesson or module is locked and user doesn't have certificate
+        messages.error(request, "This content is locked. Purchase a certificate to access it.")
+        return redirect('courses:course_detail', slug=course.slug)
+    
     # Mark lesson as completed
     progress, created = Progress.objects.get_or_create(
         user=request.user,

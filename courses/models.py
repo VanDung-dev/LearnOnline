@@ -93,6 +93,10 @@ class Module(models.Model):
         default=7,
         help_text="Number of days students have to complete this module"
     )
+    is_locked = models.BooleanField(
+        default=False,
+        help_text="If checked, only students who purchased certificate can access this module"
+    )
 
     class Meta:
         ordering = ['order']
@@ -145,6 +149,10 @@ class Lesson(models.Model):
     video_url = models.URLField(blank=True, null=True)
     order = models.PositiveIntegerField(default=0)
     is_published = models.BooleanField(default=True)
+    is_locked = models.BooleanField(
+        default=False,
+        help_text="If checked, only students who purchased certificate can access this lesson"
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
