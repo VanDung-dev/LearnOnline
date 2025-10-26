@@ -26,8 +26,7 @@ def public_certificate(request, certificate_id):
 @login_required
 def purchase_certificate(request, slug):
     """
-    View to handle certificate purchase for free courses.
-    For paid courses, certificates are automatically included.
+    Redirect to payment system for certificate purchase
     """
     course = get_object_or_404(Course, slug=slug)
     
@@ -37,32 +36,14 @@ def purchase_certificate(request, slug):
     # Check if certificate is free
     if course.is_certificate_free():
         messages.info(request, "Certificate is free for this course.")
-        return redirect('courses:lesson_detail', course_slug=course.slug, lesson_slug=course.lessons.first().slug)
+        first_module = course.modules.first()
+        if first_module:
+            first_lesson = first_module.lessons.first()
+            if first_lesson:
+                return redirect('courses:lesson_detail', course_slug=course.slug, lesson_slug=first_lesson.slug)
     
-    # For paid courses with paid certificates, we would implement payment processing here
-    # For now, we'll just create the certificate directly
-    if request.method == 'POST':
-        # In a real application, you would process payment here
-        # For this example, we'll just create the certificate
-        
-        # Check if certificate already exists
-        if not Certificate.objects.filter(user=request.user, course=course).exists():
-            Certificate.objects.create(
-                user=request.user,
-                course=course,
-                enrollment=enrollment
-            )
-            messages.success(request, "Certificate purchased successfully!")
-        else:
-            messages.info(request, "You already have a certificate for this course.")
-            
-        return redirect('courses:lesson_detail', course_slug=course.slug, lesson_slug=course.lessons.first().slug)
-    
-    context = {
-        'course': course,
-        'certificate_price': course.certificate_price,
-    }
-    return render(request, 'courses/purchase_certificate.html', context)
+    # Redirect to payment system
+    return redirect('payments:purchase_certificate_payment', course_slug=slug)
 
 
 def home(request):
