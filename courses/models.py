@@ -28,6 +28,12 @@ class Course(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='courses')
     instructor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='courses_created')
     price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    certificate_price = models.DecimalField(
+        max_digits=10, 
+        decimal_places=2, 
+        default=0,
+        help_text="Price for certificate. Set to 0 if certificate is free (when course price > 0) or if course is free."
+    )
     thumbnail = models.ImageField(upload_to='course_thumbnails/', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -55,6 +61,11 @@ class Course(models.Model):
         return self.title
 
     def save(self, *args, **kwargs):
+        # Automatically set certificate_price to 0 if course price > 0
+        # This ensures students don't have to pay twice for the course and certificate
+        if self.price > 0:
+            self.certificate_price = 0
+            
         if not self.slug:
             self.slug = slugify(self.title)
             # Ensure uniqueness
@@ -67,6 +78,10 @@ class Course(models.Model):
     
     def get_absolute_url(self):
         return reverse('courses:course_detail', kwargs={'slug': self.slug})
+
+    def is_certificate_free(self):
+        """Check if certificate is free for students"""
+        return self.price > 0 or self.certificate_price == 0
 
 
 class Module(models.Model):
