@@ -25,6 +25,7 @@ urlpatterns = [
     path('', RedirectView.as_view(url='/home/', permanent=False)),
     path('', include('courses.urls')),
     path('accounts/', include('accounts.urls')),
+    path('payments/', include('payments.urls')),
 ]
 
 if settings.DEBUG:
