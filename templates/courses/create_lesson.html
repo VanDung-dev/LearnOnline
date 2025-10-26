@@ -64,6 +64,14 @@
         {% endif %}
     </div>
     
+    <div class="mb-3 form-check">
+        <input type="checkbox" class="form-check-input" id="{{ form.is_locked.id_for_label }}" name="{{ form.is_locked.html_name }}" {% if form.is_locked.value %}checked{% endif %}>
+        <label class="form-check-label" for="{{ form.is_locked.id_for_label }}">Lock Lesson (Only accessible to students who purchased certificate)</label>
+        {% if form.is_locked.errors %}
+            <div class="text-danger">{{ form.is_locked.errors }}</div>
+        {% endif %}
+    </div>
+    
     <div class="d-flex justify-content-between">
         {% if course.slug %}
             <a href="{% url 'courses:edit_course' slug=course.slug %}" class="btn btn-secondary">Cancel</a>

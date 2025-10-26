@@ -46,6 +46,9 @@
                 <h2 class="accordion-header" id="heading{{ forloop.counter }}">
                     <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ forloop.counter }}">
                         {{ module.title }}
+                        {% if module.is_locked %}
+                            <span class="badge bg-warning ms-2">Locked</span>
+                        {% endif %}
                     </button>
                 </h2>
                 <div id="collapse{{ forloop.counter }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" data-bs-parent="#modulesAccordion">
@@ -66,6 +69,9 @@
                                     <a href="{% url 'courses:lesson_detail' course.slug lesson.slug %}">{{ lesson.title }}</a>
                                 {% else %}
                                     {{ lesson.title }}
+                                {% endif %}
+                                {% if lesson.is_locked %}
+                                    <span class="badge bg-warning">Locked</span>
                                 {% endif %}
                                 <span class="badge bg-secondary float-end">{{ lesson.lesson_type }}</span>
                             </li>
