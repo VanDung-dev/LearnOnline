@@ -32,7 +32,7 @@
     </div>
     
     <div class="row">
-        <div class="col-md-6 mb-3">
+        <div class="col-md-4 mb-3">
             <label for="{{ form.category.id_for_label }}" class="form-label">Category</label>
             <select class="form-control" id="{{ form.category.id_for_label }}" name="{{ form.category.html_name }}">
                 <option value="">Select a category</option>
@@ -47,11 +47,24 @@
             {% endif %}
         </div>
         
-        <div class="col-md-6 mb-3">
-            <label for="{{ form.price.id_for_label }}" class="form-label">Price ($)</label>
+        <div class="col-md-4 mb-3">
+            <label for="{{ form.price.id_for_label }}" class="form-label">Course Price ($)</label>
             <input type="number" class="form-control" id="{{ form.price.id_for_label }}" name="{{ form.price.html_name }}" step="0.01" min="0" value="{{ form.price.value|default:'0' }}">
+            <div class="form-text">Set to 0 for free course</div>
             {% if form.price.errors %}
                 <div class="text-danger">{{ form.price.errors }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="col-md-4 mb-3">
+            <label for="{{ form.certificate_price.id_for_label }}" class="form-label">Certificate Price ($)</label>
+            <input type="number" class="form-control" id="{{ form.certificate_price.id_for_label }}" name="{{ form.certificate_price.html_name }}" step="0.01" min="0" value="{{ form.certificate_price.value|default:'0' }}" {% if form.price.value and form.price.value > 0 %}readonly{% endif %}>
+            <div class="form-text">
+                Set to 0 for free certificate (included with course purchase or free course)<br>
+                <strong>Note:</strong> If course price > 0, certificate will be free automatically
+            </div>
+            {% if form.certificate_price.errors %}
+                <div class="text-danger">{{ form.certificate_price.errors }}</div>
             {% endif %}
         </div>
     </div>

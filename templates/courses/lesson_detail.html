@@ -81,6 +81,27 @@
             </div>
         </div>
         
+        <!-- Certificate section -->
+        <div class="card mt-3">
+            <div class="card-body">
+                <h5 class="card-title">Certificate</h5>
+                {% load courses_extras %}
+                {% if user|has_certificate:course %}
+                    {% with certificate=user|get_certificate:course %}
+                    <p class="text-success"><strong>You have earned a certificate for this course!</strong></p>
+                    <a href="{% url 'courses:course_certificate' certificate.certificate_number %}" class="btn btn-success">View Certificate</a>
+                    {% endwith %}
+                {% else %}
+                    {% if course.is_certificate_free %}
+                        <p class="text-info">Certificate is free with course completion.</p>
+                    {% else %}
+                        <p class="card-text">Price: ${{ course.certificate_price }}</p>
+                        <a href="{% url 'courses:purchase_certificate' course.slug %}" class="btn btn-warning">Purchase Certificate</a>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+        
         <div class="card mt-3">
             <div class="card-body">
                 <h5 class="card-title">Course Modules</h5>

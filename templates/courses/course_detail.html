@@ -83,7 +83,16 @@
             <div class="card-body">
                 <h5 class="card-title">Course Details</h5>
                 <p class="card-text">Instructor: {{ course.instructor.get_full_name|default:course.instructor.username }}</p>
-                <p class="card-text">Price: ${{ course.price }}</p>
+                <p class="card-text">Course Price: ${{ course.price }}</p>
+                {% if course.price > 0 and course.certificate_price > 0 %}
+                    <div class="alert alert-warning">
+                        <strong>Note:</strong> Certificate is included with course purchase.
+                    </div>
+                {% elif course.price == 0 and course.certificate_price > 0 %}
+                    <p class="card-text">Certificate Price: ${{ course.certificate_price }}</p>
+                {% elif course.price == 0 and course.certificate_price == 0 %}
+                    <p class="card-text">Certificate: Free</p>
+                {% endif %}
                 {% if course.opening_date %}
                 <p class="card-text">Opens: {{ course.opening_date }}</p>
                 {% endif %}
@@ -114,6 +123,9 @@
                         {% else %}
                             {% if course.expiration_date and course.expiration_date < now %}
                                 <a href="#" class="btn btn-secondary disabled">Course Expired - No Certificate Available</a>
+                            {% elif course.price == 0 and course.certificate_price > 0 %}
+                                <!-- For free courses with paid certificates, show purchase certificate button -->
+                                <a href="{% url 'courses:purchase_certificate' course.slug %}" class="btn btn-warning">Purchase Certificate for ${{ course.certificate_price }}</a>
                             {% else %}
                                 <a href="#" class="btn btn-success disabled">Enrolled</a>
                             {% endif %}
