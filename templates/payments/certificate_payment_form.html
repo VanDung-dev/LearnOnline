@@ -3,69 +3,203 @@
 {% block title %}Purchase Certificate - {{ course.title }}{% endblock %}
 
 {% block content %}
-<div class="container">
+<div class="container py-5">
     <div class="row justify-content-center">
-        <div class="col-md-8">
-            <h1 class="text-center mb-4">Purchase Certificate</h1>
-            
-            <div class="card">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm mb-4">
                 <div class="card-body">
-                    <h3 class="card-title">{{ course.title }}</h3>
-                    <p class="card-text">Instructor: {{ course.instructor.get_full_name|default:course.instructor.username }}</p>
-                    
-                    <div class="alert alert-info">
-                        <h5>Certificate Details</h5>
-                        <p>This is a verified certificate of completion for the course "{{ course.title }}".</p>
-                        <p><strong>Price:</strong> ${{ certificate_price }}</p>
+                    <div class="d-flex flex-column flex-md-row align-items-center">
+                        <div class="flex-shrink-0 mb-3 mb-md-0">
+                            <div class="bg-light rounded-circle d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                                <i class="bi bi-award-fill text-warning fs-1"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-md-4 text-center text-md-start">
+                            <h2 class="mb-2">{{ course.title }}</h2>
+                            <p class="text-muted mb-1">
+                                <i class="bi bi-person-fill me-1"></i>
+                                Instructor: {{ course.instructor.get_full_name|default:course.instructor.username }}
+                            </p>
+                            <p class="text-muted mb-0">
+                                <i class="bi bi-tag-fill me-1"></i>
+                                Certificate Price: <span class="fw-bold text-dark">${{ certificate_price }}</span>
+                            </p>
+                        </div>
+                        <div class="mt-3 mt-md-0 ms-md-4 text-center">
+                            <a href="{% url 'courses:course_detail' course.slug %}" class="btn btn-outline-primary">
+                                <i class="bi bi-eye me-1"></i>View Course Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-12 col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-4">
+                    <h1 class="text-center mb-0">Purchase Certificate</h1>
+                </div>
+                <div class="card-body p-4 p-md-5">
+                    <div class="alert alert-warning d-flex align-items-center mb-4">
+                        <i class="bi bi-award-fill me-2 fs-4"></i>
+                        <div>
+                            <h5 class="alert-heading">Certificate Details</h5>
+                            <p class="mb-0">This is a verified certificate of completion for the course "{{ course.title }}".</p>
+                            <p class="mb-0 fw-bold fs-5 mt-2">Total: ${{ certificate_price }}</p>
+                        </div>
                     </div>
                     
                     <form id="certificate-payment-form">
                         {% csrf_token %}
                         <input type="hidden" name="course_slug" value="{{ course.slug }}">
                         
-                        <div class="mb-3">
-                            <label class="form-label">Card Type</label>
-                            <div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="card_type" id="visa" value="visa" required>
-                                    <label class="form-check-label" for="visa">
-                                        <i class="fab fa-cc-visa fa-2x"></i> Visa
-                                    </label>
+                        <div class="mb-4">
+                            <h5 class="mb-3">Payment Method</h5>
+                            <div class="card border shadow-sm">
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-medium">Card Type</label>
+                                        <div class="d-flex gap-3">
+                                            <div class="border rounded p-3 flex-fill text-center card-option" data-card-type="visa">
+                                                <div class="form-check-label d-flex flex-column align-items-center">
+                                                    <i class="bi bi-credit-card-fill fs-1 text-primary mb-2"></i>
+                                                    <span>Visa</span>
+                                                </div>
+                                            </div>
+                                            <div class="border rounded p-3 flex-fill text-center card-option" data-card-type="mastercard">
+                                                <div class="form-check-label d-flex flex-column align-items-center">
+                                                    <i class="bi bi-credit-card-fill fs-1 text-danger mb-2"></i>
+                                                    <span>Mastercard</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <input type="hidden" name="card_type" id="card_type" value="">
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="card_number" class="form-label fw-medium">Card Number</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-white">
+                                                <i class="bi bi-credit-card"></i>
+                                            </span>
+                                            <input type="text" class="form-control form-control-lg" id="card_number" name="card_number" placeholder="1234 5678 9012 3456" required>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="expiry_date" class="form-label fw-medium">Expiry Date</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-white">
+                                                    <i class="bi bi-calendar"></i>
+                                                </span>
+                                                <input type="text" class="form-control form-control-lg" id="expiry_date" name="expiry_date" placeholder="MM/YY" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="cvv" class="form-label fw-medium">CVV</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-white">
+                                                    <i class="bi bi-lock"></i>
+                                                </span>
+                                                <input type="text" class="form-control form-control-lg" id="cvv" name="cvv" placeholder="123" required>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="card_type" id="mastercard" value="mastercard" required>
-                                    <label class="form-check-label" for="mastercard">
-                                        <i class="fab fa-cc-mastercard fa-2x"></i> Mastercard
-                                    </label>
-                                </div>
                             </div>
                         </div>
                         
-                        <div class="mb-3">
-                            <label for="card_number" class="form-label">Card Number</label>
-                            <input type="text" class="form-control" id="card_number" name="card_number" placeholder="1234 5678 9012 3456" required>
-                        </div>
-                        
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="expiry_date" class="form-label">Expiry Date</label>
-                                <input type="text" class="form-control" id="expiry_date" name="expiry_date" placeholder="MM/YY" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="cvv" class="form-label">CVV</label>
-                                <input type="text" class="form-control" id="cvv" name="cvv" placeholder="123" required>
-                            </div>
-                        </div>
-                        
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-success btn-lg" id="pay-button">
-                                Purchase Certificate for ${{ certificate_price }}
+                        <div class="d-grid gap-3 d-md-flex justify-content-md-center">
+                            <button type="submit" class="btn btn-warning btn-lg flex-fill" id="pay-button">
+                                <i class="bi bi-shield-lock me-2"></i>Purchase Certificate ${{ certificate_price }}
                             </button>
-                            <a href="{% url 'courses:course_detail' course.slug %}" class="btn btn-secondary">
-                                Cancel
+                            <a href="{% url 'courses:course_detail' course.slug %}" class="btn btn-outline-secondary btn-lg flex-fill">
+                                <i class="bi bi-arrow-left me-2"></i>Cancel
                             </a>
                         </div>
                     </form>
+                </div>
+                <div class="card-footer bg-white py-3">
+                    <div class="d-flex justify-content-center align-items-center text-muted">
+                        <i class="bi bi-shield-lock me-2"></i>
+                        <small>Your payment details are securely encrypted</small>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="d-flex justify-content-center align-items-center text-muted">
+                        <div class="border-top flex-grow-1"></div>
+                        <span class="px-3">Trusted Payment Partners</span>
+                        <div class="border-top flex-grow-1"></div>
+                    </div>
+                    <div class="d-flex justify-content-center gap-4 mt-3">
+                        <i class="bi bi-paypal text-muted" style="font-size: 2rem;"></i>
+                        <i class="bi bi-credit-card-2-front text-muted" style="font-size: 2rem;"></i>
+                        <i class="bi bi-google text-muted" style="font-size: 2rem;"></i>
+                        <i class="bi bi-apple text-muted" style="font-size: 2rem;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-12 col-lg-4 mt-4 mt-lg-0">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0">Certificate Benefits</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex align-items-center px-0 py-3">
+                            <i class="bi bi-patch-check-fill text-warning me-3 fs-4"></i>
+                            <div>
+                                <h6 class="mb-0">Verified Certificate</h6>
+                                <small class="text-muted">Official proof of completion</small>
+                            </div>
+                        </li>
+                        <li class="list-group-item d-flex align-items-center px-0 py-3">
+                            <i class="bi bi-share-fill text-primary me-3 fs-4"></i>
+                            <div>
+                                <h6 class="mb-0">Shareable</h6>
+                                <small class="text-muted">Add to LinkedIn or resume</small>
+                            </div>
+                        </li>
+                        <li class="list-group-item d-flex align-items-center px-0 py-3">
+                            <i class="bi bi-download text-success me-3 fs-4"></i>
+                            <div>
+                                <h6 class="mb-0">Downloadable</h6>
+                                <small class="text-muted">Get PDF certificate instantly</small>
+                            </div>
+                        </li>
+                        <li class="list-group-item d-flex align-items-center px-0 py-3">
+                            <i class="bi bi-unlock-fill text-info me-3 fs-4"></i>
+                            <div>
+                                <h6 class="mb-0">Unlock Content</h6>
+                                <small class="text-muted">Access premium course materials</small>
+                            </div>
+                        </li>
+                        <li class="list-group-item px-0 py-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">Total</h5>
+                                <h4 class="mb-0 fw-bold">${{ certificate_price }}</h4>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="card border-0 shadow-sm mt-4">
+                <div class="card-body">
+                    <h6 class="card-title">
+                        <i class="bi bi-question-circle me-2"></i>Need Help?
+                    </h6>
+                    <p class="card-text">
+                        If you experience any issues with your payment, please contact our support team.
+                    </p>
+                    <a href="#" class="btn btn-outline-primary w-100">Contact Support</a>
                 </div>
             </div>
         </div>
@@ -73,22 +207,53 @@
 </div>
 
 <style>
-    .fab.fa-cc-visa {
-        color: #1a1f71;
-    }
-    
-    .fab.fa-cc-mastercard {
-        color: #eb001b;
-    }
+.card-option {
+    transition: all 0.2s ease-in-out;
+    cursor: pointer;
+}
+
+.card-option:hover {
+    border-color: #ffc107 !important;
+    box-shadow: 0 0.125rem 0.25rem rgba(255, 193, 7, 0.25);
+}
+
+.card-option.selected {
+    border-color: #ffc107 !important;
+    background-color: rgba(255, 193, 7, 0.05);
+}
 </style>
 
 <script>
+// Add visual feedback when a card type is selected
+document.querySelectorAll('.card-option').forEach(option => {
+    option.addEventListener('click', function() {
+        // Remove selected class from all card options
+        document.querySelectorAll('.card-option').forEach(opt => {
+            opt.classList.remove('selected');
+        });
+        
+        // Add selected class to clicked option
+        this.classList.add('selected');
+        
+        // Set the hidden input value
+        document.getElementById('card_type').value = this.getAttribute('data-card-type');
+    });
+});
+
 document.getElementById('certificate-payment-form').addEventListener('submit', function(e) {
     e.preventDefault();
     
+    // Check if a card type has been selected
+    const cardType = document.getElementById('card_type').value;
+    if (!cardType) {
+        alert('Please select a card type');
+        return;
+    }
+    
     const payButton = document.getElementById('pay-button');
+    const originalText = payButton.innerHTML;
     payButton.disabled = true;
-    payButton.textContent = 'Processing...';
+    payButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Processing...';
     
     const formData = new FormData(this);
     
@@ -106,14 +271,14 @@ document.getElementById('certificate-payment-form').addEventListener('submit', f
         } else {
             alert('Payment failed: ' + data.error);
             payButton.disabled = false;
-            payButton.textContent = 'Purchase Certificate for ${{ certificate_price }}';
+            payButton.innerHTML = originalText;
         }
     })
     .catch(error => {
         console.error('Error:', error);
         alert('An error occurred during payment processing.');
         payButton.disabled = false;
-        payButton.textContent = 'Purchase Certificate for ${{ certificate_price }}';
+        payButton.innerHTML = originalText;
     });
 });
 </script>
