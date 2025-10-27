@@ -19,5 +19,17 @@ urlpatterns = [
     path('instructor/courses/<slug:slug>/delete/', views.delete_course, name='delete_course'),
     path('instructor/courses/<slug:course_slug>/modules/create/', views.create_module, name='create_module'),
     path('instructor/courses/<slug:course_slug>/modules/<int:module_id>/edit/', views.edit_module, name='edit_module'),
+    path('instructor/courses/<slug:course_slug>/modules/<int:module_id>/delete/', views.delete_module, name='delete_module'),
     path('instructor/courses/<slug:course_slug>/modules/<int:module_id>/lessons/create/', views.create_lesson, name='create_lesson'),
+    path('instructor/courses/<slug:course_slug>/modules/<int:module_id>/lessons/<int:lesson_id>/edit/', views.edit_lesson, name='edit_lesson'),
+    path('instructor/courses/<slug:course_slug>/modules/<int:module_id>/lessons/<int:lesson_id>/delete/', views.delete_lesson, name='delete_lesson'),
+    
+    # Quiz configuration URLs
+    path('instructor/lessons/<int:lesson_id>/quiz/configure/', views.configure_quiz, name='configure_quiz'),
+    path('instructor/lessons/<int:lesson_id>/quiz/questions/add/', views.add_question, name='add_question'),
+    path('instructor/lessons/<int:lesson_id>/quiz/questions/<int:question_id>/edit/', views.edit_question, name='edit_question'),
+    path('instructor/lessons/<int:lesson_id>/quiz/questions/<int:question_id>/delete/', views.delete_question, name='delete_question'),
+    path('instructor/lessons/<int:lesson_id>/quiz/questions/<int:question_id>/answers/add/', views.add_answer, name='add_answer'),
+    path('instructor/lessons/<int:lesson_id>/quiz/questions/<int:question_id>/answers/<int:answer_id>/edit/', views.edit_answer, name='edit_answer'),
+    path('instructor/lessons/<int:lesson_id>/quiz/questions/<int:question_id>/answers/<int:answer_id>/delete/', views.delete_answer, name='delete_answer'),
 ]

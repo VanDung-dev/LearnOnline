@@ -147,6 +147,7 @@ class Lesson(models.Model):
     lesson_type = models.CharField(max_length=10, choices=LESSON_TYPES, default='text')
     content = models.TextField(blank=True)
     video_url = models.URLField(blank=True, null=True)
+    video_file = models.FileField(upload_to='lesson_videos/', blank=True, null=True)
     order = models.PositiveIntegerField(default=0)
     is_published = models.BooleanField(default=True)
     is_locked = models.BooleanField(
@@ -154,6 +155,10 @@ class Lesson(models.Model):
         help_text="If checked, only students who purchased certificate can access this lesson"
     )
     created_at = models.DateTimeField(auto_now_add=True)
+    max_attempts = models.PositiveIntegerField(
+        default=0,
+        help_text="Maximum number of attempts allowed for this quiz (0 for unlimited)"
+    )
 
     class Meta:
         ordering = ['order']
@@ -171,6 +176,80 @@ class Lesson(models.Model):
     
     def __str__(self):
         return f'{self.module.course.title} - {self.title}'
+
+
+# Quiz models
+class Quiz(models.Model):
+    lesson = models.OneToOneField(Lesson, on_delete=models.CASCADE, related_name='quiz')
+    title = models.CharField(max_length=200)
+    description = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return f'Quiz for {self.lesson.title}'
+
+
+class Question(models.Model):
+    QUESTION_TYPES = (
+        ('single', 'Single Choice'),
+        ('multiple', 'Multiple Choice'),
+    )
+    
+    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name='questions')
+    text = models.TextField()
+    question_type = models.CharField(max_length=10, choices=QUESTION_TYPES, default='single')
+    order = models.PositiveIntegerField(default=0)
+    points = models.PositiveIntegerField(default=1)
+    
+    class Meta:
+        ordering = ['order']
+    
+    def __str__(self):
+        return f'Question: {self.text}'
+
+
+class Answer(models.Model):
+    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='answers')
+    text = models.TextField()
+    is_correct = models.BooleanField(default=False)
+    order = models.PositiveIntegerField(default=0)
+    
+    class Meta:
+        ordering = ['order']
+    
+    def __str__(self):
+        return f'Answer: {self.text}'
+
+
+class QuizAttempt(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='quiz_attempts')
+    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE, related_name='quiz_attempts')
+    attempt_number = models.PositiveIntegerField()
+    score = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    started_at = models.DateTimeField(auto_now_add=True)
+    completed_at = models.DateTimeField(null=True, blank=True)
+    
+    class Meta:
+        unique_together = ('user', 'lesson', 'attempt_number')
+        ordering = ['-started_at']
+    
+    def __str__(self):
+        return f'{self.user.username} - {self.lesson.title} - Attempt {self.attempt_number}'
+
+
+class UserAnswer(models.Model):
+    quiz_attempt = models.ForeignKey(QuizAttempt, on_delete=models.CASCADE, related_name='user_answers')
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    # For single choice questions, only one answer will be selected
+    # For multiple choice questions, multiple answers can be selected
+    selected_answers = models.ManyToManyField(Answer, blank=True)
+    
+    class Meta:
+        unique_together = ('quiz_attempt', 'question')
+    
+    def __str__(self):
+        return f'User answer for {self.question.text}'
 
 
 class Enrollment(models.Model):

@@ -5,8 +5,8 @@ from django.contrib import messages
 from django.db import models
 from django.utils import timezone
 from django.db.models import Q
-from .models import Category, Course, Lesson, Enrollment, Progress, Module, Certificate
-from .forms import CourseForm, ModuleForm, LessonForm
+from .models import Category, Course, Lesson, Enrollment, Progress, Module, Certificate, Quiz, Question, Answer, QuizAttempt, UserAnswer
+from .forms import CourseForm, ModuleForm, LessonForm, QuizForm, QuestionForm, AnswerForm
 
 
 def public_certificate(request, certificate_id):
@@ -161,7 +161,115 @@ def lesson_detail(request, course_slug, lesson_slug):
         messages.error(request, "This content is locked. Purchase a certificate to access it.")
         return redirect('courses:course_detail', slug=course.slug)
     
-    # Mark lesson as completed
+    # Handle quiz lessons
+    if lesson.lesson_type == 'quiz':
+        # Check if quiz exists
+        try:
+            quiz = lesson.quiz
+        except Quiz.DoesNotExist:
+            messages.error(request, "This quiz is not configured yet.")
+            return redirect('courses:course_detail', slug=course.slug)
+        
+        # Check attempts
+        attempts = QuizAttempt.objects.filter(user=request.user, lesson=lesson)
+        attempt_count = attempts.count()
+        
+        # Check if user has exceeded max attempts
+        if lesson.max_attempts > 0 and attempt_count >= lesson.max_attempts:
+            messages.error(request, f"You have reached the maximum number of attempts ({lesson.max_attempts}) for this quiz.")
+            # Show previous attempts
+            context = {
+                'course': course,
+                'lesson': lesson,
+                'quiz': quiz,
+                'attempts': attempts,
+                'max_attempts_reached': True,
+            }
+            return render(request, 'courses/lesson_detail.html', context)
+        
+        # Create a new attempt
+        new_attempt = QuizAttempt.objects.create(
+            user=request.user,
+            lesson=lesson,
+            attempt_number=attempt_count + 1
+        )
+        
+        if request.method == 'POST':
+            # Process quiz submission
+            score = 0
+            total_points = 0
+            
+            for question in quiz.questions.all():
+                # Get selected answers
+                if question.question_type == 'single':
+                    answer_id = request.POST.get(f'question_{question.id}')
+                    if answer_id:
+                        try:
+                            selected_answer = Answer.objects.get(id=answer_id, question=question)
+                            # Save user answer
+                            user_answer = UserAnswer.objects.create(quiz_attempt=new_attempt, question=question)
+                            user_answer.selected_answers.add(selected_answer)
+                            
+                            # Check if answer is correct
+                            if selected_answer.is_correct:
+                                score += question.points
+                            total_points += question.points
+                        except Answer.DoesNotExist:
+                            pass
+                else:  # multiple choice
+                    answer_ids = request.POST.getlist(f'question_{question.id}')
+                    if answer_ids:
+                        selected_answers = Answer.objects.filter(id__in=answer_ids, question=question)
+                        # Save user answers
+                        user_answer = UserAnswer.objects.create(quiz_attempt=new_attempt, question=question)
+                        user_answer.selected_answers.set(selected_answers)
+                        
+                        # Check if all selected answers are correct and no incorrect answers are selected
+                        correct_answers = set(question.answers.filter(is_correct=True).values_list('id', flat=True))
+                        selected_answer_ids = set(selected_answers.values_list('id', flat=True))
+                        
+                        if correct_answers == selected_answer_ids:
+                            score += question.points
+                        total_points += question.points
+            
+            # Calculate and save score
+            if total_points > 0:
+                new_attempt.score = (score / total_points) * 100
+            else:
+                new_attempt.score = 0
+            new_attempt.completed_at = timezone.now()
+            new_attempt.save()
+            
+            # Mark lesson as completed if score is high enough (e.g., 70%)
+            if new_attempt.score >= 70:
+                progress, created = Progress.objects.get_or_create(
+                    user=request.user,
+                    lesson=lesson
+                )
+                if not progress.completed:
+                    progress.completed = True
+                    progress.completed_at = timezone.now()
+                    progress.save()
+                
+                # Check if course is completed and issue certificate if needed
+                check_and_issue_certificate(request.user, course)
+                
+                messages.success(request, f"Quiz submitted successfully! Your score: {new_attempt.score:.2f}%")
+            else:
+                messages.info(request, f"Quiz submitted. Your score: {new_attempt.score:.2f}%. You need at least 70% to pass.")
+            
+            return redirect('courses:lesson_detail', course_slug=course.slug, lesson_slug=lesson.slug)
+        else:
+            # Show quiz form
+            context = {
+                'course': course,
+                'lesson': lesson,
+                'quiz': quiz,
+                'attempt': new_attempt,
+            }
+            return render(request, 'courses/quiz_detail.html', context)
+    
+    # Mark lesson as completed (for non-quiz lessons)
     progress, created = Progress.objects.get_or_create(
         user=request.user,
         lesson=lesson
@@ -358,18 +466,43 @@ def edit_module(request, course_slug, module_id):
 
 
 @login_required
+def delete_module(request, course_slug, module_id):
+    course = get_object_or_404(Course, slug=course_slug, instructor=request.user)
+    module = get_object_or_404(Module, id=module_id, course=course)
+    
+    if request.method == 'POST':
+        module_title = module.title
+        module.delete()
+        messages.success(request, f'Module "{module_title}" has been deleted successfully!')
+        return redirect('courses:edit_course', slug=course.slug)
+    
+    context = {
+        'course': course,
+        'module': module,
+    }
+    return render(request, 'courses/delete_module.html', context)
+
+
+@login_required
 def create_lesson(request, course_slug, module_id):
     course = get_object_or_404(Course, slug=course_slug, instructor=request.user)
     module = get_object_or_404(Module, id=module_id, course=course)
     
     if request.method == 'POST':
-        form = LessonForm(request.POST)
+        form = LessonForm(request.POST, request.FILES)
         if form.is_valid():
             lesson = form.save(commit=False)
             lesson.module = module
             lesson.save()
             messages.success(request, 'Lesson created successfully!')
-            return redirect('courses:edit_course', slug=course.slug)
+            
+            # Redirect based on lesson type for further configuration
+            if lesson.lesson_type == 'quiz':
+                # Redirect to quiz configuration page
+                messages.info(request, 'You can now configure your quiz questions.')
+                return redirect('courses:configure_quiz', lesson_id=lesson.id)
+            else:
+                return redirect('courses:edit_course', slug=course.slug)
     else:
         form = LessonForm()
     
@@ -379,6 +512,211 @@ def create_lesson(request, course_slug, module_id):
         'module': module,
     }
     return render(request, 'courses/create_lesson.html', context)
+
+
+@login_required
+def edit_lesson(request, course_slug, module_id, lesson_id):
+    course = get_object_or_404(Course, slug=course_slug, instructor=request.user)
+    module = get_object_or_404(Module, id=module_id, course=course)
+    lesson = get_object_or_404(Lesson, id=lesson_id, module=module)
+    
+    if request.method == 'POST':
+        form = LessonForm(request.POST, request.FILES, instance=lesson)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Lesson updated successfully!')
+            
+            # Redirect based on lesson type for further configuration
+            if lesson.lesson_type == 'quiz':
+                # Redirect to quiz configuration page
+                messages.info(request, 'You can now configure your quiz questions.')
+                return redirect('courses:configure_quiz', lesson_id=lesson.id)
+            else:
+                return redirect('courses:edit_course', slug=course.slug)
+    else:
+        form = LessonForm(instance=lesson)
+    
+    context = {
+        'form': form,
+        'course': course,
+        'module': module,
+        'lesson': lesson,
+    }
+    return render(request, 'courses/create_lesson.html', context)
+
+
+@login_required
+def delete_lesson(request, course_slug, module_id, lesson_id):
+    course = get_object_or_404(Course, slug=course_slug, instructor=request.user)
+    module = get_object_or_404(Module, id=module_id, course=course)
+    lesson = get_object_or_404(Lesson, id=lesson_id, module=module)
+    
+    if request.method == 'POST':
+        lesson_title = lesson.title
+        lesson.delete()
+        messages.success(request, f'Lesson "{lesson_title}" has been deleted successfully!')
+        return redirect('courses:edit_course', slug=course.slug)
+    
+    context = {
+        'course': course,
+        'module': module,
+        'lesson': lesson,
+    }
+    return render(request, 'courses/delete_lesson.html', context)
+
+
+@login_required
+def configure_quiz(request, lesson_id):
+    lesson = get_object_or_404(Lesson, id=lesson_id, module__course__instructor=request.user)
+    
+    # Get or create quiz for this lesson
+    quiz, created = Quiz.objects.get_or_create(lesson=lesson, defaults={'title': f'Quiz for {lesson.title}'})
+    
+    if request.method == 'POST':
+        form = QuizForm(request.POST, instance=quiz)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Quiz updated successfully!')
+            return redirect('courses:configure_quiz', lesson_id=lesson.id)
+    else:
+        form = QuizForm(instance=quiz)
+    
+    context = {
+        'lesson': lesson,
+        'quiz': quiz,
+        'form': form,
+    }
+    return render(request, 'courses/configure_quiz.html', context)
+
+
+@login_required
+def add_question(request, lesson_id):
+    lesson = get_object_or_404(Lesson, id=lesson_id, module__course__instructor=request.user)
+    quiz, created = Quiz.objects.get_or_create(lesson=lesson, defaults={'title': f'Quiz for {lesson.title}'})
+    
+    if request.method == 'POST':
+        form = QuestionForm(request.POST)
+        if form.is_valid():
+            question = form.save(commit=False)
+            question.quiz = quiz
+            question.save()
+            messages.success(request, 'Question added successfully!')
+            return redirect('courses:configure_quiz', lesson_id=lesson.id)
+    else:
+        form = QuestionForm()
+    
+    context = {
+        'lesson': lesson,
+        'quiz': quiz,
+        'form': form,
+    }
+    return render(request, 'courses/add_question.html', context)
+
+
+@login_required
+def edit_question(request, lesson_id, question_id):
+    lesson = get_object_or_404(Lesson, id=lesson_id, module__course__instructor=request.user)
+    question = get_object_or_404(Question, id=question_id, quiz__lesson=lesson)
+    
+    if request.method == 'POST':
+        form = QuestionForm(request.POST, instance=question)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Question updated successfully!')
+            return redirect('courses:configure_quiz', lesson_id=lesson.id)
+    else:
+        form = QuestionForm(instance=question)
+    
+    context = {
+        'lesson': lesson,
+        'question': question,
+        'form': form,
+    }
+    return render(request, 'courses/edit_question.html', context)
+
+
+@login_required
+def delete_question(request, lesson_id, question_id):
+    lesson = get_object_or_404(Lesson, id=lesson_id, module__course__instructor=request.user)
+    question = get_object_or_404(Question, id=question_id, quiz__lesson=lesson)
+    
+    if request.method == 'POST':
+        question.delete()
+        messages.success(request, 'Question deleted successfully!')
+        return redirect('courses:configure_quiz', lesson_id=lesson.id)
+    
+    context = {
+        'lesson': lesson,
+        'question': question,
+    }
+    return render(request, 'courses/delete_question.html', context)
+
+
+@login_required
+def add_answer(request, lesson_id, question_id):
+    lesson = get_object_or_404(Lesson, id=lesson_id, module__course__instructor=request.user)
+    question = get_object_or_404(Question, id=question_id, quiz__lesson=lesson)
+    
+    if request.method == 'POST':
+        form = AnswerForm(request.POST)
+        if form.is_valid():
+            answer = form.save(commit=False)
+            answer.question = question
+            answer.save()
+            messages.success(request, 'Answer added successfully!')
+            return redirect('courses:edit_question', lesson_id=lesson.id, question_id=question.id)
+    else:
+        form = AnswerForm()
+    
+    context = {
+        'lesson': lesson,
+        'question': question,
+        'form': form,
+    }
+    return render(request, 'courses/add_answer.html', context)
+
+
+@login_required
+def edit_answer(request, lesson_id, question_id, answer_id):
+    lesson = get_object_or_404(Lesson, id=lesson_id, module__course__instructor=request.user)
+    question = get_object_or_404(Question, id=question_id, quiz__lesson=lesson)
+    answer = get_object_or_404(Answer, id=answer_id, question=question)
+    
+    if request.method == 'POST':
+        form = AnswerForm(request.POST, instance=answer)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Answer updated successfully!')
+            return redirect('courses:edit_question', lesson_id=lesson.id, question_id=question.id)
+    else:
+        form = AnswerForm(instance=answer)
+    
+    context = {
+        'lesson': lesson,
+        'question': question,
+        'answer': answer,
+        'form': form,
+    }
+    return render(request, 'courses/edit_answer.html', context)
+
+
+@login_required
+def delete_answer(request, lesson_id, question_id, answer_id):
+    lesson = get_object_or_404(Lesson, id=lesson_id, module__course__instructor=request.user)
+    question = get_object_or_404(Question, id=question_id, quiz__lesson=lesson)
+    answer = get_object_or_404(Answer, id=answer_id, question=question)
+    
+    if request.method == 'POST':
+        answer.delete()
+        messages.success(request, 'Answer deleted successfully!')
+        return redirect('courses:edit_question', lesson_id=lesson.id, question_id=question.id)
+    
+    context = {
+        'lesson': lesson,
+        'question': question,
+        'answer': answer,
+    }
+    return render(request, 'courses/delete_answer.html', context)
 
 
 def course_certificate(request, certificate_id):
