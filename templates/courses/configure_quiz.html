@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block title %}Configure Quiz - {{ lesson.title }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mt-4">Configure Quiz for Lesson: {{ lesson.title }}</h1>
+    <h2>Course: {{ lesson.module.course.title }}</h2>
+    
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3>Quiz Details</h3>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="{{ form.title.id_for_label }}" class="form-label">Quiz Title</label>
+                    <input type="text" class="form-control" id="{{ form.title.id_for_label }}" name="{{ form.title.html_name }}" value="{{ form.title.value|default:'' }}">
+                    {% if form.title.errors %}
+                        <div class="text-danger">{{ form.title.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="mb-3">
+                    <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+                    <textarea class="form-control" id="{{ form.description.id_for_label }}" name="{{ form.description.html_name }}" rows="3">{{ form.description.value|default:'' }}</textarea>
+                    {% if form.description.errors %}
+                        <div class="text-danger">{{ form.description.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Update Quiz</button>
+                <a href="{% url 'courses:edit_course' slug=lesson.module.course.slug %}" class="btn btn-secondary">Back to Course</a>
+            </form>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h3>Questions</h3>
+            <a href="{% url 'courses:add_question' lesson_id=lesson.id %}" class="btn btn-sm btn-primary">Add Question</a>
+        </div>
+        <div class="card-body">
+            {% if quiz.questions.all %}
+                <div class="list-group">
+                    {% for question in quiz.questions.all %}
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>{{ question.text }}</strong>
+                                    <span class="badge bg-secondary ms-2">{{ question.get_question_type_display }}</span>
+                                    <span class="badge bg-info ms-2">{{ question.points }} point{{ question.points|pluralize }}</span>
+                                </div>
+                                <div>
+                                    <a href="{% url 'courses:edit_question' lesson_id=lesson.id question_id=question.id %}" class="btn btn-sm btn-outline-primary">Edit</a>
+                                    <a href="{% url 'courses:delete_question' lesson_id=lesson.id question_id=question.id %}" class="btn btn-sm btn-outline-danger">Delete</a>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-2">
+                                <strong>Answers:</strong>
+                                <div class="ms-3">
+                                    {% for answer in question.answers.all %}
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span>{{ answer.text }}</span>
+                                            {% if answer.is_correct %}
+                                                <span class="badge bg-success">Correct</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">Incorrect</span>
+                                            {% endif %}
+                                        </div>
+                                    {% empty %}
+                                        <p class="text-muted">No answers defined for this question.</p>
+                                    {% endfor %}
+                                    <div class="mt-2">
+                                        <a href="{% url 'courses:add_answer' lesson_id=lesson.id question_id=question.id %}" class="btn btn-sm btn-outline-secondary">Add Answer</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-muted">No questions have been added to this quiz yet.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

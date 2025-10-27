@@ -143,9 +143,11 @@
                 <div>
                     {% if course.slug %}
                         <a href="{% url 'courses:edit_module' course_slug=course.slug module_id=module.id %}" class="btn btn-sm btn-outline-secondary">Edit Module</a>
+                        <a href="{% url 'courses:delete_module' course_slug=course.slug module_id=module.id %}" class="btn btn-sm btn-outline-danger">Delete Module</a>
                         <a href="{% url 'courses:create_lesson' course_slug=course.slug module_id=module.id %}" class="btn btn-sm btn-outline-primary">Add Lesson</a>
                     {% else %}
                         <a href="#" class="btn btn-sm btn-outline-secondary disabled">Edit Module</a>
+                        <a href="#" class="btn btn-sm btn-outline-danger disabled">Delete Module</a>
                         <a href="#" class="btn btn-sm btn-outline-primary disabled">Add Lesson</a>
                     {% endif %}
                 </div>
@@ -162,9 +164,24 @@
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 <div>
                                     <strong>{{ lesson.title }}</strong>
-                                    <span class="badge bg-secondary ms-2">{{ lesson.lesson_type }}</span>
+                                    <span class="badge bg-secondary ms-2">{{ lesson.lesson_type|capfirst }}</span>
                                     {% if not lesson.is_published %}
                                         <span class="badge bg-warning ms-2">Draft</span>
+                                    {% endif %}
+                                    {% if lesson.is_locked %}
+                                        <span class="badge bg-danger ms-2">Locked</span>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    {% if lesson.lesson_type == 'video' and lesson.video_url %}
+                                        <a href="{{ lesson.video_url }}" target="_blank" class="btn btn-sm btn-outline-info">Preview Video</a>
+                                    {% endif %}
+                                    {% if course.slug and module.id %}
+                                        <a href="{% url 'courses:edit_lesson' course_slug=course.slug module_id=module.id lesson_id=lesson.id %}" class="btn btn-sm btn-outline-secondary">Edit Lesson</a>
+                                        <a href="{% url 'courses:delete_lesson' course_slug=course.slug module_id=module.id lesson_id=lesson.id %}" class="btn btn-sm btn-outline-danger">Delete Lesson</a>
+                                    {% endif %}
+                                    {% if lesson.lesson_type == 'quiz' %}
+                                        <a href="{% url 'courses:configure_quiz' lesson_id=lesson.id %}" class="btn btn-sm btn-outline-primary">Configure Quiz</a>
                                     {% endif %}
                                 </div>
                             </li>
