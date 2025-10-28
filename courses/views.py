@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseForbidden, Http404
+from django.http import HttpResponseForbidden, Http404, JsonResponse
 from django.contrib import messages
 from django.db import models
 from django.utils import timezone
@@ -735,6 +735,38 @@ def course_certificate(request, certificate_id):
         'is_public': not is_owner,
     }
     return render(request, 'courses/certificate.html', context)
+
+
+@login_required
+def reorder_lessons(request, course_slug, module_id):
+    """
+    Handle lesson reordering via AJAX drag and drop
+    """
+    print(f"Reorder lessons called with course_slug: {course_slug}, module_id: {module_id}")
+    print(f"Request method: {request.method}")
+    print(f"Is AJAX: {request.headers.get('X-Requested-With') == 'XMLHttpRequest'}")
+    
+    course = get_object_or_404(Course, slug=course_slug, instructor=request.user)
+    module = get_object_or_404(Module, id=module_id, course=course)
+    print(f"Found module: {module.title}")
+    
+    if request.method == 'POST' and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        try:
+            # Get the ordered lesson IDs from the request
+            lesson_order = request.POST.getlist('lesson_order[]')
+            print(f"Lesson order received: {lesson_order}")
+            
+            # Update the order of each lesson
+            for index, lesson_id in enumerate(lesson_order):
+                Lesson.objects.filter(id=lesson_id, module=module).update(order=index)
+                print(f"Updated lesson {lesson_id} order to {index}")
+            
+            return JsonResponse({'status': 'success'})
+        except Exception as e:
+            print(f"Error in reorder_lessons: {str(e)}")
+            return JsonResponse({'status': 'error', 'message': str(e)})
+    
+    return JsonResponse({'status': 'error', 'message': 'Invalid request'})
 
 
 # Custom 404 view
