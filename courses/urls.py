@@ -24,6 +24,7 @@ urlpatterns = [
     path('instructor/courses/<slug:course_slug>/modules/<int:module_id>/lessons/<int:lesson_id>/edit/', views.edit_lesson, name='edit_lesson'),
     path('instructor/courses/<slug:course_slug>/modules/<int:module_id>/lessons/<int:lesson_id>/delete/', views.delete_lesson, name='delete_lesson'),
     path('instructor/courses/<slug:course_slug>/modules/<int:module_id>/lessons/reorder/', views.reorder_lessons, name='reorder_lessons'),
+    path('instructor/courses/<slug:course_slug>/modules/reorder/', views.reorder_modules, name='reorder_modules'),
     
     # Quiz configuration URLs
     path('instructor/lessons/<int:lesson_id>/quiz/configure/', views.configure_quiz, name='configure_quiz'),
