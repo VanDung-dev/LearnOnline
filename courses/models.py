@@ -180,20 +180,23 @@ class Lesson(models.Model):
 
 # Quiz models
 class Quiz(models.Model):
-    lesson = models.OneToOneField(Lesson, on_delete=models.CASCADE, related_name='quiz')
+    lesson = models.OneToOneField(Lesson, on_delete=models.CASCADE, related_name='quiz', null=True, blank=True)
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
     def __str__(self):
-        return f'Quiz for {self.lesson.title}'
+        if self.lesson:
+            return f'Quiz for {self.lesson.title}'
+        return self.title
 
 
 class Question(models.Model):
     QUESTION_TYPES = (
         ('single', 'Single Choice'),
         ('multiple', 'Multiple Choice'),
+        ('essay', 'Essay Answer'),
     )
     
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name='questions')
