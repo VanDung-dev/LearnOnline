@@ -431,10 +431,8 @@ def delete_course(request, slug):
         messages.success(request, f'Course "{course_title}" has been deleted successfully!')
         return redirect('courses:instructor_courses')
     
-    context = {
-        'course': course,
-    }
-    return render(request, 'courses/delete_course.html', context)
+    # Instead of rendering a separate template, redirect to edit_course with a delete flag
+    return redirect('courses:edit_course', slug=slug)
 
 
 @login_required
@@ -492,11 +490,8 @@ def delete_module(request, course_slug, module_id):
         messages.success(request, f'Module "{module_title}" has been deleted successfully!')
         return redirect('courses:edit_course', slug=course.slug)
     
-    context = {
-        'course': course,
-        'module': module,
-    }
-    return render(request, 'courses/delete_module.html', context)
+    # Instead of rendering a separate template, redirect to edit_course with a delete flag
+    return redirect('courses:edit_course', slug=course.slug)
 
 
 @login_required
@@ -573,12 +568,8 @@ def delete_lesson(request, course_slug, module_id, lesson_id):
         messages.success(request, f'Lesson "{lesson_title}" has been deleted successfully!')
         return redirect('courses:edit_course', slug=course.slug)
     
-    context = {
-        'course': course,
-        'module': module,
-        'lesson': lesson,
-    }
-    return render(request, 'courses/delete_lesson.html', context)
+    # Instead of rendering a separate template, redirect to edit_course with a delete flag
+    return redirect('courses:edit_course', slug=course.slug)
 
 
 @login_required

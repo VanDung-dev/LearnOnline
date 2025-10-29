@@ -147,7 +147,7 @@
                     <div>
                         {% if course.slug %}
                             <a href="{% url 'courses:edit_module' course_slug=course.slug module_id=module.id %}" class="btn btn-sm btn-outline-secondary">Edit Module</a>
-                            <a href="{% url 'courses:delete_module' course_slug=course.slug module_id=module.id %}" class="btn btn-sm btn-outline-danger">Delete Module</a>
+                            <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModuleModal{{ module.id }}">Delete Module</button>
                             <a href="{% url 'courses:create_lesson' course_slug=course.slug module_id=module.id %}" class="btn btn-sm btn-outline-primary">Add Lesson</a>
                         {% else %}
                             <a href="#" class="btn btn-sm btn-outline-secondary disabled">Edit Module</a>
@@ -184,7 +184,7 @@
                                             {% endif %}
                                             {% if course.slug and module.id %}
                                                 <a href="{% url 'courses:edit_lesson' course_slug=course.slug module_id=module.id lesson_id=lesson.id %}" class="btn btn-sm btn-outline-secondary">Edit Lesson</a>
-                                                <a href="{% url 'courses:delete_lesson' course_slug=course.slug module_id=module.id lesson_id=lesson.id %}" class="btn btn-sm btn-outline-danger">Delete Lesson</a>
+                                                <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteLessonModal{{ lesson.id }}">Delete Lesson</button>
                                             {% endif %}
                                             {% if lesson.lesson_type == 'quiz' %}
                                                 <a href="{% url 'courses:configure_quiz' lesson_id=lesson.id %}" class="btn btn-sm btn-outline-primary">Configure Quiz</a>
@@ -202,6 +202,54 @@
                     {% endif %}
                 </div>
             </div>
+            
+            <!-- Delete Module Modal -->
+            <div class="modal fade" id="deleteModuleModal{{ module.id }}" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Delete Module</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>Are you sure you want to delete the module <strong>"{{ module.title }}"</strong>?</p>
+                            <p class="text-danger"><strong>Warning:</strong> This action cannot be undone. All lessons associated with this module will also be deleted.</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <form method="post" action="{% url 'courses:delete_module' course_slug=course.slug module_id=module.id %}" style="display: inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger">Yes, Delete Module</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Delete Lesson Modals -->
+            {% for lesson in module.lessons.all %}
+            <div class="modal fade" id="deleteLessonModal{{ lesson.id }}" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Delete Lesson</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>Are you sure you want to delete the lesson <strong>"{{ lesson.title }}"</strong>?</p>
+                            <p class="text-danger"><strong>Warning:</strong> This action cannot be undone.</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <form method="post" action="{% url 'courses:delete_lesson' course_slug=course.slug module_id=module.id lesson_id=lesson.id %}" style="display: inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger">Yes, Delete Lesson</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
         {% endfor %}
         <div class="mt-2">
             <small class="text-muted">Drag and drop modules to reorder them</small>
@@ -216,6 +264,29 @@
             {% endif %}
         </div>
     {% endif %}
+</div>
+
+<!-- Delete Course Modal -->
+<div class="modal fade" id="deleteCourseModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Delete Course</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete the course <strong>"{{ course.title }}"</strong>?</p>
+                <p class="text-danger"><strong>Warning:</strong> This action cannot be undone. All modules, lessons, and enrollments associated with this course will also be deleted.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form method="post" action="{% url 'courses:delete_course' slug=course.slug %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Yes, Delete Course</button>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}
 
