@@ -129,9 +129,9 @@
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h4>Modules and Lessons</h4>
     {% if course.slug %}
-        <a href="{% url 'courses:create_module' course_slug=course.slug %}" class="btn btn-sm btn-primary">Add Module</a>
+        <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#createModuleModal">Add Module</button>
     {% else %}
-        <a href="#" class="btn btn-sm btn-primary disabled">Add Module</a>
+        <button type="button" class="btn btn-sm btn-primary disabled">Add Module</button>
     {% endif %}
 </div>
 
@@ -146,13 +146,13 @@
                     </div>
                     <div>
                         {% if course.slug %}
-                            <a href="{% url 'courses:edit_module' course_slug=course.slug module_id=module.id %}" class="btn btn-sm btn-outline-secondary">Edit Module</a>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editModuleModal{{ module.id }}">Edit Module</button>
                             <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModuleModal{{ module.id }}">Delete Module</button>
-                            <a href="{% url 'courses:create_lesson' course_slug=course.slug module_id=module.id %}" class="btn btn-sm btn-outline-primary">Add Lesson</a>
+                            <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#createLessonModal{{ module.id }}">Add Lesson</button>
                         {% else %}
-                            <a href="#" class="btn btn-sm btn-outline-secondary disabled">Edit Module</a>
-                            <a href="#" class="btn btn-sm btn-outline-danger disabled">Delete Module</a>
-                            <a href="#" class="btn btn-sm btn-outline-primary disabled">Add Lesson</a>
+                            <button type="button" class="btn btn-sm btn-outline-secondary disabled">Edit Module</button>
+                            <button type="button" class="btn btn-sm btn-outline-danger disabled">Delete Module</button>
+                            <button type="button" class="btn btn-sm btn-outline-primary disabled">Add Lesson</button>
                         {% endif %}
                     </div>
                 </div>
@@ -183,7 +183,7 @@
                                                 <a href="{{ lesson.video_url }}" target="_blank" class="btn btn-sm btn-outline-info">Preview Video</a>
                                             {% endif %}
                                             {% if course.slug and module.id %}
-                                                <a href="{% url 'courses:edit_lesson' course_slug=course.slug module_id=module.id lesson_id=lesson.id %}" class="btn btn-sm btn-outline-secondary">Edit Lesson</a>
+                                                <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editLessonModal{{ lesson.id }}">Edit Lesson</button>
                                                 <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteLessonModal{{ lesson.id }}">Delete Lesson</button>
                                             {% endif %}
                                             {% if lesson.lesson_type == 'quiz' %}
@@ -202,6 +202,164 @@
                     {% endif %}
                 </div>
             </div>
+            
+            <!-- Edit Module Modal -->
+            <div class="modal fade" id="editModuleModal{{ module.id }}" tabindex="-1">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <form method="post" action="{% url 'courses:edit_module' course_slug=course.slug module_id=module.id %}">
+                            {% csrf_token %}
+                            <div class="modal-header">
+                                <h5 class="modal-title">Edit Module: {{ module.title }}</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="mb-3">
+                                    <label for="title_{{ module.id }}" class="form-label">Module Title</label>
+                                    <input type="text" class="form-control" id="title_{{ module.id }}" name="title" value="{{ module.title }}">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="description_{{ module.id }}" class="form-label">Description</label>
+                                    <textarea class="form-control" id="description_{{ module.id }}" name="description" rows="3">{{ module.description }}</textarea>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="order_{{ module.id }}" class="form-label">Order</label>
+                                    <input type="number" class="form-control" id="order_{{ module.id }}" name="order" min="0" value="{{ module.order }}">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="duration_days_{{ module.id }}" class="form-label">Duration (Days)</label>
+                                    <input type="number" class="form-control" id="duration_days_{{ module.id }}" name="duration_days" min="1" value="{{ module.duration_days }}">
+                                    <div class="form-text">Number of days students have to complete this module</div>
+                                </div>
+                                
+                                <div class="mb-3 form-check">
+                                    <input type="checkbox" class="form-check-input" id="is_locked_{{ module.id }}" name="is_locked" {% if module.is_locked %}checked{% endif %}>
+                                    <label class="form-check-label" for="is_locked_{{ module.id }}">Lock Module (Only accessible to students who purchased certificate)</label>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-primary">Update Module</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Create Lesson Modal -->
+            <div class="modal fade" id="createLessonModal{{ module.id }}" tabindex="-1">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <form method="post" action="{% url 'courses:create_lesson' course_slug=course.slug module_id=module.id %}">
+                            {% csrf_token %}
+                            <div class="modal-header">
+                                <h5 class="modal-title">Create Lesson for Module: {{ module.title }}</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="mb-3">
+                                    <label for="lesson_title_{{ module.id }}" class="form-label">Lesson Title</label>
+                                    <input type="text" class="form-control" id="lesson_title_{{ module.id }}" name="title" required>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="lesson_type_{{ module.id }}" class="form-label">Lesson Type</label>
+                                    <select class="form-control" id="lesson_type_{{ module.id }}" name="lesson_type">
+                                        <option value="text">Text</option>
+                                        <option value="video">Video</option>
+                                        <option value="quiz">Quiz</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="lesson_content_{{ module.id }}" class="form-label">Content</label>
+                                    <textarea class="form-control" id="lesson_content_{{ module.id }}" name="content" rows="5"></textarea>
+                                    <small class="form-text text-muted">For text lessons, add your content here.</small>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="lesson_order_{{ module.id }}" class="form-label">Order</label>
+                                    <input type="number" class="form-control" id="lesson_order_{{ module.id }}" name="order" min="0" value="0">
+                                </div>
+                                
+                                <div class="mb-3 form-check">
+                                    <input type="checkbox" class="form-check-input" id="lesson_is_published_{{ module.id }}" name="is_published" checked>
+                                    <label class="form-check-label" for="lesson_is_published_{{ module.id }}">Is Published</label>
+                                </div>
+                                
+                                <div class="mb-3 form-check">
+                                    <input type="checkbox" class="form-check-input" id="lesson_is_locked_{{ module.id }}" name="is_locked">
+                                    <label class="form-check-label" for="lesson_is_locked_{{ module.id }}">Lock Lesson (Only accessible to students who purchased certificate)</label>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-primary">Create Lesson</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Edit Lesson Modals -->
+            {% for lesson in module.lessons.all %}
+            <div class="modal fade" id="editLessonModal{{ lesson.id }}" tabindex="-1">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <form method="post" action="{% url 'courses:edit_lesson' course_slug=course.slug module_id=module.id lesson_id=lesson.id %}">
+                            {% csrf_token %}
+                            <div class="modal-header">
+                                <h5 class="modal-title">Edit Lesson: {{ lesson.title }}</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="mb-3">
+                                    <label for="edit_lesson_title_{{ lesson.id }}" class="form-label">Lesson Title</label>
+                                    <input type="text" class="form-control" id="edit_lesson_title_{{ lesson.id }}" name="title" value="{{ lesson.title }}" required>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="edit_lesson_type_{{ lesson.id }}" class="form-label">Lesson Type</label>
+                                    <select class="form-control" id="edit_lesson_type_{{ lesson.id }}" name="lesson_type">
+                                        <option value="text" {% if lesson.lesson_type == 'text' %}selected{% endif %}>Text</option>
+                                        <option value="video" {% if lesson.lesson_type == 'video' %}selected{% endif %}>Video</option>
+                                        <option value="quiz" {% if lesson.lesson_type == 'quiz' %}selected{% endif %}>Quiz</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="edit_lesson_content_{{ lesson.id }}" class="form-label">Content</label>
+                                    <textarea class="form-control" id="edit_lesson_content_{{ lesson.id }}" name="content" rows="5">{{ lesson.content|default:'' }}</textarea>
+                                    <small class="form-text text-muted">For text lessons, add your content here.</small>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="edit_lesson_order_{{ lesson.id }}" class="form-label">Order</label>
+                                    <input type="number" class="form-control" id="edit_lesson_order_{{ lesson.id }}" name="order" min="0" value="{{ lesson.order }}">
+                                </div>
+                                
+                                <div class="mb-3 form-check">
+                                    <input type="checkbox" class="form-check-input" id="edit_lesson_is_published_{{ lesson.id }}" name="is_published" {% if lesson.is_published %}checked{% endif %}>
+                                    <label class="form-check-label" for="edit_lesson_is_published_{{ lesson.id }}">Is Published</label>
+                                </div>
+                                
+                                <div class="mb-3 form-check">
+                                    <input type="checkbox" class="form-check-input" id="edit_lesson_is_locked_{{ lesson.id }}" name="is_locked" {% if lesson.is_locked %}checked{% endif %}>
+                                    <label class="form-check-label" for="edit_lesson_is_locked_{{ lesson.id }}">Lock Lesson (Only accessible to students who purchased certificate)</label>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-primary">Update Lesson</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
             
             <!-- Delete Module Modal -->
             <div class="modal fade" id="deleteModuleModal{{ module.id }}" tabindex="-1">
@@ -258,12 +416,58 @@
         <div class="alert alert-info">
             <p>This course doesn't have any modules yet.</p>
             {% if course.slug %}
-                <a href="{% url 'courses:create_module' course_slug=course.slug %}" class="btn btn-primary">Create Your First Module</a>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createModuleModal">Create Your First Module</button>
             {% else %}
-                <a href="#" class="btn btn-primary disabled">Create Your First Module</a>
+                <button type="button" class="btn btn-primary disabled">Create Your First Module</button>
             {% endif %}
         </div>
     {% endif %}
+</div>
+
+<!-- Create Module Modal -->
+<div class="modal fade" id="createModuleModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form method="post" action="{% url 'courses:create_module' course_slug=course.slug %}">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title">Create Module for Course: {{ course.title }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="module_title" class="form-label">Module Title</label>
+                        <input type="text" class="form-control" id="module_title" name="title" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="module_description" class="form-label">Description</label>
+                        <textarea class="form-control" id="module_description" name="description" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="module_order" class="form-label">Order</label>
+                        <input type="number" class="form-control" id="module_order" name="order" min="0" value="0">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="module_duration_days" class="form-label">Duration (Days)</label>
+                        <input type="number" class="form-control" id="module_duration_days" name="duration_days" min="1" value="7">
+                        <div class="form-text">Number of days students have to complete this module</div>
+                    </div>
+                    
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="module_is_locked" name="is_locked">
+                        <label class="form-check-label" for="module_is_locked">Lock Module (Only accessible to students who purchased certificate)</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create Module</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
 <!-- Delete Course Modal -->
