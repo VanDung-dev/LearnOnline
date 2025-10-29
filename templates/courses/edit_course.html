@@ -253,7 +253,7 @@
             <div class="modal fade" id="createLessonModal{{ module.id }}" tabindex="-1">
                 <div class="modal-dialog modal-lg">
                     <div class="modal-content">
-                        <form method="post" action="{% url 'courses:create_lesson' course_slug=course.slug module_id=module.id %}">
+                        <form method="post" action="{% url 'courses:create_lesson' course_slug=course.slug module_id=module.id %}" enctype="multipart/form-data">
                             {% csrf_token %}
                             <div class="modal-header">
                                 <h5 class="modal-title">Create Lesson for Module: {{ module.title }}</h5>
@@ -274,10 +274,38 @@
                                     </select>
                                 </div>
                                 
-                                <div class="mb-3">
+                                <div class="mb-3 lesson-content-section" id="text-content-section-{{ module.id }}" style="display: block;">
                                     <label for="lesson_content_{{ module.id }}" class="form-label">Content</label>
                                     <textarea class="form-control" id="lesson_content_{{ module.id }}" name="content" rows="5"></textarea>
                                     <small class="form-text text-muted">For text lessons, add your content here.</small>
+                                </div>
+                                
+                                <div class="mb-3 lesson-content-section" id="video-content-section-{{ module.id }}" style="display: none;">
+                                    <div class="mb-3">
+                                        <label for="lesson_video_url_{{ module.id }}" class="form-label">Video URL</label>
+                                        <input type="url" class="form-control" id="lesson_video_url_{{ module.id }}" name="video_url">
+                                        <small class="form-text text-muted">For video lessons, add the video URL here (YouTube, Vimeo, etc.).</small>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="lesson_video_file_{{ module.id }}" class="form-label">Upload Video File</label>
+                                        <input type="file" class="form-control" id="lesson_video_file_{{ module.id }}" name="video_file">
+                                        <small class="form-text text-muted">Alternatively, you can upload a video file directly.</small>
+                                    </div>
+                                    
+                                    <div class="alert alert-info">
+                                        <strong>Note:</strong> You must provide either a Video URL or upload a Video File, but not both.
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3 lesson-content-section" id="quiz-content-section-{{ module.id }}" style="display: none;">
+                                    <label for="lesson_max_attempts_{{ module.id }}" class="form-label">Maximum Quiz Attempts</label>
+                                    <input type="number" class="form-control" id="lesson_max_attempts_{{ module.id }}" name="max_attempts" min="0" value="0">
+                                    <small class="form-text text-muted">Set to 0 for unlimited attempts. This limits how many times a student can take the quiz.</small>
+                                    
+                                    <div class="alert alert-info mt-3">
+                                        <p>Quiz configuration will be available after creating the lesson. You will be redirected to the quiz editor where you can add questions and answers.</p>
+                                    </div>
                                 </div>
                                 
                                 <div class="mb-3">
@@ -309,7 +337,7 @@
             <div class="modal fade" id="editLessonModal{{ lesson.id }}" tabindex="-1">
                 <div class="modal-dialog modal-lg">
                     <div class="modal-content">
-                        <form method="post" action="{% url 'courses:edit_lesson' course_slug=course.slug module_id=module.id lesson_id=lesson.id %}">
+                        <form method="post" action="{% url 'courses:edit_lesson' course_slug=course.slug module_id=module.id lesson_id=lesson.id %}" enctype="multipart/form-data">
                             {% csrf_token %}
                             <div class="modal-header">
                                 <h5 class="modal-title">Edit Lesson: {{ lesson.title }}</h5>
@@ -330,10 +358,37 @@
                                     </select>
                                 </div>
                                 
-                                <div class="mb-3">
+                                <div class="mb-3 lesson-content-section" id="edit-text-content-section-{{ lesson.id }}" style="display: {% if lesson.lesson_type == 'text' %}block{% else %}none{% endif %};">
                                     <label for="edit_lesson_content_{{ lesson.id }}" class="form-label">Content</label>
                                     <textarea class="form-control" id="edit_lesson_content_{{ lesson.id }}" name="content" rows="5">{{ lesson.content|default:'' }}</textarea>
                                     <small class="form-text text-muted">For text lessons, add your content here.</small>
+                                </div>
+                                
+                                <div class="mb-3 lesson-content-section" id="edit-video-content-section-{{ lesson.id }}" style="display: {% if lesson.lesson_type == 'video' %}block{% else %}none{% endif %};">
+                                    <div class="mb-3">
+                                        <label for="edit_lesson_video_url_{{ lesson.id }}" class="form-label">Video URL</label>
+                                        <input type="url" class="form-control" id="edit_lesson_video_url_{{ lesson.id }}" name="video_url" value="{{ lesson.video_url|default:'' }}">
+                                        <small class="form-text text-muted">For video lessons, add the video URL here (YouTube, Vimeo, etc.).</small>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="edit_lesson_video_file_{{ lesson.id }}" class="form-label">Upload Video File</label>
+                                        <input type="file" class="form-control" id="edit_lesson_video_file_{{ lesson.id }}" name="video_file">
+                                        <small class="form-text text-muted">Alternatively, you can upload a video file directly.</small>
+                                        {% if lesson.video_file %}
+                                            <small class="form-text text-muted">Current file: {{ lesson.video_file.name }}</small>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="alert alert-info">
+                                        <strong>Note:</strong> You must provide either a Video URL or upload a Video File, but not both.
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3 lesson-content-section" id="edit-quiz-content-section-{{ lesson.id }}" style="display: {% if lesson.lesson_type == 'quiz' %}block{% else %}none{% endif %};">
+                                    <label for="edit_lesson_max_attempts_{{ lesson.id }}" class="form-label">Maximum Quiz Attempts</label>
+                                    <input type="number" class="form-control" id="edit_lesson_max_attempts_{{ lesson.id }}" name="max_attempts" min="0" value="{{ lesson.max_attempts }}">
+                                    <small class="form-text text-muted">Set to 0 for unlimited attempts. This limits how many times a student can take the quiz.</small>
                                 </div>
                                 
                                 <div class="mb-3">
@@ -617,6 +672,62 @@ $(document).ready(function() {
     });
     
     $('.sortable-modules').disableSelection();
+    
+    // Handle lesson type changes in create lesson modals
+    $('select[id^="lesson_type_"]').each(function() {
+        const moduleId = $(this).attr('id').split('_').pop();
+        const textSection = $(`#text-content-section-${moduleId}`);
+        const videoSection = $(`#video-content-section-${moduleId}`);
+        const quizSection = $(`#quiz-content-section-${moduleId}`);
+        
+        $(this).on('change', function() {
+            // Hide all sections
+            textSection.hide();
+            videoSection.hide();
+            quizSection.hide();
+            
+            // Show the relevant section based on selection
+            switch($(this).val()) {
+                case 'text':
+                    textSection.show();
+                    break;
+                case 'video':
+                    videoSection.show();
+                    break;
+                case 'quiz':
+                    quizSection.show();
+                    break;
+            }
+        });
+    });
+    
+    // Handle lesson type changes in edit lesson modals
+    $('select[id^="edit_lesson_type_"]').each(function() {
+        const lessonId = $(this).attr('id').split('_').pop();
+        const textSection = $(`#edit-text-content-section-${lessonId}`);
+        const videoSection = $(`#edit-video-content-section-${lessonId}`);
+        const quizSection = $(`#edit-quiz-content-section-${lessonId}`);
+        
+        $(this).on('change', function() {
+            // Hide all sections
+            textSection.hide();
+            videoSection.hide();
+            quizSection.hide();
+            
+            // Show the relevant section based on selection
+            switch($(this).val()) {
+                case 'text':
+                    textSection.show();
+                    break;
+                case 'video':
+                    videoSection.show();
+                    break;
+                case 'quiz':
+                    quizSection.show();
+                    break;
+            }
+        });
+    });
 });
 </script>
 {% endblock %}
