@@ -166,10 +166,10 @@ class Lesson(models.Model):
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.title)
-            # Ensure uniqueness within the module
+            # Ensure uniqueness within the course (not just within the module)
             original_slug = self.slug
             counter = 1
-            while Lesson.objects.filter(module=self.module, slug=self.slug).exists():
+            while Lesson.objects.filter(slug=self.slug, module__course=self.module.course).exists():
                 self.slug = f'{original_slug}-{counter}'
                 counter += 1
         super().save(*args, **kwargs)

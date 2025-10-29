@@ -141,7 +141,19 @@ def enroll_course(request, slug):
 @login_required
 def lesson_detail(request, course_slug, lesson_slug):
     course = get_object_or_404(Course, slug=course_slug, is_active=True)
-    lesson = get_object_or_404(Lesson, slug=lesson_slug, module__course=course)
+    # First get all lessons with the given slug in this course
+    lessons = Lesson.objects.filter(slug=lesson_slug, module__course=course, is_published=True)
+    if not lessons.exists():
+        raise Http404("Lesson not found")
+    elif lessons.count() > 1:
+        # If multiple lessons with same slug, get the first one
+        lesson = lessons.first()
+        # Log this issue for debugging
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.warning(f"Multiple lessons found with slug '{lesson_slug}' in course '{course.title}'")
+    else:
+        lesson = lessons.first()
     
     # Check if course is currently open
     now = timezone.now()
@@ -155,6 +167,11 @@ def lesson_detail(request, course_slug, lesson_slug):
     
     # Check if lesson or module is locked
     has_certificate = Certificate.objects.filter(user=request.user, course=course).exists()
+    
+    # Add debugging information
+    if lesson.lesson_type == 'video' and not lesson.video_url:
+        logger = logging.getLogger(__name__)
+        logger.warning(f"Video lesson '{lesson.title}' (ID: {lesson.id}) has no video URL set")
     
     if (lesson.is_locked or lesson.module.is_locked) and not has_certificate:
         # Lesson or module is locked and user doesn't have certificate
@@ -300,16 +317,22 @@ def lesson_detail(request, course_slug, lesson_slug):
     
     # Get next and previous lessons
     all_lessons = Lesson.objects.filter(module__course=course, is_published=True)
-    current_index = list(all_lessons).index(lesson)
-    
-    prev_lesson = None
-    next_lesson = None
-    
-    if current_index > 0:
-        prev_lesson = all_lessons[current_index - 1]
-    
-    if current_index < len(all_lessons) - 1:
-        next_lesson = all_lessons[current_index + 1]
+    all_lessons_list = list(all_lessons)
+    try:
+        current_index = all_lessons_list.index(lesson)
+        
+        prev_lesson = None
+        next_lesson = None
+        
+        if current_index > 0:
+            prev_lesson = all_lessons_list[current_index - 1]
+        
+        if current_index < len(all_lessons_list) - 1:
+            next_lesson = all_lessons_list[current_index + 1]
+    except ValueError:
+        # In case the lesson is not in the list (shouldn't happen but just in case)
+        prev_lesson = None
+        next_lesson = None
     
     context = {
         'course': course,
@@ -549,6 +572,26 @@ def delete_lesson(request, course_slug, module_id, lesson_id):
         return redirect('courses:edit_course', slug=course.slug)
     
     # Instead of rendering a separate template, redirect to edit_course with a delete flag
+    return redirect('courses:edit_course', slug=course.slug)
+
+
+@login_required
+def delete_lesson_video(request, course_slug, module_id, lesson_id):
+    course = get_object_or_404(Course, slug=course_slug, instructor=request.user)
+    module = get_object_or_404(Module, id=module_id, course=course)
+    lesson = get_object_or_404(Lesson, id=lesson_id, module=module)
+    
+    if request.method == 'POST':
+        # Check if lesson has a video file
+        if lesson.video_file:
+            # Delete the video file
+            lesson.video_file.delete()
+            lesson.video_file = None
+            lesson.save()
+            messages.success(request, 'Video file deleted successfully!')
+        else:
+            messages.info(request, 'No video file found for this lesson.')
+    
     return redirect('courses:edit_course', slug=course.slug)
 
 
