@@ -113,7 +113,7 @@
         <input type="checkbox" class="form-check-input" id="{{ form.is_active.id_for_label }}" name="{{ form.is_active.html_name }}" {% if form.is_active.value %}checked{% endif %}>
         <label class="form-check-label" for="{{ form.is_active.id_for_label }}">Is Active</label>
         {% if form.is_active.errors %}
-            <div class="text-danger">{{ form.is_active.errors }}</div>
+        <div class="text-danger">{{ form.is_active.errors }}</div>
         {% endif %}
     </div>
     
@@ -129,7 +129,7 @@
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h4>Modules and Lessons</h4>
     {% if course.slug %}
-        <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#createModuleModal">Add Module</button>
+    <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#createModuleModal">Add Module</button>
     {% else %}
         <button type="button" class="btn btn-sm btn-primary disabled">Add Module</button>
     {% endif %}
@@ -180,7 +180,7 @@
                                         </div>
                                         <div>
                                             {% if lesson.lesson_type == 'video' and lesson.video_url %}
-                                                <a href="{{ lesson.video_url }}" target="_blank" class="btn btn-sm btn-outline-info">Preview Video</a>
+                                                <a href="{{ lesson.video_url }}" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#videoModal" onclick="loadVideo('{{ lesson.video_url }}')">Preview Video</a>
                                             {% endif %}
                                             {% if course.slug and module.id %}
                                                 <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editLessonModal{{ lesson.id }}">Edit Lesson</button>
@@ -379,7 +379,7 @@
                                             <div class="mt-2">
                                                 <small class="form-text text-muted">Current file: {{ lesson.video_file.name }}</small>
                                                 <div class="mt-1">
-                                                    <a href="{{ lesson.video_file.url }}" target="_blank" class="btn btn-sm btn-outline-info me-2">Preview Video</a>
+                                                    <button type="button" class="btn btn-sm btn-outline-info me-2" data-bs-toggle="modal" data-bs-target="#videoModal" onclick="loadVideoFile('{{ lesson.video_file.url }}')">Preview Video</button>
                                                     <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteVideoModal{{ lesson.id }}">Delete Video File</button>
                                                 </div>
                                             </div>
@@ -528,7 +528,6 @@
                         <label for="module_title" class="form-label">Module Title</label>
                         <input type="text" class="form-control" id="module_title" name="title" required>
                     </div>
-                    
                     <div class="mb-3">
                         <label for="module_description" class="form-label">Description</label>
                         <textarea class="form-control" id="module_description" name="description" rows="3"></textarea>
@@ -538,7 +537,6 @@
                         <label for="module_order" class="form-label">Order</label>
                         <input type="number" class="form-control" id="module_order" name="order" min="0" value="0">
                     </div>
-                    
                     <div class="mb-3">
                         <label for="module_duration_days" class="form-label">Duration (Days)</label>
                         <input type="number" class="form-control" id="module_duration_days" name="duration_days" min="1" value="7">
@@ -584,6 +582,29 @@
 {% endblock %}
 
 {% block extra_js %}
+<!-- Video Preview Modal -->
+<div class="modal fade" id="videoModal" tabindex="-1" aria-labelledby="videoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="videoModalLabel">Video Preview</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+        <div class="modal-body">
+            <div class="ratio ratio-16x9">
+                <iframe id="videoFrame" src="" title="Video preview" allowfullscreen></iframe>
+            </div>
+            <video id="videoPlayer" class="w-100" controls style="display: none;">
+                Your browser does not support the video tag.
+            </video>
+        </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
 <script>
@@ -762,6 +783,73 @@ $(document).ready(function() {
             }
         });
     });
+});
+
+function loadVideo(videoUrl) {
+    const videoFrame = document.getElementById('videoFrame');
+    const videoPlayer = document.getElementById('videoPlayer');
+    
+    // Hide both iframes and video players
+    videoFrame.style.display = 'none';
+    videoPlayer.style.display = 'none';
+    
+    // Check if it's a YouTube URL
+    if (videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')) {
+        // Convert YouTube URLs to embed if needed
+        let embedUrl = videoUrl;
+        if (videoUrl.includes('youtube.com/watch')) {
+            const videoId = videoUrl.split('v=')[1];
+            const ampersandPosition = videoId.indexOf('&');
+            if (ampersandPosition !== -1) {
+                embedUrl = 'https://www.youtube.com/embed/' + videoId.substring(0, ampersandPosition);
+            } else {
+                embedUrl = 'https://www.youtube.com/embed/' + videoId;
+            }
+        } else if (videoUrl.includes('youtu.be')) {
+            const videoId = videoUrl.split('youtu.be/')[1];
+            embedUrl = 'https://www.youtube.com/embed/' + videoId;
+        }
+        
+        videoFrame.src = embedUrl;
+        videoFrame.style.display = 'block';
+    } 
+    // Check if it's a Vimeo URL
+    else if (videoUrl.includes('vimeo.com')) {
+        const videoId = videoUrl.split('vimeo.com/')[1];
+        const embedUrl = 'https://player.vimeo.com/video/' + videoId;
+        videoFrame.src = embedUrl;
+        videoFrame.style.display = 'block';
+    }
+    // Other platforms can be added here
+    else {
+        videoFrame.src = videoUrl;
+        videoFrame.style.display = 'block';
+    }
+}
+
+function loadVideoFile(videoFileUrl) {
+    const videoFrame = document.getElementById('videoFrame');
+    const videoPlayer = document.getElementById('videoPlayer');
+    
+    // Hide iframes and show video player
+    videoFrame.style.display = 'none';
+    videoPlayer.style.display = 'block';
+    
+    // Set the power for the video player
+    videoPlayer.src = videoFileUrl;
+}
+
+// Stop video when modal is closed
+document.getElementById('videoModal').addEventListener('hidden.bs.modal', function () {
+    const videoFrame = document.getElementById('videoFrame');
+    const videoPlayer = document.getElementById('videoPlayer');
+    
+    // Stop iframe by deleting src
+    videoFrame.src = '';
+    
+    // Stop the video player and reset the time
+    videoPlayer.pause();
+    videoPlayer.currentTime = 0;
 });
 </script>
 {% endblock %}
