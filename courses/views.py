@@ -447,14 +447,10 @@ def create_module(request, course_slug):
             module.save()
             messages.success(request, 'Module created successfully!')
             return redirect('courses:edit_course', slug=course.slug)
-    else:
-        form = ModuleForm()
     
-    context = {
-        'form': form,
-        'course': course,
-    }
-    return render(request, 'courses/create_module.html', context)
+    # Redirect back to the edit course page instead of rendering a separate template
+    messages.info(request, 'Module creation is now handled through the course edit page.')
+    return redirect('courses:edit_course', slug=course.slug)
 
 
 @login_required
@@ -468,15 +464,10 @@ def edit_module(request, course_slug, module_id):
             form.save()
             messages.success(request, 'Module updated successfully!')
             return redirect('courses:edit_course', slug=course.slug)
-    else:
-        form = ModuleForm(instance=module)
     
-    context = {
-        'form': form,
-        'course': course,
-        'module': module,
-    }
-    return render(request, 'courses/edit_module.html', context)
+    # Redirect back to the edit course page instead of rendering a separate template
+    messages.info(request, 'Module editing is now handled through the course edit page.')
+    return redirect('courses:edit_course', slug=course.slug)
 
 
 @login_required
@@ -514,15 +505,10 @@ def create_lesson(request, course_slug, module_id):
                 return redirect('courses:configure_quiz', lesson_id=lesson.id)
             else:
                 return redirect('courses:edit_course', slug=course.slug)
-    else:
-        form = LessonForm()
     
-    context = {
-        'form': form,
-        'course': course,
-        'module': module,
-    }
-    return render(request, 'courses/create_lesson.html', context)
+    # Redirect back to the edit course page instead of rendering a separate template
+    messages.info(request, 'Lesson creation is now handled through the course edit page.')
+    return redirect('courses:edit_course', slug=course.slug)
 
 
 @login_required
@@ -544,16 +530,10 @@ def edit_lesson(request, course_slug, module_id, lesson_id):
                 return redirect('courses:configure_quiz', lesson_id=lesson.id)
             else:
                 return redirect('courses:edit_course', slug=course.slug)
-    else:
-        form = LessonForm(instance=lesson)
     
-    context = {
-        'form': form,
-        'course': course,
-        'module': module,
-        'lesson': lesson,
-    }
-    return render(request, 'courses/create_lesson.html', context)
+    # Redirect back to the edit course page instead of rendering a separate template
+    messages.info(request, 'Lesson editing is now handled through the course edit page.')
+    return redirect('courses:edit_course', slug=course.slug)
 
 
 @login_required
