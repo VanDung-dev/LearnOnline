@@ -147,9 +147,9 @@
                     </div>
                     <div>
                         {% if course.slug %}
+                            <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#createLessonModal{{ module.id }}">Add Lesson</button>
                             <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editModuleModal{{ module.id }}">Edit Module</button>
                             <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModuleModal{{ module.id }}">Delete Module</button>
-                            <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#createLessonModal{{ module.id }}">Add Lesson</button>
                         {% else %}
                             <button type="button" class="btn btn-sm btn-outline-secondary disabled">Edit Module</button>
                             <button type="button" class="btn btn-sm btn-outline-danger disabled">Delete Module</button>
@@ -180,15 +180,15 @@
                                             {% endif %}
                                         </div>
                                         <div>
-                                            {% if lesson.lesson_type == 'video' and lesson.video_url %}
-                                                <a href="{{ lesson.video_url }}" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#videoModal" onclick="loadVideo('{{ lesson.video_url }}')">Preview Video</a>
+                                            {% if lesson.lesson_type == 'video' and lesson.video_file %}
+                                                <button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#videoModal" onclick="loadVideoFile('{{ lesson.video_file.url }}')">Preview Video</button>
+                                            {% endif %}
+                                            {% if lesson.lesson_type == 'quiz' %}
+                                                <a href="{% url 'courses:configure_quiz' lesson_id=lesson.id %}" class="btn btn-sm btn-outline-primary">Configure Quiz</a>
                                             {% endif %}
                                             {% if course.slug and module.id %}
                                                 <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editLessonModal{{ lesson.id }}">Edit Lesson</button>
                                                 <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteLessonModal{{ lesson.id }}">Delete Lesson</button>
-                                            {% endif %}
-                                            {% if lesson.lesson_type == 'quiz' %}
-                                                <a href="{% url 'courses:configure_quiz' lesson_id=lesson.id %}" class="btn btn-sm btn-outline-primary">Configure Quiz</a>
                                             {% endif %}
                                         </div>
                                     </li>
@@ -380,7 +380,6 @@
                                             <div class="mt-2">
                                                 <small class="form-text text-muted">Current file: {{ lesson.video_file.name }}</small>
                                                 <div class="mt-1">
-                                                    <button type="button" class="btn btn-sm btn-outline-info me-2" data-bs-toggle="modal" data-bs-target="#videoModal" onclick="loadVideoFile('{{ lesson.video_file.url }}')">Preview Video</button>
                                                     <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteVideoModal{{ lesson.id }}">Delete Video File</button>
                                                 </div>
                                             </div>
