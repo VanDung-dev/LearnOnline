@@ -187,7 +187,7 @@
                                                 <a href="{% url 'courses:configure_quiz' lesson_id=lesson.id %}" class="btn btn-sm btn-outline-primary">Configure Quiz</a>
                                             {% endif %}
                                             {% if course.slug and module.id %}
-                                                <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editLessonModal{{ lesson.id }}">Edit Lesson</button>
+                                                <a href="{% url 'courses:edit_lesson' course_slug=course.slug module_id=module.id lesson_id=lesson.id %}" class="btn btn-sm btn-outline-secondary">Edit Lesson</a>
                                                 <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteLessonModal{{ lesson.id }}">Delete Lesson</button>
                                             {% endif %}
                                         </div>
@@ -207,7 +207,6 @@
             {% include 'courses/includes/create_lesson_modal.html' with module=module %}
 
             {% include 'courses/includes/edit_module_modal.html' with module=module %}
-            {% include 'courses/includes/edit_lesson_modal.html' with module=module %}
 
             {% include 'courses/includes/delete_module_modal.html' with module=module %}
             {% include 'courses/includes/delete_lesson_modal.html' with module=module %}
