@@ -207,22 +207,7 @@
     </div>
 </div>
 
-<style>
-.card-option {
-    transition: all 0.2s ease-in-out;
-    cursor: pointer;
-}
-
-.card-option:hover {
-    border-color: #ffc107 !important;
-    box-shadow: 0 0.125rem 0.25rem rgba(255, 193, 7, 0.25);
-}
-
-.card-option.selected {
-    border-color: #ffc107 !important;
-    background-color: rgba(255, 193, 7, 0.05);
-}
-</style>
+<link rel="stylesheet" type="text/css" href="{% static 'payments/certificate_payment_form.css' %}">
 
 <script>
 const processPaymentUrl = '{% url "payments:process_certificate_payment" course.slug %}';

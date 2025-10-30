@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Certificate - {{ certificate.course.title }}{% endblock %}
 
@@ -54,71 +55,7 @@
     </div>
 </div>
 
-<style>
-.certificate-card {
-    border: 2px solid #007bff;
-    box-shadow: 0 0 20px rgba(0, 123, 255, 0.2);
-    background: #fff;
-    margin-top: 2rem;
-}
-
-.certificate-title {
-    color: #007bff;
-    font-size: 2.5rem;
-    font-weight: bold;
-    text-transform: uppercase;
-    letter-spacing: 3px;
-}
-
-.certificate-subtitle {
-    font-size: 1.2rem;
-    color: #6c757d;
-}
-
-.recipient-name h2 {
-    color: #28a745;
-    font-size: 2rem;
-    font-weight: bold;
-}
-
-.course-title {
-    color: #007bff;
-    font-size: 1.8rem;
-    font-weight: bold;
-}
-
-.certificate-details {
-    background-color: #f8f9fa;
-    padding: 1rem;
-    border-radius: 5px;
-}
-
-.signature-section {
-    margin-top: 2rem;
-}
-
-@media print {
-    body * {
-        visibility: hidden;
-    }
-    #print-section {
-        visibility: visible;
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-        text-align: center;
-    }
-    #print-section * {
-        visibility: visible;
-    }
-    
-    /* Try to minimize what appears in headers */
-    title {
-        display: none;
-    }
-}
-</style>
+<link rel="stylesheet" type="text/css" href="{% static 'courses/certificate.css' %}">
 
 <script>
 function printCertificate() {
