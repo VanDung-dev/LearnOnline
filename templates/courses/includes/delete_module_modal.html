@@ -1,0 +1,22 @@
+<!-- Delete Module Modal -->
+<div class="modal fade" id="deleteModuleModal{{ module.id }}" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Delete Module</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete the module <strong>"{{ module.title }}"</strong>?</p>
+                <p class="text-danger"><strong>Warning:</strong> This action cannot be undone. All lessons associated with this module will also be deleted.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form method="post" action="{% url 'courses:delete_module' course_slug=course.slug module_id=module.id %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Yes, Delete Module</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

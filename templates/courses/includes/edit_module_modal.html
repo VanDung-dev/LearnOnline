@@ -1,0 +1,45 @@
+<!-- Edit Module Modal -->
+<div class="modal fade" id="editModuleModal{{ module.id }}" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form method="post" action="{% url 'courses:edit_module' course_slug=course.slug module_id=module.id %}">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Module: {{ module.title }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="title_{{ module.id }}" class="form-label">Module Title</label>
+                        <input type="text" class="form-control" id="title_{{ module.id }}" name="title" value="{{ module.title }}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="description_{{ module.id }}" class="form-label">Description</label>
+                        <textarea class="form-control" id="description_{{ module.id }}" name="description" rows="3">{{ module.description }}</textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="order_{{ module.id }}" class="form-label">Order</label>
+                        <input type="number" class="form-control" id="order_{{ module.id }}" name="order" min="0" value="{{ module.order }}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="duration_days_{{ module.id }}" class="form-label">Duration (Days)</label>
+                        <input type="number" class="form-control" id="duration_days_{{ module.id }}" name="duration_days" min="1" value="{{ module.duration_days }}">
+                        <div class="form-text">Number of days students have to complete this module</div>
+                    </div>
+
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="is_locked_{{ module.id }}" name="is_locked" {% if module.is_locked %}checked{% endif %}>
+                        <label class="form-check-label" for="is_locked_{{ module.id }}">Lock Module (Only accessible to students who purchased certificate)</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Update Module</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
