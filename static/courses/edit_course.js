@@ -145,79 +145,9 @@ $(document).ready(function() {
             }
         });
     });
-    
-    // Handle lesson type changes in edit lesson modals
-    $('select[id^="edit_lesson_type_"]').each(function() {
-        const lessonId = $(this).attr('id').split('_').pop();
-        const textSection = $(`#edit-text-content-section-${lessonId}`);
-        const videoSection = $(`#edit-video-content-section-${lessonId}`);
-        const quizSection = $(`#edit-quiz-content-section-${lessonId}`);
-        
-        $(this).on('change', function() {
-            // Hide all sections
-            textSection.hide();
-            videoSection.hide();
-            quizSection.hide();
-            
-            // Show the relevant section based on selection
-            switch($(this).val()) {
-                case 'text':
-                    textSection.show();
-                    break;
-                case 'video':
-                    videoSection.show();
-                    break;
-                case 'quiz':
-                    quizSection.show();
-                    break;
-            }
-        });
-    });
 });
 
-// Video handling functions
-function loadVideo(videoUrl) {
-    const videoFrame = document.getElementById('videoFrame');
-    const videoPlayer = document.getElementById('videoPlayer');
-    
-    // Hide both iframes and video players
-    videoFrame.style.display = 'none';
-    videoPlayer.style.display = 'none';
-    
-    // Check if it's a YouTube URL
-    if (videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')) {
-        // Convert YouTube URLs to embed if needed
-        let embedUrl = videoUrl;
-        if (videoUrl.includes('youtube.com/watch')) {
-            const videoId = videoUrl.split('v=')[1];
-            const ampersandPosition = videoId.indexOf('&');
-            if (ampersandPosition !== -1) {
-                embedUrl = 'https://www.youtube.com/embed/' + videoId.substring(0, ampersandPosition);
-            } else {
-                embedUrl = 'https://www.youtube.com/embed/' + videoId;
-            }
-        } else if (videoUrl.includes('youtu.be')) {
-            const videoId = videoUrl.split('youtu.be/')[1];
-            embedUrl = 'https://www.youtube.com/embed/' + videoId;
-        }
-        
-        videoFrame.src = embedUrl;
-        videoFrame.style.display = 'block';
-    } 
-    // Check if it's a Vimeo URL
-    else if (videoUrl.includes('vimeo.com')) {
-        const videoId = videoUrl.split('vimeo.com/')[1];
-        const embedUrl = 'https://player.vimeo.com/video/' + videoId;
-        videoFrame.src = embedUrl;
-        videoFrame.style.display = 'block';
-    }
-    // Other platforms can be added here
-    else {
-        videoFrame.src = videoUrl;
-        videoFrame.style.display = 'block';
-    }
-}
-
+// Video handling functions for preview in list
 function loadVideoFile(videoFileUrl) {
     const videoFrame = document.getElementById('videoFrame');
     const videoPlayer = document.getElementById('videoPlayer');
@@ -232,15 +162,20 @@ function loadVideoFile(videoFileUrl) {
 
 // Stop video when modal is closed
 document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('videoModal').addEventListener('hidden.bs.modal', function () {
-        const videoFrame = document.getElementById('videoFrame');
-        const videoPlayer = document.getElementById('videoPlayer');
-        
-        // Stop iframe by deleting src
-        videoFrame.src = '';
-        
-        // Stop the video player and reset the time
-        videoPlayer.pause();
-        videoPlayer.currentTime = 0;
-    });
+    const videoModal = document.getElementById('videoModal');
+    if (videoModal) {
+        videoModal.addEventListener('hidden.bs.modal', function () {
+            const videoFrame = document.getElementById('videoFrame');
+            const videoPlayer = document.getElementById('videoPlayer');
+            
+            if (videoFrame) {
+                videoFrame.src = '';
+            }
+            
+            if (videoPlayer) {
+                videoPlayer.pause();
+                videoPlayer.currentTime = 0;
+            }
+        });
+    }
 });
