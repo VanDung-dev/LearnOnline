@@ -42,7 +42,7 @@ def edit_lesson(request, course_slug, module_id, lesson_id):
     if request.method == 'POST':
         form = LessonForm(request.POST, request.FILES, instance=lesson)
         if form.is_valid():
-            form.save()
+            lesson = form.save()
             messages.success(request, 'Lesson updated successfully!')
 
             # Redirect based on lesson type for further configuration
@@ -52,10 +52,18 @@ def edit_lesson(request, course_slug, module_id, lesson_id):
                 return redirect('courses:configure_quiz', lesson_id=lesson.id)
             else:
                 return redirect('courses:edit_course', slug=course.slug)
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = LessonForm(instance=lesson)
 
-    # Redirect back to the edit course page instead of rendering a separate template
-    messages.info(request, 'Lesson editing is now handled through the course edit page.')
-    return redirect('courses:edit_course', slug=course.slug)
+    context = {
+        'course': course,
+        'module': module,
+        'lesson': lesson,
+        'form': form,
+    }
+    return render(request, 'courses/edit_lesson.html', context)
 
 
 @login_required
