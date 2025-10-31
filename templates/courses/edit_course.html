@@ -180,9 +180,6 @@
                                             {% endif %}
                                         </div>
                                         <div>
-                                            {% if lesson.lesson_type == 'video' and lesson.video_file %}
-                                                <button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#videoModal" onclick="loadVideoFile('{{ lesson.video_file.url }}')">Preview Video</button>
-                                            {% endif %}
                                             {% if lesson.lesson_type == 'quiz' %}
                                                 <a href="{% url 'courses:configure_quiz' lesson_id=lesson.id %}" class="btn btn-sm btn-outline-primary">Configure Quiz</a>
                                             {% endif %}
@@ -210,7 +207,6 @@
 
             {% include 'courses/includes/delete_module_modal.html' with module=module %}
             {% include 'courses/includes/delete_lesson_modal.html' with module=module %}
-            {% include 'courses/includes/delete_video_file_modal.html' with module=module %}
 
         {% endfor %}
         <div class="mt-2">
@@ -234,8 +230,6 @@
 {% endblock %}
 
 {% block extra_js %}
-
-{% include 'courses/includes/video_preview_modal.html' with module=module %}
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
