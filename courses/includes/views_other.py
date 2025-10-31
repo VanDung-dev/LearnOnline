@@ -90,7 +90,7 @@ def delete_lesson_video(request, course_slug, module_id, lesson_id):
 @login_required
 def configure_quiz(request, lesson_id=None):
     """
-Redirect to the edit lesson page where quiz configuration is now handled
+    Redirect to the edit lesson page where quiz configuration is now handled
     """
     if lesson_id:
         lesson = get_object_or_404(Lesson, id=lesson_id, module__course__instructor=request.user)
