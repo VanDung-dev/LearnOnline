@@ -78,3 +78,35 @@ def module_deadline(module, user):
         return module.get_deadline(enrollment.enrolled_at)
     except Enrollment.DoesNotExist:
         return module.get_deadline()
+
+@register.filter
+def youtube_embed_url(url):
+    """
+    Convert YouTube URL to embed format
+    """
+    if not url:
+        return ''
+        
+    # Handle various YouTube URL formats
+    import re
+    
+    # Regex pattern to match YouTube URLs and extract video ID
+    patterns = [
+        r'(?:v=|be\/|embed\/|v\/|watch\?.*v=)([\w-]{11})',
+        r'(?:https?:\/\/)?(?:www\.)?youtu\.be\/([\w-]{11})'
+    ]
+    
+    for pattern in patterns:
+        match = re.search(pattern, url)
+        if match:
+            video_id = match.group(1)
+            break
+    else:
+        video_id = None
+    
+    if video_id:
+        # Make sure we return a proper embed URL
+        return f'https://www.youtube.com/embed/{video_id}'
+        
+    # Return original URL if not a recognized YouTube format
+    return url
