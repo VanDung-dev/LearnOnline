@@ -180,9 +180,6 @@
                                             {% endif %}
                                         </div>
                                         <div>
-                                            {% if lesson.lesson_type == 'quiz' %}
-                                                <a href="{% url 'courses:configure_quiz' lesson_id=lesson.id %}" class="btn btn-sm btn-outline-primary">Configure Quiz</a>
-                                            {% endif %}
                                             {% if course.slug and module.id %}
                                                 <a href="{% url 'courses:edit_lesson' course_slug=course.slug module_id=module.id lesson_id=lesson.id %}" class="btn btn-sm btn-outline-secondary">Edit Lesson</a>
                                                 <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteLessonModal{{ lesson.id }}">Delete Lesson</button>
