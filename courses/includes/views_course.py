@@ -113,39 +113,3 @@ def course_detail(request, slug):
         'is_enrolled': is_enrolled,
     }
     return render(request, 'courses/course_detail.html', context)
-
-
-@login_required
-def enroll_course(request, slug):
-    course = get_object_or_404(Course, slug=slug, is_active=True)
-
-    # Check if course is currently open for enrollment
-    now = timezone.now()
-    if course.closing_date and now > course.closing_date:
-        messages.error(request, "Enrollment for this course is closed.")
-        return redirect('courses:course_detail', slug=slug)
-
-    # Check if user is already enrolled
-    enrollment, created = Enrollment.objects.get_or_create(
-        user=request.user,
-        course=course
-    )
-
-    if created:
-        messages.success(request, "You have been successfully enrolled in this course.")
-    else:
-        messages.info(request, "You are already enrolled in this course.")
-
-    return render(request, 'courses/enrollment_success.html', {'course': course})
-
-
-@login_required
-def instructor_courses(request):
-    if not hasattr(request.user, 'profile') or not request.user.profile.is_instructor():
-        return HttpResponseForbidden("You must be an instructor to view this page.")
-
-    courses = Course.objects.filter(instructor=request.user)
-    context = {
-        'courses': courses,
-    }
-    return render(request, 'courses/instructor_courses.html', context)
