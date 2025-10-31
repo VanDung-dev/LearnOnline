@@ -49,9 +49,9 @@
                                     <div class="mt-2">
                                         <small class="form-text text-muted">Current file: {{ lesson.video_file.name }}</small>
                                         <div class="mt-1">
-                                            <a href="#" class="text-danger" data-bs-toggle="modal" data-bs-target="#deleteVideoModal">
+                                            <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteVideoModal">
                                                 Delete current video
-                                            </a>
+                                            </button>
                                         </div>
                                         <div class="mt-3">
                                             <h6>Current Video:</h6>
@@ -103,28 +103,9 @@
 </div>
 
 {% if lesson.video_file %}
-<!-- Delete Video Modal -->
-<div class="modal fade" id="deleteVideoModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Delete Video</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <p>Are you sure you want to delete the current video file?</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <form method="post" action="{% url 'courses:delete_lesson_video' course_slug=course.slug module_id=module.id lesson_id=lesson.id %}">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-danger">Delete Video</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
+{% include 'courses/includes/delete_video_modal.html' with module=module %}
 {% endif %}
+
 {% endblock %}
 
 {% block extra_js %}
