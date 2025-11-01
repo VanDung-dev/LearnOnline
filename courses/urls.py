@@ -7,6 +7,7 @@ urlpatterns = [
     path('', views.home, name='home'),
     path('courses/', views.course_list, name='course_list'),
     path('courses/<slug:slug>/', views.course_detail, name='course_detail'),
+    path('courses/<slug:slug>/preview/', views.preview_course, name='preview_course'),
     path('courses/<slug:slug>/enroll/', views.enroll_course, name='enroll_course'),
     path('courses/<slug:course_slug>/lessons/<slug:lesson_slug>/', views.lesson_detail, name='lesson_detail'),
     path('courses/<slug:course_slug>/modules/<int:module_id>/lessons/<int:lesson_id>/reorder/', views.reorder_lessons, name='reorder_lessons'),
