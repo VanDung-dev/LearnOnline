@@ -3,6 +3,13 @@
 {% block title %}{{ lesson.title }} - {{ course.title }} - Online Learning Platform{% endblock %}
 
 {% block content %}
+{% if is_preview %}
+<div class="alert alert-info">
+    <h4>Preview Mode</h4>
+    <p>You are previewing this lesson as a student. This is how students will see your lesson.</p>
+</div>
+{% endif %}
+
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{% url 'courses:home' %}">Home</a></li>
