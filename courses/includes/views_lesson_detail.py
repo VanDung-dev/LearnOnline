@@ -30,20 +30,27 @@ def lesson_detail(request, course_slug, lesson_slug):
             (course.closing_date and now > course.closing_date)):
         raise Http404("Course is not currently available")
 
-    # Check if user is enrolled in the course
-    enrollment = get_object_or_404(Enrollment, user=request.user, course=course)
-    is_enrolled = True
-
-    # Check if lesson or module is locked
-    has_certificate = Certificate.objects.filter(user=request.user, course=course).exists()
+    # Check if user is the instructor (for preview mode)
+    is_instructor = (request.user == course.instructor)
+    
+    # For instructors, we allow previewing without enrollment
+    if is_instructor:
+        enrollment = None
+        is_enrolled = True  # Treat instructor as enrolled for preview
+        has_certificate = True  # Treat instructor as having certificate for preview
+    else:
+        # Regular student flow - must be enrolled
+        enrollment = get_object_or_404(Enrollment, user=request.user, course=course)
+        is_enrolled = True
+        has_certificate = Certificate.objects.filter(user=request.user, course=course).exists()
 
     # Add debugging information
     if lesson.lesson_type == 'video' and not lesson.video_url:
         logger = logging.getLogger(__name__)
         logger.warning(f"Video lesson '{lesson.title}' (ID: {lesson.id}) has no video URL set")
 
-    if (lesson.is_locked or lesson.module.is_locked) and not has_certificate:
-        # Lesson or module is locked and user doesn't have certificate
+    if (lesson.is_locked or lesson.module.is_locked) and not has_certificate and not is_instructor:
+        # Lesson or module is locked and user doesn't have certificate (and is not instructor)
         messages.error(request, "This content is locked. Purchase a certificate to access it.")
         return redirect('courses:course_detail', slug=course.slug)
 
@@ -55,6 +62,16 @@ def lesson_detail(request, course_slug, lesson_slug):
         except Quiz.DoesNotExist:
             messages.error(request, "This quiz is not configured yet.")
             return redirect('courses:course_detail', slug=course.slug)
+
+        # For instructors in preview mode, skip quiz functionality
+        if is_instructor:
+            context = {
+                'course': course,
+                'lesson': lesson,
+                'quiz': quiz,
+                'is_preview': True,
+            }
+            return render(request, 'courses/quiz_detail.html', context)
 
         # Check attempts
         attempts = QuizAttempt.objects.filter(user=request.user, lesson=lesson)
@@ -173,18 +190,20 @@ def lesson_detail(request, course_slug, lesson_slug):
             }
             return render(request, 'courses/quiz_detail.html', context)
 
-    # Mark lesson as completed (for non-quiz lessons)
-    progress, created = Progress.objects.get_or_create(
-        user=request.user,
-        lesson=lesson
-    )
+    # For instructors in preview mode, skip completion tracking
+    if not is_instructor:
+        # Mark lesson as completed (for non-quiz lessons)
+        progress, created = Progress.objects.get_or_create(
+            user=request.user,
+            lesson=lesson
+        )
 
-    if not progress.completed:
-        progress.completed = True
-        progress.save()
+        if not progress.completed:
+            progress.completed = True
+            progress.save()
 
-    # Check if course is completed and issue certificate if needed
-    check_and_issue_certificate(request.user, course)
+        # Check if course is completed and issue certificate if needed
+        check_and_issue_certificate(request.user, course)
 
     # Get next and previous lessons
     all_lessons = Lesson.objects.filter(module__course=course, is_published=True)
@@ -211,6 +230,7 @@ def lesson_detail(request, course_slug, lesson_slug):
         'prev_lesson': prev_lesson,
         'next_lesson': next_lesson,
         'enrollment': enrollment,
+        'is_preview': is_instructor,  # Show preview banner for instructors
     }
     return render(request, 'courses/lesson_detail.html', context)
 

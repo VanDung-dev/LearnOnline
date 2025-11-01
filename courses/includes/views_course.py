@@ -113,3 +113,23 @@ def course_detail(request, slug):
         'is_enrolled': is_enrolled,
     }
     return render(request, 'courses/course_detail.html', context)
+
+
+@login_required
+def preview_course(request, slug):
+    # Allow instructors to preview their courses as if they were students
+    course = get_object_or_404(Course, slug=slug)
+    
+    # Check if user is the instructor of this course
+    if request.user != course.instructor:
+        return HttpResponseForbidden("You are not authorized to preview this course.")
+    
+    # For preview purposes, treat instructor as enrolled
+    is_enrolled = True
+    
+    context = {
+        'course': course,
+        'is_enrolled': is_enrolled,
+        'is_preview': True,  # Flag to indicate this is a preview
+    }
+    return render(request, 'courses/course_detail.html', context)
