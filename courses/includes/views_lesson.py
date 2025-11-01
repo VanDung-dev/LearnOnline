@@ -136,22 +136,14 @@ def edit_lesson(request, course_slug, module_id, lesson_id):
                 messages.success(request, 'Quiz updated successfully!')
             else:
                 messages.error(request, 'Error updating quiz!')
-            return redirect('courses:edit_lesson', course_slug=course.slug, module_id=module.id, lesson_id=lesson.id)
+            return redirect('courses:edit_course', slug=course.slug)
             
         else:
             # Handle lesson form
             form = LessonForm(request.POST, request.FILES, instance=lesson)
             if form.is_valid():
-                lesson = form.save()
                 messages.success(request, 'Lesson updated successfully!')
-
-                # Redirect based on lesson type for further configuration
-                if lesson.lesson_type == 'quiz':
-                    # Redirect to quiz configuration page
-                    messages.info(request, 'You can now configure your quiz questions.')
-                    return redirect('courses:edit_lesson', course_slug=course.slug, module_id=module.id, lesson_id=lesson.id)
-                else:
-                    return redirect('courses:edit_course', slug=course.slug)
+                return redirect('courses:edit_course', slug=course.slug)
             else:
                 messages.error(request, 'Please correct the errors below.')
     else:
