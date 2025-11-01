@@ -24,12 +24,6 @@ urlpatterns = [
     path('instructor/courses/<slug:course_slug>/modules/<int:module_id>/edit/', views.edit_module, name='edit_module'),
     path('instructor/courses/<slug:course_slug>/modules/<int:module_id>/delete/', views.delete_module, name='delete_module'),
     path('instructor/courses/<slug:course_slug>/reorder/', views.reorder_modules, name='reorder_modules'),
-    
-    # Quiz URLs with lesson dependency
-    path('instructor/lessons/<int:lesson_id>/quiz/configure/', views.configure_quiz, name='configure_quiz'),
-
-    # Standalone Quiz URLs (without lesson dependency)
-    path('instructor/quizzes/configure/', views.configure_quiz, name='configure_quiz_standalone', kwargs={'lesson_id': None}),
 
     # Certificate URLs
     path('certificate/<str:certificate_id>/', views.course_certificate, name='course_certificate'),

@@ -16,7 +16,7 @@ from .includes.views_lesson_detail import (
     lesson_detail, check_and_issue_certificate
 )
 from .includes.views_other import (
-    home, configure_quiz, custom_page_not_found, enroll_course, 
+    home, custom_page_not_found, enroll_course,
     instructor_courses, delete_lesson_video
 )
 from .includes.view_certificate import (
@@ -29,6 +29,6 @@ __all__ = [
     'create_module', 'edit_module', 'delete_module', 'reorder_modules',
     'create_lesson', 'edit_lesson', 'delete_lesson', 'delete_lesson_video',
     'reorder_lessons', 'lesson_detail', 'check_and_issue_certificate',
-    'public_certificate', 'purchase_certificate', 'home', 'configure_quiz',
+    'public_certificate', 'purchase_certificate', 'home',
     'course_certificate', 'custom_page_not_found',
 ]

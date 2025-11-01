@@ -19,14 +19,6 @@ def create_lesson(request, course_slug, module_id):
             lesson.save()
             messages.success(request, 'Lesson created successfully!')
 
-            # Redirect based on lesson type for further configuration
-            if lesson.lesson_type == 'quiz':
-                # Redirect to quiz configuration page
-                messages.info(request, 'You can now configure your quiz questions.')
-                return redirect('courses:configure_quiz', lesson_id=lesson.id)
-            else:
-                return redirect('courses:edit_course', slug=course.slug)
-
     # Redirect back to the edit course page instead of rendering a separate template
     messages.info(request, 'Lesson creation is now handled through the course edit page.')
     return redirect('courses:edit_course', slug=course.slug)
