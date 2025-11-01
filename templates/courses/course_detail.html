@@ -3,6 +3,13 @@
 {% block title %}{{ course.title }} - Online Learning Platform{% endblock %}
 
 {% block content %}
+{% if is_preview %}
+<div class="alert alert-info">
+    <h4>Preview Mode</h4>
+    <p>You are previewing this course as a student. This is how students will see your course.</p>
+</div>
+{% endif %}
+
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{% url 'courses:home' %}">Home</a></li>
@@ -113,10 +120,11 @@
                 <p class="card-text">Duration: {{ course|course_duration_weeks }} week{{ course|course_duration_weeks|pluralize }}</p>
                 
                 {% if user.is_authenticated %}
-                    {% if user == course.instructor %}
+                    {% if user == course.instructor and not is_preview %}
                         <!-- Show edit and delete options for course instructor -->
                         <div class="d-grid gap-2">
                             <a href="{% url 'courses:edit_course' course.slug %}" class="btn btn-warning">Edit Course</a>
+                            <a href="{% url 'courses:preview_course' course.slug %}" class="btn btn-info">Preview as Student</a>
                             <a href="{% url 'courses:delete_course' course.slug %}" class="btn btn-danger">Delete Course</a>
                         </div>
                     {% elif is_enrolled %}
