@@ -30,7 +30,7 @@
 
                         <div class="mb-3 lesson-content-section" id="text-content-section" style="display: {% if lesson.lesson_type == 'text' %}block{% else %}none{% endif %};">
                             <label for="lesson_content" class="form-label">Content</label>
-                            <textarea class="form-control" id="lesson_content" name="content" rows="5">{{ lesson.content|default:'' }}</textarea>
+                            <textarea class="form-control" id="lesson_content" name="content" rows="10">{{ lesson.content|default:'' }}</textarea>
                             <small class="form-text text-muted">For text lessons, add your content here.</small>
                         </div>
 
@@ -70,7 +70,7 @@
                             </div>
                         </div>
 
-                       <div class="mb-3 lesson-content-section" id="quiz-content-section" style="display: {% if lesson.lesson_type == 'quiz' %}block{% else %}none{% endif %};">
+                        <div class="mb-3 lesson-content-section" id="quiz-content-section" style="display: {% if lesson.lesson_type == 'quiz' %}block{% else %}none{% endif %};">
                             <!-- Questions and Answers Section -->
                             <div class="card">
                                 <div class="card-header d-flex justify-content-between align-items-center">
@@ -129,6 +129,11 @@
                                     {% endif %}
                                 </div>
                             </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="lesson_max_attempts" class="form-label">Maximum Quiz Attempts (0 for unlimited)</label>
+                            <input type="number" class="form-control" id="lesson_max_attempts" name="max_attempts" min="0" value="{{ lesson.max_attempts }}">
                         </div>
 
                         <div class="mb-3">
@@ -321,5 +326,6 @@
 {% endblock %}
 
 {% block extra_js %}
+<script src="{% static 'courses/tinymce/js/tinymce/tinymce.min.js' %}"></script>
 <script src="{% static 'courses/edit_lesson.js' %}"></script>
 {% endblock %}

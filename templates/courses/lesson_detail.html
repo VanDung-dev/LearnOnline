@@ -47,7 +47,7 @@
         
         {% if lesson.lesson_type == 'text' %}
             <div class="lesson-content">
-                {{ lesson.content|linebreaks }}
+                {{ lesson.content|safe }}
             </div>
         {% elif lesson.lesson_type == 'video' %}
             {% if lesson.video_url %}
@@ -91,12 +91,12 @@
             {% endif %}
             {% if lesson.content %}
                 <div class="lesson-content">
-                    {{ lesson.content|linebreaks }}
+                    {{ lesson.content|safe }}
                 </div>
             {% endif %}
         {% elif lesson.lesson_type == 'quiz' %}
             <div class="lesson-content">
-                {{ lesson.content|linebreaks }}
+                {{ lesson.content|safe }}
             </div>
             <!-- Quiz functionality would go here -->
         {% endif %}
@@ -156,7 +156,7 @@
                             {% endif %}
                             {% for lesson_item in module.lessons.all %}
                                 <a href="{% url 'courses:lesson_detail' course.slug lesson_item.slug %}" 
-                                   class="list-group-item list-group-item-action {% if lesson_item.id == lesson.id %}active{% endif %}">
+                                    class="list-group-item list-group-item-action {% if lesson_item.id == lesson.id %}active{% endif %}">
                                     {{ lesson_item.title }}
                                 </a>
                             {% endfor %}

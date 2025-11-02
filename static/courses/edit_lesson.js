@@ -13,10 +13,64 @@ document.addEventListener('DOMContentLoaded', function() {
                 section.style.display = type === selectedType ? 'block' : 'none';
             }
         });
+        
+        // Re-initialize TinyMCE when switching to text section
+        if (selectedType === 'text') {
+            if (typeof tinymce !== 'undefined') {
+                // Check if editor already exists
+                const editor = tinymce.get('lesson_content');
+                if (!editor) {
+                    tinymce.init({
+                        selector: '#lesson_content',
+                        plugins: 'lists link image table code help wordcount',
+                        toolbar: 'undo redo | styles | bold italic underline strikethrough | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link | help',
+                        menubar: false,
+                        statusbar: false,
+                        height: 300,
+                        branding: false,
+                        promotion: false
+                    });
+                }
+            }
+        }
     }
 
     if (lessonType) {
         lessonType.addEventListener('change', updateSections);
+    }
+
+    // Initialize TinyMCE on page load if it's a text lesson
+    if (lessonType && lessonType.value === 'text') {
+        if (typeof tinymce !== 'undefined') {
+            tinymce.init({
+                selector: '#lesson_content',
+                plugins: 'lists link image table code help wordcount',
+                toolbar: 'undo redo | styles | bold italic underline strikethrough | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link | help',
+                menubar: false,
+                statusbar: false,
+                height: 300,
+                branding: false,
+                promotion: false
+            });
+        }
+    }
+
+    // Ensure TinyMCE content is synced before form submission
+    const lessonForm = document.querySelector('form');
+    if (lessonForm) {
+        lessonForm.addEventListener('submit', function(e) {
+            if (typeof tinymce !== 'undefined') {
+                const editor = tinymce.get('lesson_content');
+                if (editor) {
+                    editor.save(); // Sync content to textarea
+                    // Also update the textarea directly to ensure content is there
+                    const textarea = document.getElementById('lesson_content');
+                    if (textarea) {
+                        textarea.value = editor.getContent();
+                    }
+                }
+            }
+        });
     }
 
     // Handle video preview modal
