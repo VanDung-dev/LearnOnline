@@ -29,12 +29,14 @@
                         </div>
 
                         <div class="mb-3 lesson-content-section" id="text-content-section" style="display: {% if lesson.lesson_type == 'text' %}block{% else %}none{% endif %};">
+                            <!--TEXT LESSON SECTION -->
                             <label for="lesson_content" class="form-label">Content</label>
                             <textarea class="form-control" id="lesson_content" name="content" rows="10">{{ lesson.content|default:'' }}</textarea>
                             <small class="form-text text-muted">For text lessons, add your content here.</small>
                         </div>
 
                         <div class="mb-3 lesson-content-section" id="video-content-section" style="display: {% if lesson.lesson_type == 'video' %}block{% else %}none{% endif %};">
+                            <!--VIDEO LESSON SECTION -->
                             <div class="mb-3">
                                 <label for="lesson_video_url" class="form-label">Video URL</label>
                                 <input type="url" class="form-control" id="lesson_video_url" name="video_url" value="{{ lesson.video_url|default:'' }}">
@@ -71,6 +73,7 @@
                         </div>
 
                         <div class="mb-3 lesson-content-section" id="quiz-content-section" style="display: {% if lesson.lesson_type == 'quiz' %}block{% else %}none{% endif %};">
+                            <!-- QUIZ LESSON SECTION -->
                             <!-- Questions and Answers Section -->
                             <div class="card">
                                 <div class="card-header d-flex justify-content-between align-items-center">

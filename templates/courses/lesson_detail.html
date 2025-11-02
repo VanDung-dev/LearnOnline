@@ -46,10 +46,12 @@
         {% endif %}
         
         {% if lesson.lesson_type == 'text' %}
+            <!--TEXT LESSON SECTION -->
             <div class="lesson-content">
                 {{ lesson.content|safe }}
             </div>
         {% elif lesson.lesson_type == 'video' %}
+            <!-- VIDEO LESSON SECTION -->
             {% if lesson.video_url %}
                 <div class="video-container mb-4">
                     <iframe width="100%"
@@ -74,16 +76,11 @@
                     <strong>Video not available:</strong> The instructor has not added a video URL or file for this lesson yet.
                 </div>
             {% endif %}
-            {% if lesson.content %}
-                <div class="lesson-content">
-                    {{ lesson.content|safe }}
-                </div>
-            {% endif %}
         {% elif lesson.lesson_type == 'quiz' %}
+            <!--QUIZ LESSON SECTION -->
             <div class="lesson-content">
                 {{ lesson.content|safe }}
             </div>
-            <!-- Quiz functionality would go here -->
         {% endif %}
     </div>
     
