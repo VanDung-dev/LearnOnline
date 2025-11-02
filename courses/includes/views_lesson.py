@@ -142,10 +142,18 @@ def edit_lesson(request, course_slug, module_id, lesson_id):
             # Handle lesson form
             form = LessonForm(request.POST, request.FILES, instance=lesson)
             if form.is_valid():
+                form.save()
                 messages.success(request, 'Lesson updated successfully!')
                 return redirect('courses:edit_course', slug=course.slug)
             else:
-                messages.error(request, 'Please correct the errors below.')
+                # Display form errors for debugging
+                error_messages = []
+                for field, errors in form.errors.items():
+                    error_messages.append(f"{field}: {', '.join(errors)}")
+                if error_messages:
+                    messages.error(request, f"Form errors: {'; '.join(error_messages)}")
+                else:
+                    messages.error(request, 'Please correct the errors below.')
     else:
         form = LessonForm(instance=lesson)
 
