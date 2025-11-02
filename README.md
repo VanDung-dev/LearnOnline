@@ -5,12 +5,17 @@
     pip install -r requirements.txt
     ```
 
-2. Apply database migrations:
+2. Set up TinyMCE for rich text editing:
+    ```bash
+    python setup_tinymce.py
+    ```
+
+3. Apply database migrations:
     ```bash
     python manage.py migrate
     ```
 
-3. Start the development server:
+4. Start the development server:
     ```bash
     python manage.py runserver
     ```
@@ -39,4 +44,9 @@ If you encounter errors, try these commands:
 4. Collect static files:
     ```bash
     python manage.py collectstatic
+    ```
+
+5. Re-setup TinyMCE (if needed):
+    ```bash
+    python setup_tinymce.py
     ```
