@@ -31,7 +31,7 @@
                         <!--TEXT LESSON SECTION -->
                         <div class="mb-3 lesson-content-section" id="text-content-section" style="display: {% if lesson.lesson_type == 'text' %}block{% else %}none{% endif %};">
                             <label for="lesson_content" class="form-label">Content</label>
-                            <textarea class="form-control" id="lesson_content" name="content" rows="10">{{ lesson.content|default:'' }}</textarea>
+                            <textarea class="form-control" id="lesson_content" name="content" rows="10" style="height: 1000px;">{{ lesson.content|default:'' }}</textarea>
                             <small class="form-text text-muted">For text lessons, add your content here.</small>
                         </div>
 
@@ -142,8 +142,6 @@
                                 <input type="number" class="form-control" id="lesson_order" name="order" min="0" value="{{ lesson.order }}">
                             </div>
                         </div>
-
-
 
                         <div class="mb-3 form-check">
                             <input type="checkbox" class="form-check-input" id="lesson_is_published" name="is_published" {% if lesson.is_published %}checked{% endif %}>

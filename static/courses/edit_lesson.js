@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         toolbar: 'undo redo | styles | bold italic underline strikethrough | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | help',
                         menubar: false,
                         statusbar: false,
-                        height: 300,
+                        height: 1000,
                         branding: false,
                         promotion: false,
                         // Enable image handling
@@ -80,7 +80,17 @@ document.addEventListener('DOMContentLoaded', function() {
                             xhr.send(formData);
                         },
                         // Allow image tools
-                        toolbar_mode: 'floating'
+                        toolbar_mode: 'floating',
+                        setup: function(editor) {
+                            editor.on('init', function() {
+                                // Ensure the editor container has the correct height
+                                const container = editor.getContainer();
+                                const iframe = container.querySelector('iframe');
+                                if (iframe) {
+                                    iframe.style.height = '1000px';
+                                }
+                            });
+                        }
                     });
                 }
             }
@@ -100,7 +110,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 toolbar: 'undo redo | styles | bold italic underline strikethrough | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | help',
                 menubar: false,
                 statusbar: false,
-                height: 300,
+                height: 1000,
                 branding: false,
                 promotion: false,
                 // Enable image handling
@@ -138,7 +148,17 @@ document.addEventListener('DOMContentLoaded', function() {
                     xhr.send(formData);
                 },
                 // Allow image tools
-                toolbar_mode: 'floating'
+                toolbar_mode: 'floating',
+                setup: function(editor) {
+                    editor.on('init', function() {
+                        // Ensure the editor container has the correct height
+                        const container = editor.getContainer();
+                        const iframe = container.querySelector('iframe');
+                        if (iframe) {
+                            iframe.style.height = '1000px';
+                        }
+                    });
+                }
             });
         }
     }
