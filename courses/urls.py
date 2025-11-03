@@ -15,6 +15,7 @@ urlpatterns = [
     path('courses/<slug:course_slug>/modules/<int:module_id>/lessons/<int:lesson_id>/edit/', views.edit_lesson, name='edit_lesson'),
     path('courses/<slug:course_slug>/modules/<int:module_id>/lessons/<int:lesson_id>/delete/', views.delete_lesson, name='delete_lesson'),
     path('courses/<slug:course_slug>/modules/<int:module_id>/lessons/<int:lesson_id>/video/delete/', views.delete_lesson_video, name='delete_lesson_video'),
+    path('courses/upload_image/', views.upload_image, name='upload_image'),
     
     # Instructor URLs
     path('instructor/courses/', views.instructor_courses, name='instructor_courses'),
