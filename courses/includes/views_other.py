@@ -1,9 +1,16 @@
+import os
+
+from django.core.files.base import ContentFile
+from django.core.files.storage import default_storage
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseForbidden, JsonResponse
 from django.contrib import messages
 from django.db import models
 from django.utils import timezone
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
+from django.conf import settings
 from ..models import Course, Lesson, Enrollment, Module, Category
 
 
@@ -85,3 +92,44 @@ def delete_lesson_video(request, course_slug, module_id, lesson_id):
             messages.info(request, 'No video file found for this lesson.')
 
     return redirect('courses:edit_course', slug=course.slug)
+
+
+@login_required
+@csrf_exempt
+@require_POST
+def upload_image(request):
+    """
+    Handle image uploads from TinyMCE editor in lessons
+    """
+    # Check if user is an instructor
+    if not hasattr(request.user, 'profile') or request.user.profile.role != 'instructor':
+        return HttpResponseForbidden("Only instructors can upload images.")
+
+    # Get the uploaded file
+    image_file = request.FILES.get('file')
+
+    if not image_file:
+        return JsonResponse({'error': 'No file provided'}, status=400)
+
+    # Validate file type
+    allowed_types = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
+    if image_file.content_type not in allowed_types:
+        return JsonResponse({'error': 'Invalid file type. Only JPEG, PNG, GIF, and WebP images are allowed.'},
+                            status=400)
+
+    # Validate file size (limit to 5MB)
+    if image_file.size > 5 * 1024 * 1024:
+        return JsonResponse({'error': 'File size exceeds 5MB limit'}, status=400)
+
+    # Create directory for lesson images if it doesn't exist
+    lesson_images_dir = os.path.join(settings.MEDIA_ROOT, 'lesson_images')
+    os.makedirs(lesson_images_dir, exist_ok=True)
+
+    # Save the file
+    file_path = os.path.join('lesson_images', image_file.name)
+    path = default_storage.save(file_path, ContentFile(image_file.read()))
+
+    # Return the URL of the uploaded image
+    image_url = os.path.join(settings.MEDIA_URL, path)
+
+    return JsonResponse({'location': image_url})
