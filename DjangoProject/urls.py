@@ -30,6 +30,9 @@ urlpatterns = [
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+else:
+    # In production, also serve static files (not ideal for production, but needed for this setup)
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 # Custom 404 handler
 handler404 = 'courses.views.custom_page_not_found'

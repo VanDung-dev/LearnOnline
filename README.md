@@ -50,3 +50,17 @@ If you encounter errors, try these commands:
     ```bash
     python setup_tinymce.py
     ```
+   
+---
+
+## Static Files
+
+In production mode (`DEBUG=False`), Django requires static files to be collected into a single directory. 
+The `staticfiles` directory is automatically created when you run `collectstatic` command. This directory 
+contains all CSS, JavaScript, and image files from the project needed to run the application properly 
+when debug mode is disabled.
+
+To collect static files:
+```bash
+python manage.py collectstatic --noinput
+```
