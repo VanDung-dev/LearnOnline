@@ -6,6 +6,22 @@ document.addEventListener('DOMContentLoaded', function() {
         'quiz': document.getElementById('quiz-content-section')
     };
 
+    //Get CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
     function updateSections() {
         const selectedType = lessonType.value;
         Object.entries(sections).forEach(([type, section]) => {
@@ -23,12 +39,48 @@ document.addEventListener('DOMContentLoaded', function() {
                     tinymce.init({
                         selector: '#lesson_content',
                         plugins: 'lists link image table code help wordcount',
-                        toolbar: 'undo redo | styles | bold italic underline strikethrough | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link | help',
+                        toolbar: 'undo redo | styles | bold italic underline strikethrough | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | help',
                         menubar: false,
                         statusbar: false,
                         height: 300,
                         branding: false,
-                        promotion: false
+                        promotion: false,
+                        // Enable image handling
+                        image_advtab: true,
+                        image_caption: true,
+                        images_upload_url: '/courses/upload_image/',
+                        images_upload_handler: function (blobInfo, success, failure) {
+                            const xhr = new XMLHttpRequest();
+                            xhr.withCredentials = false;
+                            xhr.open('POST','/courses/upload_image/');
+                            
+                            //Add CSRF token
+                            const csrftoken = getCookie('csrftoken');
+                            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                            
+                            xhr.onload = function() {
+                                if (xhr.status !== 200) {
+                                    failure('HTTP Error: ' + xhr.status);
+                                    return;
+                                }
+                                
+                                const json = JSON.parse(xhr.responseText);
+                                
+                                if (!json || typeof json.location != 'string') {
+                                    failure('Invalid JSON: ' + xhr.responseText);
+                                    return;
+                                }
+                                
+                                success(json.location);
+                            };
+                            
+                            const formData = new FormData();
+                            formData.append('file', blobInfo.blob(), blobInfo.filename());
+                            
+                            xhr.send(formData);
+                        },
+                        // Allow image tools
+                        toolbar_mode: 'floating'
                     });
                 }
             }
@@ -45,12 +97,48 @@ document.addEventListener('DOMContentLoaded', function() {
             tinymce.init({
                 selector: '#lesson_content',
                 plugins: 'lists link image table code help wordcount',
-                toolbar: 'undo redo | styles | bold italic underline strikethrough | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link | help',
+                toolbar: 'undo redo | styles | bold italic underline strikethrough | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | help',
                 menubar: false,
                 statusbar: false,
                 height: 300,
                 branding: false,
-                promotion: false
+                promotion: false,
+                // Enable image handling
+                image_advtab: true,
+                image_caption: true,
+                images_upload_url: '/courses/upload_image/',
+                images_upload_handler: function (blobInfo, success, failure) {
+                    const xhr = new XMLHttpRequest();
+                    xhr.withCredentials = false;
+                    xhr.open('POST', '/courses/upload_image/');
+                    
+                    //Add CSRF token
+                    const csrftoken = getCookie('csrftoken');
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                    
+                    xhr.onload = function() {
+                        if (xhr.status !== 200) {
+                            failure('HTTP Error: ' + xhr.status);
+                            return;
+                        }
+                        
+                        const json = JSON.parse(xhr.responseText);
+                        
+                        if (!json || typeof json.location != 'string') {
+                            failure('Invalid JSON: ' + xhr.responseText);
+                            return;
+                        }
+                        
+                        success(json.location);
+                    };
+                    
+                    const formData = new FormData();
+                    formData.append('file', blobInfo.blob(), blobInfo.filename());
+                    
+                    xhr.send(formData);
+                },
+                // Allow image tools
+                toolbar_mode: 'floating'
             });
         }
     }
