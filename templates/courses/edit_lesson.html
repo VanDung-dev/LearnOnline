@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static courses_extras %}
 
 {% block title %}Edit Lesson - {{ lesson.title }}{% endblock %}
 
@@ -49,7 +49,7 @@
                                 <small class="form-text text-muted">Alternatively, you can upload a video file directly.</small>
                                 {% if lesson.video_file %}
                                     <div class="mt-2">
-                                        <small class="form-text text-muted">Current file: {{ lesson.video_file.name }}</small>
+                                        <small class="form-text text-muted">Current thumbnail: {{ lesson.video_file.name|basename }}</small>
                                         <div class="mt-1">
                                             <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteVideoModal">
                                                 Delete current video

@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static courses_extras %}
 
 {% block title %}Edit Course - Instructor Dashboard{% endblock %}
 
@@ -106,7 +106,7 @@
             <div class="text-danger">{{ form.thumbnail.errors }}</div>
         {% endif %}
         {% if course.thumbnail %}
-            <small class="form-text text-muted">Current thumbnail: {{ course.thumbnail.name }}</small>
+            <small class="form-text text-muted">Current thumbnail: {{ course.thumbnail.name|basename }}</small>
             <div class="mt-2">
                 <img src="{{ course.thumbnail.url }}" alt="Current thumbnail" class="img-thumbnail" style="max-height: 150px;">
                 <br>

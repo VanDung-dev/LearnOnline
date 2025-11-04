@@ -1,8 +1,13 @@
+import os
 from django import template
 from django.utils import timezone
 from ..models import Certificate, Enrollment
 
 register = template.Library()
+
+@register.filter(name='basename')
+def basename_filter(path):
+    return os.path.basename(str(path))
 
 @register.filter
 def has_certificate(user, course):
