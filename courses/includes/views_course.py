@@ -35,6 +35,17 @@ def edit_course(request, slug):
     course = get_object_or_404(Course, slug=slug, instructor=request.user)
 
     if request.method == 'POST':
+        #Check if delete_thumbnail button was clicked
+        if request.POST.get('delete_thumbnail') == 'true':
+            if course.thumbnail:
+                # Delete the thumbnail file
+                course.thumbnail.delete(save=False)
+                # Set thumbnail field to None
+                course.thumbnail = None
+                course.save()
+            messages.success(request, 'Thumbnaildeleted successfully!')
+            return redirect('courses:edit_course', slug=slug)
+        
         form = CourseForm(request.POST, request.FILES, instance=course)
         if form.is_valid():
             form.save()

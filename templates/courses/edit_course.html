@@ -107,6 +107,11 @@
         {% endif %}
         {% if course.thumbnail %}
             <small class="form-text text-muted">Current thumbnail: {{ course.thumbnail.name }}</small>
+            <div class="mt-2">
+                <img src="{{ course.thumbnail.url }}" alt="Current thumbnail" class="img-thumbnail" style="max-height: 150px;">
+                <br>
+                <button type="submit" name="delete_thumbnail" value="true" class="btn btn-sm btn-outline-danger mt-2">Delete Thumbnail</button>
+            </div>
         {% endif %}
     </div>
     
