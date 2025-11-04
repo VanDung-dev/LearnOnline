@@ -129,7 +129,7 @@ def upload_image(request):
     file_path = os.path.join('lesson_images', image_file.name)
     path = default_storage.save(file_path, ContentFile(image_file.read()))
 
-    # Return the URL of the uploaded image
-    image_url = os.path.join(settings.MEDIA_URL, path)
+    # Return the URL of the uploaded image (use forward slashes for URL)
+    image_url = settings.MEDIA_URL + path.replace('\\', '/')
 
     return JsonResponse({'location': image_url})
