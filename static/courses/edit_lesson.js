@@ -49,35 +49,49 @@ document.addEventListener('DOMContentLoaded', function() {
                         image_advtab: true,
                         image_caption: true,
                         images_upload_url: '/courses/upload_image/',
-                        images_upload_handler: function (blobInfo, success, failure) {
-                            const xhr = new XMLHttpRequest();
-                            xhr.withCredentials = false;
-                            xhr.open('POST','/courses/upload_image/');
-                            
-                            //Add CSRF token
-                            const csrftoken = getCookie('csrftoken');
-                            xhr.setRequestHeader("X-CSRFToken", csrftoken);
-                            
-                            xhr.onload = function() {
-                                if (xhr.status !== 200) {
-                                    failure('HTTP Error: ' + xhr.status);
-                                    return;
-                                }
-                                
-                                const json = JSON.parse(xhr.responseText);
-                                
-                                if (!json || typeof json.location != 'string') {
-                                    failure('Invalid JSON: ' + xhr.responseText);
-                                    return;
-                                }
-                                
-                                success(json.location);
-                            };
-                            
-                            const formData = new FormData();
-                            formData.append('file', blobInfo.blob(), blobInfo.filename());
-                            
-                            xhr.send(formData);
+                        images_upload_handler: function (blobInfo, progress) {
+                            return new Promise((resolve, reject) => {
+                                const xhr = new XMLHttpRequest();
+                                xhr.withCredentials = false;
+                                xhr.open('POST', '/courses/upload_image/');
+
+                                // Add CSRF token
+                                const csrftoken = getCookie('csrftoken');
+                                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+
+                                xhr.upload.onprogress = function (e) {
+                                    progress(e.loaded / e.total * 100);
+                                };
+
+                                xhr.onload = function() {
+                                    if (xhr.status !== 200) {
+                                        reject('HTTP Error: ' + xhr.status);
+                                        return;
+                                    }
+
+                                    try {
+                                        const json = JSON.parse(xhr.responseText);
+
+                                        if (!json || typeof json.location != 'string') {
+                                            reject('Invalid JSON: ' + xhr.responseText);
+                                            return;
+                                        }
+
+                                        resolve(json.location);
+                                    } catch (e) {
+                                        reject('Error parsing response: ' + e.message);
+                                    }
+                                };
+
+                                xhr.onerror = function() {
+                                    reject('Network error occurred');
+                                };
+
+                                const formData = new FormData();
+                                formData.append('file', blobInfo.blob(), blobInfo.filename());
+
+                                xhr.send(formData);
+                            });
                         },
                         // Allow image tools
                         toolbar_mode: 'floating',
@@ -117,35 +131,49 @@ document.addEventListener('DOMContentLoaded', function() {
                 image_advtab: true,
                 image_caption: true,
                 images_upload_url: '/courses/upload_image/',
-                images_upload_handler: function (blobInfo, success, failure) {
-                    const xhr = new XMLHttpRequest();
-                    xhr.withCredentials = false;
-                    xhr.open('POST', '/courses/upload_image/');
-                    
-                    //Add CSRF token
-                    const csrftoken = getCookie('csrftoken');
-                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
-                    
-                    xhr.onload = function() {
-                        if (xhr.status !== 200) {
-                            failure('HTTP Error: ' + xhr.status);
-                            return;
-                        }
-                        
-                        const json = JSON.parse(xhr.responseText);
-                        
-                        if (!json || typeof json.location != 'string') {
-                            failure('Invalid JSON: ' + xhr.responseText);
-                            return;
-                        }
-                        
-                        success(json.location);
-                    };
-                    
-                    const formData = new FormData();
-                    formData.append('file', blobInfo.blob(), blobInfo.filename());
-                    
-                    xhr.send(formData);
+                images_upload_handler: function (blobInfo, progress) {
+                    return new Promise((resolve, reject) => {
+                        const xhr = new XMLHttpRequest();
+                        xhr.withCredentials = false;
+                        xhr.open('POST', '/courses/upload_image/');
+
+                        // Add CSRF token
+                        const csrftoken = getCookie('csrftoken');
+                        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+
+                        xhr.upload.onprogress = function (e) {
+                            progress(e.loaded / e.total * 100);
+                        };
+
+                        xhr.onload = function() {
+                            if (xhr.status !== 200) {
+                                reject('HTTP Error: ' + xhr.status);
+                                return;
+                            }
+
+                            try {
+                                const json = JSON.parse(xhr.responseText);
+
+                                if (!json || typeof json.location != 'string') {
+                                    reject('Invalid JSON: ' + xhr.responseText);
+                                    return;
+                                }
+
+                                resolve(json.location);
+                            } catch (e) {
+                                reject('Error parsing response: ' + e.message);
+                            }
+                        };
+
+                        xhr.onerror = function() {
+                            reject('Network error occurred');
+                        };
+
+                        const formData = new FormData();
+                        formData.append('file', blobInfo.blob(), blobInfo.filename());
+
+                        xhr.send(formData);
+                    });
                 },
                 // Allow image tools
                 toolbar_mode: 'floating',
