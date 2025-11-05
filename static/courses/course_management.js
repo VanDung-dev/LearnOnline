@@ -27,6 +27,39 @@ $(document).ready(function() {
         }, 3000);
     }
     
+    // Handle thumbnail preview
+    $('#id_thumbnail').on('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                // Check if preview container already exists
+                let previewContainer = $('#thumbnail-preview');
+                if (previewContainer.length === 0) {
+                    // Create preview container if it doesn't exist
+                    $('#thumbnail-preview-container').append(`
+                        <div id="thumbnail-preview" class="mt-2">
+                            <small class="form-text text-muted">Preview:</small>
+                            <img src="${e.target.result}" alt="Thumbnail preview" class="img-thumbnail" style="max-height: 150px;">
+                        </div>
+                    `);
+                } else {
+                    // Update existing preview
+                    previewContainer.find('img').attr('src', e.target.result);
+                }
+                
+                // Hide current thumbnail if exists
+                $('#current-thumbnail').hide();
+            };
+            reader.readAsDataURL(file);
+        } else {
+            // Remove preview if no file is selected
+            $('#thumbnail-preview').remove();
+            // Show current thumbnail if exists
+            $('#current-thumbnail').show();
+        }
+    });
+    
     // Handle course editing via AJAX
     $('#course-edit-form').on('submit', function(e) {
         // Only handle AJAX if it's not a delete_thumbnail action
@@ -57,6 +90,8 @@ $(document).ready(function() {
             success: function(response) {
                 if (response.status === 'success') {
                     showNotification(response.message, 'success');
+                    // Reload page to show updated thumbnail
+                    setTimeout(() => location.reload(), 1500);
                 } else {
                     showNotification(response.message || 'Error updating course', 'error');
                 }
