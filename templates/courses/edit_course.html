@@ -6,7 +6,7 @@
 {% block content %}
 <h1>Edit Course: {{ course.title }}</h1>
 
-<form method="post" enctype="multipart/form-data">
+<form method="post" enctype="multipart/form-data" id="course-edit-form">
     {% csrf_token %}
     <div class="mb-3">
         <label for="{{ form.title.id_for_label }}" class="form-label">Course Title</label>
@@ -124,8 +124,11 @@
     </div>
     
     <div class="d-flex justify-content-between">
-        <a href="{% url 'courses:instructor_courses' %}" class="btn btn-secondary">Cancel</a>
-        <button type="submit" class="btn btn-primary">Update Course</button>
+        <div>
+            <a href="{% url 'courses:instructor_courses' %}" class="btn btn-secondary">Cancel</a>
+            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteCourseModal">Delete Course</button>
+        </div>
+        <button type="submit" class="btn btn-primary" id="course-save-btn">Update Course</button>
     </div>
 </form>
 
@@ -226,8 +229,8 @@
     {% endif %}
 </div>
 
-{% include 'courses/includes/create_module_modal.html' with module=module %}
-{% include 'courses/includes/delete_course_modal.html' with module=module %}
+{% include 'courses/includes/create_module_modal.html' %}
+{% include 'courses/includes/delete_course_modal.html' %}
 
 {% endblock %}
 
@@ -238,5 +241,6 @@
 <script>
     window.courseSlug = '{{ course.slug }}';
 </script>
-<script src="{% static 'courses/edit_course.js' %}"></script>
+<script src="{% static 'courses/edit_course.js' %}?v=1.1"></script>
+<script src="{% static 'courses/course_management.js' %}?v=1.1"></script>
 {% endblock %}
