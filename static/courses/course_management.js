@@ -60,10 +60,50 @@ $(document).ready(function() {
         }
     });
     
+    // Handle thumbnail deletion via AJAX
+    $('#delete-thumbnail-btn').on('click', function() {
+        const button = $(this);
+        const originalText = button.text();
+        
+        // Show loading state
+        button.prop('disabled', true).text('Deleting...');
+        
+        $.ajax({
+            url: window.location.href,
+            method: 'POST',
+            data: {
+                'delete_thumbnail': 'true',
+                'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val()
+            },
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            success: function(response) {
+                if (response.status === 'success') {
+                    showNotification(response.message, 'success');
+                    // Remove the current thumbnail display
+                    $('#current-thumbnail').remove();
+                    // If there's a preview, remove it too
+                    $('#thumbnail-preview').remove();
+                    // Reset the file input
+                    $('#id_thumbnail').val('');
+                } else {
+                    showNotification(response.message || 'Error deleting thumbnail', 'error');
+                    button.prop('disabled', false).text(originalText);
+                }
+            },
+            error: function(xhr, status, error) {
+                showNotification('Error deleting thumbnail. Please try again.', 'error');
+                button.prop('disabled', false).text(originalText);
+                console.error('Error deleting thumbnail:', error);
+            }
+        });
+    });
+    
     // Handle course editing via AJAX
     $('#course-edit-form').on('submit', function(e) {
         // Only handle AJAX if it's not a delete_thumbnail action
-        if ($('button[name="delete_thumbnail"]').is(':focus')) {
+        if ($('#delete-thumbnail-btn').is(':focus')) {
             return; // Let it proceed normally for thumbnail deletion
         }
         

@@ -111,7 +111,7 @@
                 <div class="mt-2" id="current-thumbnail">
                     <img src="{{ course.thumbnail.url }}" alt="Current thumbnail" class="img-thumbnail" style="max-height: 150px;">
                     <br>
-                    <button type="submit" name="delete_thumbnail" value="true" class="btn btn-sm btn-outline-danger mt-2">Delete Thumbnail</button>
+                    <button type="button" id="delete-thumbnail-btn" class="btn btn-sm btn-outline-danger mt-2">Delete Thumbnail</button>
                 </div>
             {% endif %}
         </div>
@@ -244,5 +244,5 @@
     window.courseSlug = '{{ course.slug }}';
 </script>
 <script src="{% static 'courses/edit_course.js' %}?v=1.1"></script>
-<script src="{% static 'courses/course_management.js' %}?v=1.2"></script>
+<script src="{% static 'courses/course_management.js' %}?v=1.3"></script>
 {% endblock %}

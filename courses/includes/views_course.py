@@ -35,8 +35,17 @@ def edit_course(request, slug):
                     default_storage.delete(course.thumbnail.name)
                 course.thumbnail = None
                 course.save()
-                messages.success(request, 'Thumbnail deleted successfully!')
-            return redirect('courses:edit_course', slug=course.slug)
+                
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    # Return JSON response for AJAX requests
+                    return JsonResponse({
+                        'status': 'success',
+                        'message': 'Thumbnail deleted successfully!'
+                    })
+                else:
+                    # Traditional redirect for non-AJAX requests
+                    messages.success(request, 'Thumbnail deleted successfully!')
+                    return redirect('courses:edit_course', slug=course.slug)
         
         # Handle regular form submission
         form = CourseForm(request.POST, request.FILES, instance=course)
