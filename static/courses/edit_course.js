@@ -19,7 +19,7 @@ $(document).ready(function() {
             
             // Send AJAX request to update module order
             $.ajax({
-                url: `/instructor/courses/${encodeURIComponent(courseSlug)}/modules/reorder/`,
+                url: `/instructor/courses/${encodeURIComponent(courseSlug)}/reorder/`,
                 method: 'POST',
                 headers: {
                     'X-CSRFToken': $('[name=csrfmiddlewaretoken]').val(),
