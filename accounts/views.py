@@ -2,16 +2,55 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib import messages
-from django.contrib.auth import logout
+from django.contrib.auth import logout, authenticate
 from django.contrib.auth.views import LoginView
+from django.contrib.auth.forms import AuthenticationForm
 from django.urls import reverse_lazy
+from django.utils.translation import gettext_lazy
 from django.views import View
 from django.http import HttpResponseRedirect
+from django.core.exceptions import ValidationError
 from courses.models import Course
 from .forms import UserRegistrationForm, UserUpdateForm, ProfileUpdateForm
 
 
+class CustomAuthenticationForm(AuthenticationForm):
+    def clean(self):
+        username = self.cleaned_data.get('username')
+        password = self.cleaned_data.get('password')
+
+        if username is not None and password:
+            self.user_cache = authenticate(
+                self.request, 
+                username=username, 
+                password=password
+            )
+            if self.user_cache is None:
+                # the username exists or the password is wrong
+                raise self.get_invalid_login_error()
+            elif not self.user_cache.is_active:
+                raise self.get_inactive_login_error()
+        return self.cleaned_data
+
+    def get_invalid_login_error(self):
+        # Generic error message to prevent username enumeration
+        message = gettext_lazy("Invalid username or password. Please try again")
+        return ValidationError(
+            message,
+            code='invalid_login',
+            params={'username': self.username_field.verbose_name},
+        )
+        
+    def get_inactive_login_error(self):
+        return ValidationError(
+            self.error_messages['inactive'],
+            code='inactive',
+        )
+
+
 class CustomLoginView(LoginView):
+    form_class = CustomAuthenticationForm
+    
     def get_success_url(self):
         user = self.request.user
         if user.is_superuser or (hasattr(user, 'profile') and user.profile.is_admin()):
