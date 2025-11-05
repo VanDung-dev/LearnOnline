@@ -1,18 +1,13 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseForbidden, Http404
 from django.contrib import messages
-from django.db import models
-from django.utils import timezone
-from django.db.models import Q
-from ..models import Course, Enrollment
+from django.http import JsonResponse
+from django.core.files.storage import default_storage
+from ..models import Course
 from ..forms import CourseForm
 
 @login_required
 def create_course(request):
-    if not hasattr(request.user, 'profile') or not request.user.profile.is_instructor():
-        return HttpResponseForbidden("You must be an instructor to create courses.")
-
     if request.method == 'POST':
         form = CourseForm(request.POST, request.FILES)
         if form.is_valid():
@@ -20,45 +15,68 @@ def create_course(request):
             course.instructor = request.user
             course.save()
             messages.success(request, 'Course created successfully!')
-            return redirect('courses:instructor_courses')
+            return redirect('courses:edit_course', slug=course.slug)
     else:
         form = CourseForm()
-
-    context = {
-        'form': form,
-    }
-    return render(request, 'courses/create_course.html', context)
+    
+    return render(request, 'courses/create_course.html', {'form': form})
 
 
 @login_required
 def edit_course(request, slug):
     course = get_object_or_404(Course, slug=slug, instructor=request.user)
-
+    
     if request.method == 'POST':
-        #Check if delete_thumbnail button was clicked
-        if request.POST.get('delete_thumbnail') == 'true':
+        # Handle thumbnail deletion
+        if 'delete_thumbnail' in request.POST:
             if course.thumbnail:
                 # Delete the thumbnail file
-                course.thumbnail.delete(save=False)
-                # Set thumbnail field to None
+                if default_storage.exists(course.thumbnail.name):
+                    default_storage.delete(course.thumbnail.name)
                 course.thumbnail = None
                 course.save()
-            messages.success(request, 'Thumbnaildeleted successfully!')
-            return redirect('courses:edit_course', slug=slug)
+                messages.success(request, 'Thumbnail deleted successfully!')
+            return redirect('courses:edit_course', slug=course.slug)
         
+        # Handle regular form submission
         form = CourseForm(request.POST, request.FILES, instance=course)
         if form.is_valid():
-            form.save()
-            messages.success(request, 'Course updated successfully!')
-            return redirect('courses:instructor_courses')
+            # Handle certificate price logic
+            course_instance = form.save(commit=False)
+            
+            # If course price > 0, certificate is automatically free
+            if course_instance.price and course_instance.price > 0:
+                course_instance.certificate_price = 0
+            
+            course_instance.save()
+            
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                # Return JSON response for AJAX requests
+                return JsonResponse({
+                    'status': 'success',
+                    'message': 'Course updated successfully!'
+                })
+            else:
+                # Traditional redirect for non-AJAX requests
+                messages.success(request, 'Course updated successfully!')
+                return redirect('courses:edit_course', slug=course.slug)
+        else:
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                # Return JSON response for AJAX requests with form errors
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Error updating course. Please check the form.',
+                    'errors': form.errors
+                })
+            else:
+                messages.error(request, 'Please correct the errors below.')
     else:
         form = CourseForm(instance=course)
-
-    context = {
-        'form': form,
+    
+    return render(request, 'courses/edit_course.html', {
         'course': course,
-    }
-    return render(request, 'courses/edit_course.html', context)
+        'form': form
+    })
 
 
 @login_required
@@ -68,79 +86,54 @@ def delete_course(request, slug):
     if request.method == 'POST':
         course_title = course.title
         course.delete()
-        messages.success(request, f'Course "{course_title}" has been deleted successfully!')
-        return redirect('courses:instructor_courses')
+        
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            # Return JSON response for AJAX requests
+            return JsonResponse({
+                'status': 'success',
+                'message': f'Course "{course_title}" has been deleted successfully!',
+                'redirect_url': '/instructor/courses/'  # URL to redirect after deletion
+            })
+        else:
+            # Traditional redirect for non-AJAX requests
+            messages.success(request, f'Course "{course_title}" has been deleted successfully!')
+            return redirect('courses:instructor_courses')
+    
+    # For GET requests, redirect back to edit course page
+    # This prevents the need for a separate delete confirmation page
+    return redirect('courses:edit_course', slug=course.slug)
 
-    # Instead of rendering a separate template, redirect to edit_course with a delete flag
-    return redirect('courses:edit_course', slug=slug)
 
-
+@login_required
 def course_list(request):
-    # Only show courses that are currently open
-    now = timezone.now()
     courses = Course.objects.filter(is_active=True)
-
-    # Filter courses to exclude those that have closed
-    courses = courses.filter(
-        models.Q(closing_date__isnull=True) | models.Q(closing_date__gte=now)
-    )
-
-    # Handle search
-    query = request.GET.get('q')
-    if query:
-        courses = courses.filter(
-            Q(title__icontains=query) |
-            Q(short_description__icontains=query) |
-            Q(description__icontains=query) |
-            Q(category__name__icontains=query) |
-            Q(instructor__username__icontains=query) |
-            Q(instructor__first_name__icontains=query) |
-            Q(instructor__last_name__icontains=query)
-        ).distinct()
-
-    context = {
-        'courses': courses,
-        'query': query,
-    }
-    return render(request, 'courses/course_list.html', context)
+    return render(request, 'courses/course_list.html', {'courses': courses})
 
 
+@login_required
 def course_detail(request, slug):
     course = get_object_or_404(Course, slug=slug, is_active=True)
-
-    # Check if course is currently available for viewing (not closed)
-    now = timezone.now()
-    if course.closing_date and now > course.closing_date:
-        # Course has closed
-        raise Http404("Course is not currently available")
-
-    # Check if user is enrolled in the course
     is_enrolled = False
     if request.user.is_authenticated:
-        is_enrolled = Enrollment.objects.filter(user=request.user, course=course).exists()
-
-    context = {
+        # Fixed the field name from 'student' to 'user'
+        is_enrolled = course.enrollments.filter(user=request.user).exists()
+    
+    return render(request, 'courses/course_detail.html', {
         'course': course,
-        'is_enrolled': is_enrolled,
-    }
-    return render(request, 'courses/course_detail.html', context)
+        'is_enrolled': is_enrolled
+    })
 
 
 @login_required
 def preview_course(request, slug):
-    # Allow instructors to preview their courses as if they were students
-    course = get_object_or_404(Course, slug=slug)
-    
-    # Check if user is the instructor of this course
-    if request.user != course.instructor:
-        return HttpResponseForbidden("You are not authorized to preview this course.")
-    
-    # For preview purposes, treat instructor as enrolled
-    is_enrolled = True
-    
-    context = {
+    course = get_object_or_404(Course, slug=slug, instructor=request.user)
+    return render(request, 'courses/course_detail.html', {
         'course': course,
-        'is_enrolled': is_enrolled,
-        'is_preview': True,  # Flag to indicate this is a preview
-    }
-    return render(request, 'courses/course_detail.html', context)
+        'is_preview': True
+    })
+
+
+@login_required
+def instructor_courses(request):
+    courses = Course.objects.filter(instructor=request.user)
+    return render(request, 'courses/instructor_courses.html', {'courses': courses})

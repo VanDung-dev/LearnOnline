@@ -17,7 +17,33 @@ def create_lesson(request, course_slug, module_id):
             lesson = form.save(commit=False)
             lesson.module = module
             lesson.save()
-            messages.success(request, 'Lesson created successfully!')
+            
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                # Return JSON response for AJAX requests
+                return JsonResponse({
+                    'status': 'success',
+                    'message': 'Lesson created successfully!',
+                    'lesson': {
+                        'id': lesson.id,
+                        'title': lesson.title,
+                        'lesson_type': lesson.lesson_type
+                    }
+                })
+            else:
+                # Traditional redirect for non-AJAX requests
+                messages.success(request, 'Lesson created successfully!')
+                return redirect('courses:edit_course', slug=course.slug)
+        else:
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                # Return JSON response for AJAX requests with form errors
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Error creating lesson. Please check the form.',
+                    'errors': form.errors
+                })
+            else:
+                messages.error(request, 'Error creating lesson. Please check the form.')
+                return redirect('courses:edit_course', slug=course.slug)
 
     # Redirect back to the edit course page instead of rendering a separate template
     messages.info(request, 'Lesson creation is now handled through the course edit page.')
@@ -175,8 +201,17 @@ def delete_lesson(request, course_slug, module_id, lesson_id):
     if request.method == 'POST':
         lesson_title = lesson.title
         lesson.delete()
-        messages.success(request, f'Lesson "{lesson_title}" has been deleted successfully!')
-        return redirect('courses:edit_course', slug=course.slug)
+        
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            # Return JSON response for AJAX requests
+            return JsonResponse({
+                'status': 'success',
+                'message': f'Lesson "{lesson_title}" has been deleted successfully!'
+            })
+        else:
+            # Traditional redirect for non-AJAX requests
+            messages.success(request, f'Lesson "{lesson_title}" has been deleted successfully!')
+            return redirect('courses:edit_course', slug=course.slug)
 
     # Instead of rendering a separate template, redirect to edit_course with a delete flag
     return redirect('courses:edit_course', slug=course.slug)

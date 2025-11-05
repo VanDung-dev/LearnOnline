@@ -15,8 +15,33 @@ def create_module(request, course_slug):
             module = form.save(commit=False)
             module.course = course
             module.save()
-            messages.success(request, 'Module created successfully!')
-            return redirect('courses:edit_course', slug=course.slug)
+            
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                # Return JSON response for AJAX requests
+                return JsonResponse({
+                    'status': 'success',
+                    'message': 'Module created successfully!',
+                    'module': {
+                        'id': module.id,
+                        'title': module.title,
+                        'description': module.description
+                    }
+                })
+            else:
+                # Traditional redirect for non-AJAX requests
+                messages.success(request, 'Module created successfully!')
+                return redirect('courses:edit_course', slug=course.slug)
+        else:
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                # Return JSON response for AJAX requests with form errors
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Error creating module. Please check the form.',
+                    'errors': form.errors
+                })
+            else:
+                messages.error(request, 'Error creating module. Please check the form.')
+                return redirect('courses:edit_course', slug=course.slug)
 
     # Redirect back to the edit course page instead of rendering a separate template
     messages.info(request, 'Module creation is now handled through the course edit page.')
@@ -32,8 +57,33 @@ def edit_module(request, course_slug, module_id):
         form = ModuleForm(request.POST, instance=module)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Module updated successfully!')
-            return redirect('courses:edit_course', slug=course.slug)
+            
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                # Return JSON response for AJAX requests
+                return JsonResponse({
+                    'status': 'success',
+                    'message': 'Module updated successfully!',
+                    'module': {
+                        'id': module.id,
+                        'title': module.title,
+                        'description': module.description
+                    }
+                })
+            else:
+                # Traditional redirect for non-AJAX requests
+                messages.success(request, 'Module updated successfully!')
+                return redirect('courses:edit_course', slug=course.slug)
+        else:
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                # Return JSON response for AJAX requests with form errors
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Error updating module. Please check the form.',
+                    'errors': form.errors
+                })
+            else:
+                messages.error(request, 'Error updating module. Please check the form.')
+                return redirect('courses:edit_course', slug=course.slug)
 
     # Redirect back to the edit course page instead of rendering a separate template
     messages.info(request, 'Module editing is now handled through the course edit page.')
@@ -48,8 +98,17 @@ def delete_module(request, course_slug, module_id):
     if request.method == 'POST':
         module_title = module.title
         module.delete()
-        messages.success(request, f'Module "{module_title}" has been deleted successfully!')
-        return redirect('courses:edit_course', slug=course.slug)
+        
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            # Return JSON response for AJAX requests
+            return JsonResponse({
+                'status': 'success',
+                'message': f'Module "{module_title}" has been deleted successfully!'
+            })
+        else:
+            # Traditional redirect for non-AJAX requests
+            messages.success(request, f'Module "{module_title}" has been deleted successfully!')
+            return redirect('courses:edit_course', slug=course.slug)
 
     # Instead of rendering a separate template, redirect to edit_course with a delete flag
     return redirect('courses:edit_course', slug=course.slug)
