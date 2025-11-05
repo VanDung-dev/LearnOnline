@@ -19,7 +19,7 @@ from .includes.views_other import (
     home, custom_page_not_found, enroll_course,
     instructor_courses, delete_lesson_video, upload_image
 )
-from .includes.view_certificate import (
+from .includes.views_certificate import (
     public_certificate, purchase_certificate, course_certificate
 )
 
