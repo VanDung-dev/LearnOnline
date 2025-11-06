@@ -23,12 +23,14 @@
                         </select>
                     </div>
 
+                    <!-- Section for Text Lessons -->
                     <div class="mb-3 lesson-content-section" id="text-content-section-{{ module.id }}" style="display: block;">
                         <label for="lesson_content_{{ module.id }}" class="form-label">Content</label>
                         <textarea class="form-control" id="lesson_content_{{ module.id }}" name="content" rows="5"></textarea>
                         <small class="form-text text-muted">For text lessons, add your content here.</small>
                     </div>
 
+                    <!-- Section for Video Lessons -->
                     <div class="mb-3 lesson-content-section" id="video-content-section-{{ module.id }}" style="display: none;">
                         <div class="mb-3">
                             <label for="lesson_video_url_{{ module.id }}" class="form-label">Video URL</label>
@@ -47,14 +49,11 @@
                         </div>
                     </div>
 
+                    <!-- Section for Quiz Lessons -->
                     <div class="mb-3 lesson-content-section" id="quiz-content-section-{{ module.id }}" style="display: none;">
                         <label for="lesson_max_attempts_{{ module.id }}" class="form-label">Maximum Quiz Attempts</label>
                         <input type="number" class="form-control" id="lesson_max_attempts_{{ module.id }}" name="max_attempts" min="0" value="0">
                         <small class="form-text text-muted">Set to 0 for unlimited attempts. This limits how many times a student can take the quiz.</small>
-
-                        <div class="alert alert-info mt-3">
-                            <p>Quiz configuration will be available after creating the lesson. You will be redirected to the quiz editor where you can add questions and answers.</p>
-                        </div>
                     </div>
 
                     <div class="mb-3">
