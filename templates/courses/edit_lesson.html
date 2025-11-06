@@ -136,11 +136,12 @@
                                 <label for="lesson_max_attempts" class="form-label">Maximum Quiz Attempts (0 for unlimited)</label>
                                 <input type="number" class="form-control" id="lesson_max_attempts" name="max_attempts" min="0" value="{{ lesson.max_attempts }}">
                             </div>
+                        </div>
 
-                            <div class="mb-3" id="max-attempts-section">
-                                <label for="lesson_order" class="form-label">Order</label>
-                                <input type="number" class="form-control" id="lesson_order" name="order" min="0" value="{{ lesson.order }}">
-                            </div>
+                        <!-- OTHER SECTION: Common fields for all lesson types -->
+                        <div class="mb-3">
+                            <label for="lesson_order" class="form-label">Order</label>
+                            <input type="number" class="form-control" id="lesson_order" name="order" min="0" value="{{ lesson.order }}">
                         </div>
 
                         <div class="mb-3 form-check">
