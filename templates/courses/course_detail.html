@@ -17,6 +17,12 @@
         <h1>{{ course.title }}</h1>
         <p class="text-muted">{{ course.category }}</p>
         
+        {% if is_instructor %}
+        <div class="alert alert-info">
+            <strong>Instructor View:</strong> You are viewing this course as the instructor. You can preview lessons without being enrolled.
+        </div>
+        {% endif %}
+        
         {% if course.opening_date or course.closing_date %}
         <div class="alert alert-info">
             <h5>Course Schedule</h5>
@@ -66,7 +72,7 @@
                         <ul class="list-group">
                             {% for lesson in module.lessons.all %}
                             <li class="list-group-item">
-                                {% if is_enrolled and course.slug and lesson.slug %}
+                                {% if is_enrolled and course.slug and lesson.slug or is_instructor and course.slug and lesson.slug %}
                                     <a href="{% url 'courses:lesson_detail' course.slug lesson.slug %}">{{ lesson.title }}</a>
                                 {% else %}
                                     {{ lesson.title }}
@@ -137,6 +143,11 @@
                                 <a href="#" class="btn btn-success disabled">Enrolled</a>
                             {% endif %}
                         {% endif %}
+                    {% elif is_instructor %}
+                        <!-- Show preview option for instructors -->
+                        <div class="alert alert-info">
+                            <p>You are the instructor of this course. You can preview lessons without enrolling.</p>
+                        </div>
                     {% else %}
                         {% if course.slug %}
                             {% if course.opening_date and now < course.opening_date %}

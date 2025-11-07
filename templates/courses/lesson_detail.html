@@ -16,13 +16,19 @@
     <div class="col-md-8">
         <h1>{{ lesson.title }}</h1>
         
+        {% if is_instructor %}
+        <div class="alert alert-info">
+            <strong>Instructor Preview:</strong> You are viewing this lesson as an instructor. Students will see this content when enrolled in the course.
+        </div>
+        {% endif %}
+        
         {% load courses_extras %}
         {% module_deadline lesson.module user as deadline %}
         {% if deadline and deadline < now %}
         <div class="alert alert-danger">
             <strong>Warning:</strong> The deadline for this module was {{ deadline }}. You can still access the materials, but you are behind schedule.
         </div>
-        {% elif deadline %}
+        {% elif deadline and not is_instructor %}
         <div class="alert alert-info">
             <strong>Module Deadline:</strong> Complete this module by {{ deadline }}.
         </div>
@@ -32,7 +38,7 @@
         <div class="alert alert-danger">
             <strong>Warning:</strong> This course has expired. You can still access the materials, but you will not be able to receive a certificate.
         </div>
-        {% elif course.expiration_date %}
+        {% elif course.expiration_date and not is_instructor %}
         <div class="alert alert-info">
             <strong>Course Deadline:</strong> Complete this course by {{ course.expiration_date }} to receive your certificate.
         </div>
@@ -97,6 +103,7 @@
             </div>
         </div>
         
+        {% if not is_instructor %}
         <!-- Certificate section -->
         <div class="card mt-3">
             <div class="card-body">
@@ -117,6 +124,7 @@
                 {% endif %}
             </div>
         </div>
+        {% endif %}
         
         <div class="card mt-3">
             <div class="card-body">
@@ -125,9 +133,11 @@
                     {% for module in course.modules.all %}
                         <div class="list-group-item list-group-item-action">
                             <h6>{{ module.title }}</h6>
+                            {% if not is_instructor %}
                             {% module_deadline module user as module_deadline %}
                             {% if module_deadline %}
                                 <small class="text-muted">Deadline: {{ module_deadline }}</small>
+                            {% endif %}
                             {% endif %}
                             {% for lesson_item in module.lessons.all %}
                                 <a href="{% url 'courses:lesson_detail' course.slug lesson_item.slug %}" 
