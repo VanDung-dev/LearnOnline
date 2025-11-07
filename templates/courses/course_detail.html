@@ -124,7 +124,6 @@
                         <!-- Show edit and delete options for course instructor -->
                         <div class="d-grid gap-2">
                             <a href="{% url 'courses:edit_course' course.slug %}" class="btn btn-warning">Edit Course</a>
-                            <a href="{% url 'courses:preview_course' course.slug %}" class="btn btn-info">Preview as Student</a>
                             <a href="{% url 'courses:delete_course' course.slug %}" class="btn btn-danger">Delete Course</a>
                         </div>
                     {% elif is_enrolled %}

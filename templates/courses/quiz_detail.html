@@ -3,13 +3,6 @@
 {% block title %}{{ lesson.title }} - {{ course.title }}{% endblock %}
 
 {% block content %}
-{% if is_preview %}
-<div class="alert alert-info">
-    <h4>Preview Mode</h4>
-    <p>You are previewing this quiz as a student. This is how students will see your quiz. In preview mode, you cannot submit answers.</p>
-</div>
-{% endif %}
-
 <div class="container">
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
@@ -25,14 +18,10 @@
     
     <div class="card">
         <div class="card-header">
-            {% if is_preview %}
-            <h3>Quiz Preview</h3>
-            {% else %}
             <h3>Quiz Attempt #{{ attempt.attempt_number }}</h3>
-            {% endif %}
         </div>
         <div class="card-body">
-            <form method="post" {% if is_preview %}onsubmit="return false;"{% endif %}>
+            <form method="post">
                 {% csrf_token %}
                 
                 {% for question in quiz.questions.all %}
@@ -43,20 +32,20 @@
                         {% if question.question_type == 'single' %}
                             {% for answer in question.answers.all %}
                                 <div class="form-check mb-2">
-                                    <input class="form-check-input" type="radio" name="question_{{ question.id }}" id="answer_{{ answer.id }}" value="{{ answer.id }}" {% if is_preview %}disabled{% endif %}>
+                                    <input class="form-check-input" type="radio" name="question_{{ question.id }}" id="answer_{{ answer.id }}" value="{{ answer.id }}">
                                     <label class="form-check-label" for="answer_{{ answer.id }}">{{ answer.text }}</label>
                                 </div>
                             {% endfor %}
                         {% elif question.question_type == 'multiple' %}
                             {% for answer in question.answers.all %}
                                 <div class="form-check mb-2">
-                                    <input class="form-check-input" type="checkbox" name="question_{{ question.id }}" id="answer_{{ answer.id }}" value="{{ answer.id }}" {% if is_preview %}disabled{% endif %}>
+                                    <input class="form-check-input" type="checkbox" name="question_{{ question.id }}" id="answer_{{ answer.id }}" value="{{ answer.id }}">
                                     <label class="form-check-label" for="answer_{{ answer.id }}">{{ answer.text }}</label>
                                 </div>
                             {% endfor %}
                         {% elif question.question_type == 'essay' %}
                             <div class="mb-3">
-                                <textarea class="form-control" name="question_{{ question.id }}" rows="5" placeholder="Enter your answer here..." {% if is_preview %}disabled{% endif %}></textarea>
+                                <textarea class="form-control" name="question_{{ question.id }}" rows="5" placeholder="Enter your answer here..."></textarea>
                             </div>
                         {% endif %}
                     </div>
@@ -64,15 +53,8 @@
                     <p class="text-muted">No questions available for this quiz.</p>
                 {% endfor %}
                 
-                {% if is_preview %}
-                <div class="alert alert-warning">
-                    <p>This is a preview. Students will be able to submit their answers.</p>
-                </div>
-                <a href="{% url 'courses:course_detail' slug=course.slug %}" class="btn btn-secondary">Back to Course</a>
-                {% else %}
                 <button type="submit" class="btn btn-primary">Submit Quiz</button>
                 <a href="{% url 'courses:course_detail' slug=course.slug %}" class="btn btn-secondary">Back to Course</a>
-                {% endif %}
             </form>
         </div>
     </div>
