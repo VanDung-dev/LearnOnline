@@ -28,20 +28,38 @@ def lesson_detail(request, course_slug, lesson_slug):
     now = timezone.now()
     if ((course.opening_date and now < course.opening_date) or
             (course.closing_date and now > course.closing_date)):
-        raise Http404("Course is not currently available")
+        # Allow instructors to view even if course is closed
+        if not (hasattr(request.user, 'profile') and 
+                request.user.profile.is_instructor() and 
+                course.instructor == request.user):
+            raise Http404("Course is not currently available")
 
-    # Check if user is enrolled
-    enrollment = get_object_or_404(Enrollment, user=request.user, course=course)
-    is_enrolled = True
-    has_certificate = Certificate.objects.filter(user=request.user, course=course).exists()
+    # Check if user is enrolled or is the instructor
+    enrollment = None
+    is_enrolled = False
+    has_certificate = False
+    
+    # Check if user is the instructor of this course
+    is_instructor = (hasattr(request.user, 'profile') and 
+                     request.user.profile.is_instructor() and 
+                     course.instructor == request.user)
+    
+    if not is_instructor:
+        # Regular student logic
+        enrollment = get_object_or_404(Enrollment, user=request.user, course=course)
+        is_enrolled = True
+        has_certificate = Certificate.objects.filter(user=request.user, course=course).exists()
+    else:
+        # For instructors, treat as enrolled but without certificate
+        is_enrolled = True
 
     # Add debugging information
     if lesson.lesson_type == 'video' and not lesson.video_url:
         logger = logging.getLogger(__name__)
         logger.warning(f"Video lesson '{lesson.title}' (ID: {lesson.id}) has no video URL set")
 
-    # Check if lesson/module is locked for regular students
-    if (lesson.is_locked or lesson.module.is_locked) and not has_certificate:
+    # Check if lesson/module is locked - instructors can always access
+    if not is_instructor and (lesson.is_locked or lesson.module.is_locked) and not has_certificate:
         # Lesson or module is locked and user doesn't have certificate
         messages.error(request, "This content is locked. Purchase a certificate to access it.")
         return redirect('courses:course_detail', slug=course.slug)
@@ -52,36 +70,44 @@ def lesson_detail(request, course_slug, lesson_slug):
         try:
             quiz = lesson.quiz
         except Quiz.DoesNotExist:
-            messages.error(request, "This quiz is not configured yet.")
-            return redirect('courses:course_detail', slug=course.slug)
+            if not is_instructor:
+                messages.error(request, "This quiz is not configured yet.")
+                return redirect('courses:course_detail', slug=course.slug)
+            else:
+                # For instructors, continue to show the lesson detail page
+                quiz = None
 
-        # Check attempts
-        attempts = QuizAttempt.objects.filter(user=request.user, lesson=lesson)
-        attempt_count = attempts.count()
+        # Students: Check attempts
+        if not is_instructor:
+            attempts = QuizAttempt.objects.filter(user=request.user, lesson=lesson)
+            attempt_count = attempts.count()
 
-        # Check if user has exceeded max attempts
-        if lesson.max_attempts > 0 and attempt_count >= lesson.max_attempts:
-            messages.error(request,
-                           f"You have reached the maximum number of attempts ({lesson.max_attempts}) for this quiz.")
-            # Show previous attempts
-            context = {
-                'course': course,
-                'lesson': lesson,
-                'quiz': quiz,
-                'attempts': attempts,
-                'max_attempts_reached': True,
-            }
-            return render(request, 'courses/lesson_detail.html', context)
+            # Check if user has exceeded max attempts
+            if lesson.max_attempts > 0 and attempt_count >= lesson.max_attempts:
+                messages.error(request,
+                               f"You have reached the maximum number of attempts ({lesson.max_attempts}) for this quiz.")
+                # Show previous attempts
+                context = {
+                    'course': course,
+                    'lesson': lesson,
+                    'quiz': quiz,
+                    'attempts': attempts,
+                    'max_attempts_reached': True,
+                    'is_instructor': is_instructor,
+                }
+                return render(request, 'courses/lesson_detail.html', context)
 
-        # Create a new attempt
-        new_attempt = QuizAttempt.objects.create(
-            user=request.user,
-            lesson=lesson,
-            attempt_number=attempt_count + 1
-        )
+        # For instructors, we skip the quiz attempt creation
+        if not is_instructor:
+            # Create a new attempt
+            new_attempt = QuizAttempt.objects.create(
+                user=request.user,
+                lesson=lesson,
+                attempt_number=attempt_count + 1
+            )
 
-        if request.method == 'POST':
-            # Process quiz submission
+        if request.method == 'POST' and not is_instructor:
+            # Process quiz submission only for students
             score = 0
             total_points = 0
 
@@ -162,28 +188,39 @@ def lesson_detail(request, course_slug, lesson_slug):
                               f"Quiz submitted. Your score: {new_attempt.score:.2f}%. You need at least 70% to pass.")
 
             return redirect('courses:lesson_detail', course_slug=course.slug, lesson_slug=lesson.slug)
-        else:
-            # Show quiz form
+        elif not is_instructor:
+            # Show quiz form for students
             context = {
                 'course': course,
                 'lesson': lesson,
                 'quiz': quiz,
                 'attempt': new_attempt,
+                'is_instructor': is_instructor,
+            }
+            return render(request, 'courses/quiz_detail.html', context)
+        else:
+            # Show quiz preview for instructors
+            context = {
+                'course': course,
+                'lesson': lesson,
+                'quiz': quiz,
+                'is_instructor': is_instructor,
             }
             return render(request, 'courses/quiz_detail.html', context)
 
-    # Mark lesson as completed (for non-quiz lessons)
-    progress, created = Progress.objects.get_or_create(
-        user=request.user,
-        lesson=lesson
-    )
+    # Mark lesson as completed (for non-quiz lessons) - only for students
+    if not is_instructor:
+        progress, created = Progress.objects.get_or_create(
+            user=request.user,
+            lesson=lesson
+        )
 
-    if not progress.completed:
-        progress.completed = True
-        progress.save()
+        if not progress.completed:
+            progress.completed = True
+            progress.save()
 
-    # Check if course is completed and issue certificate if needed
-    check_and_issue_certificate(request.user, course)
+        # Check if course is completed and issue certificate if needed
+        check_and_issue_certificate(request.user, course)
 
     # Get next and previous lessons
     all_lessons = Lesson.objects.filter(module__course=course, is_published=True)
@@ -210,6 +247,7 @@ def lesson_detail(request, course_slug, lesson_slug):
         'prev_lesson': prev_lesson,
         'next_lesson': next_lesson,
         'enrollment': enrollment,
+        'is_instructor': is_instructor,
     }
     return render(request, 'courses/lesson_detail.html', context)
 

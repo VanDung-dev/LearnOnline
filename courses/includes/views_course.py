@@ -123,13 +123,20 @@ def course_list(request):
 def course_detail(request, slug):
     course = get_object_or_404(Course, slug=slug, is_active=True)
     is_enrolled = False
+    is_instructor = False
+    
     if request.user.is_authenticated:
         # Check if user is enrolled
         is_enrolled = course.enrollments.filter(user=request.user).exists()
+        # Check if user is the instructor
+        is_instructor = (hasattr(request.user, 'profile') and 
+                         request.user.profile.is_instructor() and 
+                         course.instructor == request.user)
     
     return render(request, 'courses/course_detail.html', {
         'course': course,
-        'is_enrolled': is_enrolled
+        'is_enrolled': is_enrolled,
+        'is_instructor': is_instructor
     })
 
 
