@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Payment - {{ course.title }}{% endblock %}
+{% block title %}{% if purchase_type == 'certificate' %}Purchase Certificate{% else %}Payment{% endif %} - {{ course.title }}{% endblock %}
 
 {% block content %}
 <div class="container py-5">
@@ -12,7 +12,11 @@
                     <div class="d-flex flex-column flex-md-row align-items-center">
                         <div class="flex-shrink-0 mb-3 mb-md-0">
                             <div class="bg-light rounded-circle d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                                {% if purchase_type == 'certificate' %}
+                                <i class="bi bi-award-fill text-warning fs-1"></i>
+                                {% else %}
                                 <i class="bi bi-mortarboard-fill text-primary fs-1"></i>
+                                {% endif %}
                             </div>
                         </div>
                         <div class="flex-grow-1 ms-md-4 text-center text-md-start">
@@ -23,7 +27,11 @@
                             </p>
                             <p class="text-muted mb-0">
                                 <i class="bi bi-tag-fill me-1"></i>
+                                {% if purchase_type == 'certificate' %}
+                                Certificate Price: <span class="fw-bold text-dark">${{ certificate_price }}</span>
+                                {% else %}
                                 Price: <span class="fw-bold text-dark">${{ course.price }}</span>
+                                {% endif %}
                             </p>
                         </div>
                         <div class="mt-3 mt-md-0 ms-md-4 text-center">
@@ -39,9 +47,19 @@
         <div class="col-12 col-lg-8">
             <div class="card border-0 shadow-sm">
                 <div class="card-header bg-white py-4">
-                    <h1 class="text-center mb-0">Complete Your Purchase</h1>
+                    <h1 class="text-center mb-0">{% if purchase_type == 'certificate' %}Purchase Certificate{% else %}Complete Your Purchase{% endif %}</h1>
                 </div>
                 <div class="card-body p-4 p-md-5">
+                    {% if purchase_type == 'certificate' %}
+                    <div class="alert alert-warning d-flex align-items-center mb-4">
+                        <i class="bi bi-award-fill me-2 fs-4"></i>
+                        <div>
+                            <h5 class="alert-heading">Certificate Details</h5>
+                            <p class="mb-0">This is a verified certificate of completion for the course "{{ course.title }}".</p>
+                            <p class="mb-0 fw-bold fs-5 mt-2">Total: ${{ certificate_price }}</p>
+                        </div>
+                    </div>
+                    {% else %}
                     <div class="alert alert-info d-flex align-items-center mb-4">
                         <i class="bi bi-info-circle-fill me-2"></i>
                         <div>
@@ -50,10 +68,12 @@
                             <p class="mb-0 fw-bold fs-5 mt-2">Total: ${{ course.price }}</p>
                         </div>
                     </div>
+                    {% endif %}
                     
                     <form id="payment-form">
                         {% csrf_token %}
                         <input type="hidden" name="course_slug" value="{{ course.slug }}">
+                        <input type="hidden" name="purchase_type" value="{{ purchase_type }}">
                         
                         <div class="mb-4">
                             <h5 class="mb-3">Payment Method</h5>
@@ -113,8 +133,13 @@
                         </div>
                         
                         <div class="d-grid gap-3 d-md-flex justify-content-md-center">
-                            <button type="submit" class="btn btn-primary btn-lg flex-fill" id="pay-button">
-                                <i class="bi bi-shield-lock me-2"></i>Pay Securely ${{ course.price }}
+                            <button type="submit" class="btn {% if purchase_type == 'certificate' %}btn-warning{% else %}btn-primary{% endif %} btn-lg flex-fill" id="pay-button">
+                                <i class="bi bi-shield-lock me-2"></i>
+                                {% if purchase_type == 'certificate' %}
+                                Purchase Certificate ${{ certificate_price }}
+                                {% else %}
+                                Pay Securely ${{ course.price }}
+                                {% endif %}
                             </button>
                             <a href="{% url 'courses:course_detail' course.slug %}" class="btn btn-outline-secondary btn-lg flex-fill">
                                 <i class="bi bi-arrow-left me-2"></i>Cancel
@@ -148,6 +173,51 @@
         </div>
         
         <div class="col-12 col-lg-4 mt-4 mt-lg-0">
+            {% if purchase_type == 'certificate' %}
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0">Certificate Benefits</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex align-items-center px-0 py-3">
+                            <i class="bi bi-patch-check-fill text-warning me-3 fs-4"></i>
+                            <div>
+                                <h6 class="mb-0">Verified Certificate</h6>
+                                <small class="text-muted">Official proof of completion</small>
+                            </div>
+                        </li>
+                        <li class="list-group-item d-flex align-items-center px-0 py-3">
+                            <i class="bi bi-share-fill text-primary me-3 fs-4"></i>
+                            <div>
+                                <h6 class="mb-0">Shareable</h6>
+                                <small class="text-muted">Add to LinkedIn or resume</small>
+                            </div>
+                        </li>
+                        <li class="list-group-item d-flex align-items-center px-0 py-3">
+                            <i class="bi bi-download text-success me-3 fs-4"></i>
+                            <div>
+                                <h6 class="mb-0">Downloadable</h6>
+                                <small class="text-muted">Get PDF certificate instantly</small>
+                            </div>
+                        </li>
+                        <li class="list-group-item d-flex align-items-center px-0 py-3">
+                            <i class="bi bi-unlock-fill text-info me-3 fs-4"></i>
+                            <div>
+                                <h6 class="mb-0">Unlock Content</h6>
+                                <small class="text-muted">Access premium course materials</small>
+                            </div>
+                        </li>
+                        <li class="list-group-item px-0 py-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">Total</h5>
+                                <h4 class="mb-0 fw-bold">${{ certificate_price }}</h4>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            {% else %}
             <div class="card border-0 shadow-sm">
                 <div class="card-header bg-white py-3">
                     <h5 class="mb-0">Order Summary</h5>
@@ -184,6 +254,7 @@
                     </ul>
                 </div>
             </div>
+            {% endif %}
             
             <div class="card border-0 shadow-sm mt-4">
                 <div class="card-body">
@@ -203,7 +274,11 @@
 <link rel="stylesheet" type="text/css" href="{% static 'payments/payment_form.css' %}">
 
 <script>
+{% if purchase_type == 'certificate' %}
+const processPaymentUrl = '{% url "payments:process_payment_type" course.slug "certificate" %}';
+{% else %}
 const processPaymentUrl = '{% url "payments:process_payment" course.slug %}';
+{% endif %}
 </script>
 <script src="{% static 'payments/payment_form.js' %}"></script>
 {% endblock %}
