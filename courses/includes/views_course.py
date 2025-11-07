@@ -124,21 +124,12 @@ def course_detail(request, slug):
     course = get_object_or_404(Course, slug=slug, is_active=True)
     is_enrolled = False
     if request.user.is_authenticated:
-        # Fixed the field name from 'student' to 'user'
+        # Check if user is enrolled
         is_enrolled = course.enrollments.filter(user=request.user).exists()
     
     return render(request, 'courses/course_detail.html', {
         'course': course,
         'is_enrolled': is_enrolled
-    })
-
-
-@login_required
-def preview_course(request, slug):
-    course = get_object_or_404(Course, slug=slug, instructor=request.user)
-    return render(request, 'courses/course_detail.html', {
-        'course': course,
-        'is_preview': True
     })
 
 
