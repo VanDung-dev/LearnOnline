@@ -38,7 +38,7 @@ def purchase_certificate(request, slug):
                 return redirect('courses:lesson_detail', course_slug=course.slug, lesson_slug=first_lesson.slug)
 
     # Redirect to payment system
-    return redirect('payments:purchase_certificate_payment', course_slug=slug)
+    return redirect('payments:payment_page_type', course_slug=slug, purchase_type='certificate')
 
 
 def course_certificate(request, certificate_id):

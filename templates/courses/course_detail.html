@@ -132,7 +132,7 @@
                                 <a href="#" class="btn btn-secondary disabled">Course Expired - No Certificate Available</a>
                             {% elif course.price == 0 and course.certificate_price > 0 %}
                                 <!-- For free courses with paid certificates, show purchase certificate button -->
-                                <a href="{% url 'payments:purchase_certificate_payment' course.slug %}" class="btn btn-warning">Purchase Certificate for ${{ course.certificate_price }}</a>
+                                <a href="{% url 'payments:payment_page_type' course.slug 'certificate' %}" class="btn btn-warning">Purchase Certificate for ${{ course.certificate_price }}</a>
                             {% else %}
                                 <a href="#" class="btn btn-success disabled">Enrolled</a>
                             {% endif %}
