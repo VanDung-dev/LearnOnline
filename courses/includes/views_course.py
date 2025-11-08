@@ -141,6 +141,32 @@ def course_detail(request, slug):
 
 
 @login_required
+def course_learning_process(request, slug):
+    course = get_object_or_404(Course, slug=slug, is_active=True)
+    is_enrolled = False
+    is_instructor = False
+    
+    if request.user.is_authenticated:
+        # Check if user is enrolled
+        is_enrolled = course.enrollments.filter(user=request.user).exists()
+        # Check if user is the instructor
+        is_instructor = (hasattr(request.user, 'profile') and 
+                         request.user.profile.is_instructor() and 
+                         course.instructor == request.user)
+    
+    # Only allow enrolled users or instructors to view the learning process
+    if not is_enrolled and not is_instructor:
+        messages.error(request, 'You must be enrolled in this course to view the learning process.')
+        return redirect('courses:course_detail', slug=slug)
+    
+    return render(request, 'courses/course_learning_process.html', {
+        'course': course,
+        'is_enrolled': is_enrolled,
+        'is_instructor': is_instructor
+    })
+
+
+@login_required
 def instructor_courses(request):
     courses = Course.objects.filter(instructor=request.user)
     return render(request, 'courses/instructor_courses.html', {'courses': courses})
