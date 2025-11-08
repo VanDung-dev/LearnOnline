@@ -44,7 +44,7 @@
         </div>
         {% endif %}
         
-        <p>{{ course.description }}</p>
+        {{course.description|safe }}
     </div>
     
     <div class="col-md-4">
