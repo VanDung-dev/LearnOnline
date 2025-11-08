@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ course.title }} - Learning Process{% endblock %}
+
+{% block content %}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'courses:home' %}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'courses:course_list' %}">Courses</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'courses:course_detail' course.slug %}">{{ course.title }}</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Learning Process</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-md-8">
+        <h1>{{ course.title }} - Learning Process</h1>
+        
+        {% if is_instructor %}
+        <div class="alert alert-info">
+            <strong>Instructor View:</strong> You are viewing this course as the instructor. You can preview lessons without being enrolled.
+        </div>
+        {% endif %}
+        
+        <h3>Course Modules</h3>
+        <div class="accordion" id="modulesAccordion">
+            {% for module in course.modules.all %}
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="heading{{ forloop.counter }}">
+                    <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ forloop.counter }}">
+                        {{ module.title }}
+                        {% if module.is_locked %}
+                            <span class="badge bg-warning ms-2">Locked</span>
+                        {% endif %}
+                    </button>
+                </h2>
+                <div id="collapse{{ forloop.counter }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" data-bs-parent="#modulesAccordion">
+                    <div class="accordion-body">
+                        <p>{{ module.description }}</p>
+                        {% load courses_extras %}
+                        {% module_deadline module user as deadline %}
+                        {% if deadline %}
+                        <div class="alert alert-info">
+                            <strong>Duration:</strong> {{ module.duration_days }} days
+                            <br><strong>Your Deadline:</strong> {{ deadline }}
+                        </div>
+                        {% endif %}
+                        <ul class="list-group">
+                            {% for lesson in module.lessons.all %}
+                            <li class="list-group-item">
+                                {% if is_enrolled and course.slug and lesson.slug or is_instructor and course.slug and lesson.slug %}
+                                    <a href="{% url 'courses:lesson_detail' course.slug lesson.slug %}">{{ lesson.title }}</a>
+                                {% else %}
+                                    {{ lesson.title }}
+                                {% endif %}
+                                {% if lesson.is_locked %}
+                                    <span class="badge bg-warning">Locked</span>
+                                {% endif %}
+                                <span class="badge bg-secondary float-end">{{ lesson.lesson_type }}</span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Navigation</h5>
+                <a href="{% url 'courses:course_detail' course.slug %}" class="btn btn-primary">Back to Course Description</a>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-body">
+                <h5 class="card-title">Course Details</h5>
+                <p class="card-text">Instructor: {{ course.instructor.get_full_name|default:course.instructor.username }}</p>
+                {% if course.opening_date %}
+                <p class="card-text">Opens: {{ course.opening_date }}</p>
+                {% endif %}
+                {% if course.closing_date %}
+                <p class="card-text">Closes: {{ course.closing_date }}</p>
+                {% endif %}
+                {% if course.expiration_date %}
+                <p class="card-text">Complete by: {{ course.expiration_date }}</p>
+                {% endif %}
+                <!-- Display course duration in weeks -->
+                {% load courses_extras %}
+                <p class="card-text">Duration: {{ course|course_duration_weeks }} week{{ course|course_duration_weeks|pluralize }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
