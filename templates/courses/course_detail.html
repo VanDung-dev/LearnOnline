@@ -90,14 +90,16 @@
                             <a href="{% url 'courses:course_certificate' certificate.certificate_number %}" class="btn btn-success">View Certificate</a>
                             {% endwith %}
                         {% else %}
+                            <div class="d-grid gap-2">
                             {% if course.expiration_date and course.expiration_date < now %}
                                 <a href="#" class="btn btn-secondary disabled">Course Expired - No Certificate Available</a>
                             {% elif course.price == 0 and course.certificate_price > 0 %}
                                 <!-- For free courses with paid certificates, show purchase certificate button -->
-                                <a href="{% url 'payments:payment_page_type' course.slug 'certificate' %}" class="btn btn-warning">Purchase Certificate for ${{ course.certificate_price }}</a>
+                                <a href="{% url 'payments:payment_page_type' course.slug 'certificate' %}" class="btn btn-warning d-grid gap-2">Purchase Certificate for ${{ course.certificate_price }}</a>
                             {% else %}
                                 <a href="#" class="btn btn-success disabled">Enrolled</a>
                             {% endif %}
+                            </div>
                         {% endif %}
                     {% elif is_instructor %}
                         <!-- Show preview option for instructors -->
@@ -111,18 +113,20 @@
                             {% elif course.closing_date and now > course.closing_date %}
                                 <a href="#" class="btn btn-secondary disabled">Enrollment closed</a>
                             {% else %}
+                                <div class="d-grid gap-2">
                                 {% if course.price > 0 %}
                                     <a href="{% url 'payments:payment_page' course.slug %}" class="btn btn-primary">Pay ${{ course.price }} and Enroll</a>
                                 {% else %}
                                     <a href="{% url 'courses:enroll_course' course.slug %}" class="btn btn-primary">Enroll Now</a>
                                 {% endif %}
+                                </div>
                             {% endif %}
                         {% else %}
                             <a href="#" class="btn btn-primary disabled">Enroll Now</a>
                         {% endif %}
                     {% endif %}
                     {% if is_enrolled or is_instructor %}
-                    <div class="mt-4">
+                    <div class="mt-2 d-grid gap-2">
                         <a href="{% url 'courses:course_learning_process' course.slug %}" class="btn btn-primary">View Learning Process</a>
                     </div>
                     {% else %}
