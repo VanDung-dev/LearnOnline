@@ -46,49 +46,17 @@
         
         <p>{{ course.description }}</p>
         
-        <h3>Course Modules</h3>
-        <div class="accordion" id="modulesAccordion">
-            {% for module in course.modules.all %}
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="heading{{ forloop.counter }}">
-                    <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ forloop.counter }}">
-                        {{ module.title }}
-                        {% if module.is_locked %}
-                            <span class="badge bg-warning ms-2">Locked</span>
-                        {% endif %}
-                    </button>
-                </h2>
-                <div id="collapse{{ forloop.counter }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" data-bs-parent="#modulesAccordion">
-                    <div class="accordion-body">
-                        <p>{{ module.description }}</p>
-                        {% load courses_extras %}
-                        {% module_deadline module user as deadline %}
-                        {% if deadline %}
-                        <div class="alert alert-info">
-                            <strong>Duration:</strong> {{ module.duration_days }} days
-                            <br><strong>Your Deadline:</strong> {{ deadline }}
-                        </div>
-                        {% endif %}
-                        <ul class="list-group">
-                            {% for lesson in module.lessons.all %}
-                            <li class="list-group-item">
-                                {% if is_enrolled and course.slug and lesson.slug or is_instructor and course.slug and lesson.slug %}
-                                    <a href="{% url 'courses:lesson_detail' course.slug lesson.slug %}">{{ lesson.title }}</a>
-                                {% else %}
-                                    {{ lesson.title }}
-                                {% endif %}
-                                {% if lesson.is_locked %}
-                                    <span class="badge bg-warning">Locked</span>
-                                {% endif %}
-                                <span class="badge bg-secondary float-end">{{ lesson.lesson_type }}</span>
-                            </li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
+        {% if is_enrolled or is_instructor %}
+        <div class="mt-4">
+            <a href="{% url 'courses:course_learning_process' course.slug %}" class="btn btn-primary">View Learning Process</a>
         </div>
+        {% else %}
+        <div class="alert alert-info mt-4">
+            <h4>Course Content</h4>
+            <p>Course content is only available to enrolled students.</p>
+            <p>Enroll now to access all modules and lessons.</p>
+        </div>
+        {% endif %}
     </div>
     
     <div class="col-md-4">
