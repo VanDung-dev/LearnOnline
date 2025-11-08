@@ -45,18 +45,6 @@
         {% endif %}
         
         <p>{{ course.description }}</p>
-        
-        {% if is_enrolled or is_instructor %}
-        <div class="mt-4">
-            <a href="{% url 'courses:course_learning_process' course.slug %}" class="btn btn-primary">View Learning Process</a>
-        </div>
-        {% else %}
-        <div class="alert alert-info mt-4">
-            <h4>Course Content</h4>
-            <p>Course content is only available to enrolled students.</p>
-            <p>Enroll now to access all modules and lessons.</p>
-        </div>
-        {% endif %}
     </div>
     
     <div class="col-md-4">
@@ -132,6 +120,17 @@
                         {% else %}
                             <a href="#" class="btn btn-primary disabled">Enroll Now</a>
                         {% endif %}
+                    {% endif %}
+                    {% if is_enrolled or is_instructor %}
+                    <div class="mt-4">
+                        <a href="{% url 'courses:course_learning_process' course.slug %}" class="btn btn-primary">View Learning Process</a>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info mt-4">
+                        <h4>Course Content</h4>
+                        <p>Course content is only available to enrolled students.</p>
+                        <p>Enroll now to access all modules and lessons.</p>
+                    </div>
                     {% endif %}
                 {% else %}
                     {% if course.opening_date and now < course.opening_date %}
