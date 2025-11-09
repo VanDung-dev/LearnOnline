@@ -247,3 +247,37 @@ def reorder_lessons(request, course_slug, module_id):
             return JsonResponse({'status': 'error', 'message': str(e)})
 
     return JsonResponse({'status': 'error', 'message': 'Invalid request'})
+
+
+@login_required
+def reorder_quiz_questions(request, course_slug, module_id, lesson_id):
+    """
+    Handle quiz question reordering via AJAX drag and drop
+    """
+    course = get_object_or_404(Course, slug=course_slug, instructor=request.user)
+    module = get_object_or_404(Module, id=module_id, course=course)
+    lesson = get_object_or_404(Lesson, id=lesson_id, module=module)
+
+    # Ensure lesson has a quiz
+    if lesson.lesson_type != 'quiz':
+        return JsonResponse({'status': 'error', 'message': 'This lesson is not a quiz'})
+
+    try:
+        quiz = lesson.quiz
+    except Quiz.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'Quiz not found for this lesson'})
+
+    if request.method == 'POST' and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        try:
+            # Get the ordered question IDs from the request
+            question_order = request.POST.getlist('question_order[]')
+
+            # Update the order of each question
+            for index, question_id in enumerate(question_order):
+                Question.objects.filter(id=question_id, quiz=quiz).update(order=index)
+
+            return JsonResponse({'status': 'success'})
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)})
+
+    return JsonResponse({'status': 'error', 'message': 'Invalid request'})

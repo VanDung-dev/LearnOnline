@@ -10,7 +10,7 @@ from .includes.views_module import (
     create_module, edit_module, delete_module, reorder_modules
 )
 from .includes.views_lesson import (
-    create_lesson, edit_lesson, delete_lesson, reorder_lessons
+    create_lesson, edit_lesson, delete_lesson, reorder_lessons, reorder_quiz_questions
 )
 from .includes.views_lesson_detail import (
     lesson_detail, check_and_issue_certificate
@@ -28,7 +28,7 @@ __all__ = [
     'course_detail', 'enroll_course', 'instructor_courses',
     'create_module', 'edit_module', 'delete_module', 'reorder_modules',
     'create_lesson', 'edit_lesson', 'delete_lesson', 'delete_lesson_video',
-    'reorder_lessons', 'lesson_detail', 'check_and_issue_certificate',
+    'reorder_lessons', 'reorder_quiz_questions', 'lesson_detail', 'check_and_issue_certificate',
     'public_certificate', 'purchase_certificate', 'home',
     'course_certificate', 'custom_page_not_found', 'upload_image',
     'course_learning_process'

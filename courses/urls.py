@@ -12,6 +12,7 @@ urlpatterns = [
     path('courses/<slug:slug>/enroll/', views.enroll_course, name='enroll_course'),
     path('courses/<slug:course_slug>/lessons/<slug:lesson_slug>/', views.lesson_detail, name='lesson_detail'),
     path('courses/<slug:course_slug>/modules/<int:module_id>/lessons/<int:lesson_id>/reorder/', views.reorder_lessons, name='reorder_lessons'),
+    path('courses/<slug:course_slug>/modules/<int:module_id>/lessons/<int:lesson_id>/quiz/reorder/', views.reorder_quiz_questions, name='reorder_quiz_questions'),
     path('courses/<slug:course_slug>/modules/<int:module_id>/lessons/create/', views.create_lesson, name='create_lesson'),
     path('courses/<slug:course_slug>/modules/<int:module_id>/lessons/<int:lesson_id>/edit/', views.edit_lesson, name='edit_lesson'),
     path('courses/<slug:course_slug>/modules/<int:module_id>/lessons/<int:lesson_id>/delete/', views.delete_lesson, name='delete_lesson'),
