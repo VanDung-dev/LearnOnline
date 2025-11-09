@@ -24,13 +24,13 @@
                     <p class="text-muted">Price: ${{ course.price }}</p>
                     <div class="d-flex justify-content-between">
                         {% if course.slug %}
-                            <a href="{% url 'courses:course_detail' slug=course.slug %}" class="btn btn-sm btn-outline-primary">View</a>
-                            <a href="{% url 'courses:edit_course' slug=course.slug %}" class="btn btn-sm btn-outline-secondary">Edit</a>
-                            <a href="{% url 'courses:delete_course' slug=course.slug %}" class="btn btn-sm btn-outline-danger">Delete</a>
+                            <a href="{% url 'courses:course_detail' slug=course.slug %}" class="btn btn-sm btn-primary">View</a>
+                            <a href="{% url 'courses:edit_course' slug=course.slug %}" class="btn btn-sm btn-secondary">Edit</a>
+                            <a href="{% url 'courses:delete_course' slug=course.slug %}" class="btn btn-sm btn-danger">Delete</a>
                         {% else %}
-                            <a href="#" class="btn btn-sm btn-outline-primary disabled">View</a>
-                            <a href="#" class="btn btn-sm btn-outline-secondary disabled">Edit</a>
-                            <a href="#" class="btn btn-sm btn-outline-danger disabled">Delete</a>
+                            <a href="#" class="btn btn-sm btn-primary disabled">View</a>
+                            <a href="#" class="btn btn-sm btn-secondary disabled">Edit</a>
+                            <a href="#" class="btn btn-sm btn-danger disabled">Delete</a>
                         {% endif %}
                     </div>
                 </div>

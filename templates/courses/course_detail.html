@@ -79,7 +79,7 @@
                     {% if user == course.instructor and not is_preview %}
                         <!-- Show edit and delete options for course instructor -->
                         <div class="d-grid gap-2">
-                            <a href="{% url 'courses:edit_course' course.slug %}" class="btn btn-warning">Edit Course</a>
+                                <a href="{% url 'courses:edit_course' course.slug %}" class="btn btn-secondary">Edit Course</a>
                             <a href="{% url 'courses:delete_course' course.slug %}" class="btn btn-danger">Delete Course</a>
                         </div>
                     {% elif is_enrolled %}
@@ -87,19 +87,17 @@
                         {% load courses_extras %}
                         {% if user|has_certificate:course %}
                             {% with certificate=user|get_certificate:course %}
-                            <a href="{% url 'courses:course_certificate' certificate.certificate_number %}" class="btn btn-success">View Certificate</a>
+                            <a href="{% url 'courses:course_certificate' certificate.certificate_number %}" class="btn btn-success d-grid gap-2">View Certificate</a>
                             {% endwith %}
                         {% else %}
-                            <div class="d-grid gap-2">
                             {% if course.expiration_date and course.expiration_date < now %}
                                 <a href="#" class="btn btn-secondary disabled">Course Expired - No Certificate Available</a>
                             {% elif course.price == 0 and course.certificate_price > 0 %}
                                 <!-- For free courses with paid certificates, show purchase certificate button -->
                                 <a href="{% url 'payments:payment_page_type' course.slug 'certificate' %}" class="btn btn-warning d-grid gap-2">Purchase Certificate for ${{ course.certificate_price }}</a>
                             {% else %}
-                                <a href="#" class="btn btn-success disabled">Enrolled</a>
+                                <a href="#" class="btn btn-success disabled d-grid gap-2">Enrolled</a>
                             {% endif %}
-                            </div>
                         {% endif %}
                     {% elif is_instructor %}
                         <!-- Show preview option for instructors -->
