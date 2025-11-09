@@ -23,4 +23,12 @@ document.addEventListener('DOMContentLoaded', function() {
             loadingBar.classList.add('loading');
         });
     });
+    
+    // Handle logout confirmation
+    const logoutModal = document.getElementById('logoutModal');
+    if (logoutModal) {
+        logoutModal.addEventListener('shown.bs.modal', function () {
+            // Modal is shown
+        });
+    }
 });
