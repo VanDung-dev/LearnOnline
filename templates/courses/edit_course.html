@@ -26,7 +26,7 @@
     
     <div class="mb-3">
         <label for="{{ form.description.id_for_label }}" class="form-label">Full Description</label>
-        <textarea class="form-control" id="{{ form.description.id_for_label }}" name="{{ form.description.html_name }}" rows="5" style="height:1000px;">{{ form.description.value|default:'' }}</textarea>
+        <textarea class="form-control" id="{{ form.description.id_for_label }}" name="{{ form.description.html_name }}" rows="10" style="height:1000px;">{{ form.description.value|default:'' }}</textarea>
         {% if form.description.errors %}
             <div class="text-danger">{{ form.description.errors }}</div>
         {% endif %}
@@ -244,6 +244,7 @@
 <script>
     window.courseSlug = '{{ course.slug }}';
 </script>
+<script src="{% static 'courses/tinymce_config.js' %}"></script>
 <script src="{% static 'courses/edit_course.js' %}?v=1.1"></script>
 <script src="{% static 'courses/course_management.js' %}?v=1.3"></script>
 {% endblock %}
