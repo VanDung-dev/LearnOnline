@@ -113,13 +113,11 @@ def delete_course(request, slug):
     return redirect('courses:edit_course', slug=course.slug)
 
 
-@login_required
 def course_list(request):
     courses = Course.objects.filter(is_active=True)
     return render(request, 'courses/course_list.html', {'courses': courses})
 
 
-@login_required
 def course_detail(request, slug):
     course = get_object_or_404(Course, slug=slug, is_active=True)
     is_enrolled = False
