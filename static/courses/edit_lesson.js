@@ -6,22 +6,6 @@ document.addEventListener('DOMContentLoaded', function() {
         'quiz': document.getElementById('quiz-content-section')
     };
 
-    //Get CSRF token
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
-
     function updateSections() {
         const selectedType = lessonType.value;
         Object.entries(sections).forEach(([type, section]) => {
@@ -36,76 +20,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Check if editor already exists
                 const editor = tinymce.get('lesson_content');
                 if (!editor) {
-                    tinymce.init({
-                        selector: '#lesson_content',
-                        plugins: 'lists link image table code help wordcount',
-                        toolbar: 'undo redo | styles | bold italic underline strikethrough | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | help',
-                        menubar: false,
-                        statusbar: false,
-                        height: 1000,
-                        branding: false,
-                        promotion: false,
-                        // Enable image handling
-                        image_advtab: true,
-                        image_caption: true,
-                        images_upload_url: '/courses/upload_image/',
-                        images_upload_handler: function (blobInfo, progress) {
-                            return new Promise((resolve, reject) => {
-                                const xhr = new XMLHttpRequest();
-                                xhr.withCredentials = false;
-                                xhr.open('POST', '/courses/upload_image/');
-
-                                // Add CSRF token
-                                const csrftoken = getCookie('csrftoken');
-                                xhr.setRequestHeader("X-CSRFToken", csrftoken);
-
-                                xhr.upload.onprogress = function (e) {
-                                    progress(e.loaded / e.total * 100);
-                                };
-
-                                xhr.onload = function() {
-                                    if (xhr.status !== 200) {
-                                        reject('HTTP Error: ' + xhr.status);
-                                        return;
-                                    }
-
-                                    try {
-                                        const json = JSON.parse(xhr.responseText);
-
-                                        if (!json || typeof json.location != 'string') {
-                                            reject('Invalid JSON: ' + xhr.responseText);
-                                            return;
-                                        }
-
-                                        resolve(json.location);
-                                    } catch (e) {
-                                        reject('Error parsing response: ' + e.message);
-                                    }
-                                };
-
-                                xhr.onerror = function() {
-                                    reject('Network error occurred');
-                                };
-
-                                const formData = new FormData();
-                                formData.append('file', blobInfo.blob(), blobInfo.filename());
-
-                                xhr.send(formData);
-                            });
-                        },
-                        // Allow image tools
-                        toolbar_mode: 'floating',
-                        setup: function(editor) {
-                            editor.on('init', function() {
-                                // Ensure the editor container has the correct height
-                                const container = editor.getContainer();
-                                const iframe = container.querySelector('iframe');
-                                if (iframe) {
-                                    iframe.style.height = '1000px';
-                                }
-                            });
-                        }
-                    });
+                    //Use shared TinyMCE configuration
+                    initSharedTinyMCE('#lesson_content', 1000);
                 }
             }
         }
@@ -118,76 +34,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize TinyMCE on page load if it's a text lesson
     if (lessonType && lessonType.value === 'text') {
         if (typeof tinymce !== 'undefined') {
-            tinymce.init({
-                selector: '#lesson_content',
-                plugins: 'lists link image table code help wordcount',
-                toolbar: 'undo redo | styles | bold italic underline strikethrough | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | help',
-                menubar: false,
-                statusbar: false,
-                height: 1000,
-                branding: false,
-                promotion: false,
-                // Enable image handling
-                image_advtab: true,
-                image_caption: true,
-                images_upload_url: '/courses/upload_image/',
-                images_upload_handler: function (blobInfo, progress) {
-                    return new Promise((resolve, reject) => {
-                        const xhr = new XMLHttpRequest();
-                        xhr.withCredentials = false;
-                        xhr.open('POST', '/courses/upload_image/');
-
-                        // Add CSRF token
-                        const csrftoken = getCookie('csrftoken');
-                        xhr.setRequestHeader("X-CSRFToken", csrftoken);
-
-                        xhr.upload.onprogress = function (e) {
-                            progress(e.loaded / e.total * 100);
-                        };
-
-                        xhr.onload = function() {
-                            if (xhr.status !== 200) {
-                                reject('HTTP Error: ' + xhr.status);
-                                return;
-                            }
-
-                            try {
-                                const json = JSON.parse(xhr.responseText);
-
-                                if (!json || typeof json.location != 'string') {
-                                    reject('Invalid JSON: ' + xhr.responseText);
-                                    return;
-                                }
-
-                                resolve(json.location);
-                            } catch (e) {
-                                reject('Error parsing response: ' + e.message);
-                            }
-                        };
-
-                        xhr.onerror = function() {
-                            reject('Network error occurred');
-                        };
-
-                        const formData = new FormData();
-                        formData.append('file', blobInfo.blob(), blobInfo.filename());
-
-                        xhr.send(formData);
-                    });
-                },
-                // Allow image tools
-                toolbar_mode: 'floating',
-                setup: function(editor) {
-                    editor.on('init', function() {
-                        // Ensure the editor container has the correct height
-                        const container = editor.getContainer();
-                        const iframe = container.querySelector('iframe');
-                        if (iframe) {
-                            iframe.style.height = '1000px';
-                        }
-                    });
-                }
-            });
+            //Use shared TinyMCE configuration
+            initSharedTinyMCE('#lesson_content', 1000);
         }
     }
 
