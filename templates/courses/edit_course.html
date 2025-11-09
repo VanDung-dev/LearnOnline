@@ -199,9 +199,6 @@
                                 {% endfor %}
                             </ul>
                         </div>
-                        <div class="mt-2">
-                            <small class="text-muted">Drag and drop lessons to reorder them</small>
-                        </div>
                     {% else %}
                         <p class="text-muted">No lessons in this module yet.</p>
                     {% endif %}
@@ -216,9 +213,6 @@
             {% include 'courses/includes/delete_lesson_modal.html' with module=module %}
 
         {% endfor %}
-        <div class="mt-2">
-            <small class="text-muted">Drag and drop modules to reorder them</small>
-        </div>
     {% else %}
         <div class="alert alert-info">
             <p>This course doesn't have any modules yet.</p>
