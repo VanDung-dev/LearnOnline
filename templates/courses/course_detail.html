@@ -140,7 +140,7 @@
                     {% elif course.closing_date and now > course.closing_date %}
                         <a href="#" class="btn btn-secondary disabled">Enrollment closed</a>
                     {% else %}
-                        <a href="{% url 'accounts:login' %}" class="btn btn-primary">Login to Enroll</a>
+                        <a href="{% url 'accounts:login' %}" class="btn btn-primary d-grid gap-2">Login to Enroll</a>
                     {% endif %}
                 {% endif %}
             </div>
