@@ -324,7 +324,9 @@
 {% endfor %}
 
 {% if lesson.video_file %}
-{% include 'courses/includes/delete_video_modal.html' with module=module %}
+<!-- Delete Video Modal -->
+{% url 'courses:delete_lesson_video' course_slug=course.slug module_id=module.id lesson_id=lesson.id as delete_video_url %}
+{% include 'courses/includes/delete_modal.html' with modal_id='deleteVideoModal' modal_title='Delete Video' item_name='the current video file' action_url=delete_video_url button_text='Delete Video' %}
 {% endif %}
 
 {% endblock %}

@@ -209,8 +209,19 @@
 
             {% include 'courses/includes/edit_module_modal.html' with module=module %}
 
-            {% include 'courses/includes/delete_module_modal.html' with module=module %}
-            {% include 'courses/includes/delete_lesson_modal.html' with module=module %}
+            <!-- Delete Module Modal -->
+            {% url 'courses:delete_module' course_slug=course.slug module_id=module.id as delete_module_url %}
+            {% with module_id_str=module.id|stringformat:"d" %}
+                {% include 'courses/includes/delete_modal.html' with modal_id="deleteModuleModal"|add:module_id_str modal_title='Delete Module' item_type='module' item_name=module.title warning_message='This action cannot be undone. All lessons associated with this module will also be deleted.' action_url=delete_module_url button_text='Yes, Delete Module' %}
+            {% endwith %}
+
+            <!-- Delete Lesson Modals -->
+            {% for lesson in module.lessons.all %}
+                {% url 'courses:delete_lesson' course_slug=course.slug module_id=module.id lesson_id=lesson.id as delete_lesson_url %}
+                {% with lesson_id_str=lesson.id|stringformat:"d" %}
+                    {% include 'courses/includes/delete_modal.html' with modal_id="deleteLessonModal"|add:lesson_id_str modal_title='Delete Lesson' item_type='lesson' item_name=lesson.title warning_message='This action cannot be undone.' action_url=delete_lesson_url button_text='Yes, Delete Lesson' %}
+                {% endwith %}
+            {% endfor %}
 
         {% endfor %}
     {% else %}
@@ -226,7 +237,10 @@
 </div>
 
 {% include 'courses/includes/create_module_modal.html' %}
-{% include 'courses/includes/delete_course_modal.html' %}
+
+<!-- Delete Course Modal -->
+{% url 'courses:delete_course' slug=course.slug as delete_course_url %}
+{% include 'courses/includes/delete_modal.html' with modal_id='deleteCourseModal' modal_title='Delete Course' item_type='course' item_name=course.title warning_message='This action cannot be undone. All modules, lessons, and enrollments associated with this course will also be deleted.' action_url=delete_course_url button_text='Yes, Delete Course' %}
 
 {% endblock %}
 
