@@ -7,10 +7,10 @@ from .includes.views_course import (
     course_detail, course_learning_process
 )
 from .includes.views_module import (
-    create_module, edit_module, delete_module, reorder_modules
+    create_module, edit_module, delete_module
 )
 from .includes.views_lesson import (
-    create_lesson, edit_lesson, delete_lesson, reorder_lessons, reorder_quiz_questions
+    create_lesson, edit_lesson, delete_lesson
 )
 from .includes.views_lesson_detail import (
     lesson_detail, check_and_issue_certificate
@@ -21,6 +21,10 @@ from .includes.views_other import (
 )
 from .includes.views_certificate import (
     public_certificate, purchase_certificate, course_certificate
+)
+
+from .includes.views_reorder import (
+    reorder_modules, reorder_lessons, reorder_quiz_questions
 )
 
 __all__ = [

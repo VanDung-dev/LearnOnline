@@ -112,34 +112,3 @@ def delete_module(request, course_slug, module_id):
 
     # Instead of rendering a separate template, redirect to edit_course with a delete flag
     return redirect('courses:edit_course', slug=course.slug)
-
-
-@login_required
-def reorder_modules(request, course_slug):
-    """
-    Handle module reordering via AJAX drag and drop
-    """
-    print(f"Reorder modules called with course_slug: {course_slug}")
-    print(f"Request method: {request.method}")
-    print(f"Is AJAX: {request.headers.get('X-Requested-With') == 'XMLHttpRequest'}")
-
-    course = get_object_or_404(Course, slug=course_slug, instructor=request.user)
-    print(f"Found course: {course.title}")
-
-    if request.method == 'POST' and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-        try:
-            # Get the ordered module IDs from the request
-            module_order = request.POST.getlist('module_order[]')
-            print(f"Module order received: {module_order}")
-
-            # Update the order of each module
-            for index, module_id in enumerate(module_order):
-                Module.objects.filter(id=module_id, course=course).update(order=index)
-                print(f"Updated module {module_id} order to {index}")
-
-            return JsonResponse({'status': 'success'})
-        except Exception as e:
-            print(f"Error in reorder_modules: {str(e)}")
-            return JsonResponse({'status': 'error', 'message': str(e)})
-
-    return JsonResponse({'status': 'error', 'message': 'Invalid request'})
