@@ -176,65 +176,17 @@ $(document).ready(function() {
     const questionsContainer = $('.sortable-questions');
 
     if (questionsContainer.length > 0) {
-        questionsContainer.sortable({
-            handle: '.handle',
-            update: function(event, ui) {
-                const questionIds = [];
-                $('.sortable-question').each(function() {
-                    questionIds.push($(this).data('question-id'));
-                });
+        const courseSlug = questionsContainer.data('course-slug');
+        const moduleId = questionsContainer.data('module-id');
+        const lessonId = questionsContainer.data('lesson-id');
+        const quizId = questionsContainer.data('quiz-id');
 
-                const courseSlug = questionsContainer.data('course-slug');
-                const moduleId = questionsContainer.data('module-id');
-                const lessonId = questionsContainer.data('lesson-id');
-                const quizId = questionsContainer.data('quiz-id');
-
-                console.log('Sending question order:', questionIds);
-                console.log('Course slug:', courseSlug);
-                console.log('Module ID:', moduleId);
-                console.log('Lesson ID:', lessonId);
-                console.log('Quiz ID:', quizId);
-
-                // Show a temporary message
-                const messageElement = $('.text-muted:contains("Drag and drop questions")');
-                const originalText = messageElement.text();
-                messageElement.text('Saving question order...');
-
-                // Send AJAX request to update question order
-                $.ajax({
-                    url: `/courses/${encodeURIComponent(courseSlug)}/modules/${moduleId}/lessons/${lessonId}/quiz/reorder/`,
-                    method: 'POST',
-                    headers: {
-                        'X-CSRFToken': $('[name=csrfmiddlewaretoken]').val(),
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    data: $.param({question_order: questionIds}, true),
-                    success: function(response) {
-                        console.log('Server response:', response);
-                        if (response.status === 'success') {
-                            console.log('Questions reordered successfully');
-                            messageElement.text('Question order saved successfully!');
-                            setTimeout(function() {
-                                messageElement.text(originalText);
-                            }, 2000);
-                        } else {
-                            console.error('Error reordering questions:', response.message);
-                            messageElement.text('Error saving question order: ' + response.message);
-                            // Revert the sort
-                            questionsContainer.sortable('cancel');
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('AJAX error:', error);
-                        console.error('Response text:', xhr.responseText);
-                        messageElement.text('Error saving question order. Check console for details.');
-                        // Revert the sort
-                        questionsContainer.sortable('cancel');
-                    }
-                });
-            }
+        // Initialize question sortable using utility function
+        initQuestionSortable({
+            courseSlug: courseSlug,
+            moduleId: moduleId,
+            lessonId: lessonId,
+            quizId: quizId
         });
-
-        questionsContainer.disableSelection();
     }
 });
