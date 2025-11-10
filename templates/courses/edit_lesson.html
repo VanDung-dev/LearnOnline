@@ -83,7 +83,6 @@
                                 </div>
                                 <div class="card-body">
                                     {% if lesson.quiz and lesson.quiz.questions.all %}
-                                        <p class="text-muted mb-2"><i class="fas fa-info-circle"></i> Drag and drop questions to reorder</p>
                                         <div class="list-group sortable-questions" data-course-slug="{{ course.slug }}" data-module-id="{{ module.id }}" data-lesson-id="{{ lesson.id }}" data-quiz-id="{{ lesson.quiz.id }}">
                                             {% for question in lesson.quiz.questions.all %}
                                                 <div class="list-group-item mb-3 sortable-question" data-question-id="{{ question.id }}">
@@ -335,5 +334,6 @@
 <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
 <script src="{% static 'courses/tinymce/js/tinymce/tinymce.min.js' %}"></script>
 <script src="{% static 'courses/tinymce_config.js' %}"></script>
+<script src="{% static 'courses/sortable_utils.js' %}"></script>
 <script src="{% static 'courses/edit_lesson.js' %}?v=1.1"></script>
 {% endblock %}
