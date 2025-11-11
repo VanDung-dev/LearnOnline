@@ -18,3 +18,11 @@
 #loading-bar.complete {
     transform: scaleX(1);
 }
+
+footer a:hover {
+    text-decoration: underline;
+}
+
+footer ul li {
+    margin-bottom: 5px;
+}
