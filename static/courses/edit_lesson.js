@@ -169,6 +169,49 @@ document.addEventListener('DOMContentLoaded', function() {
             e.target.closest('.answer-item').remove();
         }
     });
+    
+    // Handle delete question buttons
+    var deleteQuestionButtons = document.querySelectorAll('[data-bs-target^="#deleteQuestionModal"]');
+    deleteQuestionButtons.forEach(function(button) {
+        button.addEventListener('click', function() {
+            var questionId = this.getAttribute('data-question-id');
+            var questionText = this.getAttribute('data-question-text');
+            
+            // Update modal content
+            var modal = document.getElementById('deleteQuestionModal');
+            var itemNameElement = modal.querySelector('[data-item-name]');
+            if (itemNameElement) {
+                itemNameElement.textContent = '"' + questionText + '"';
+            }
+            
+            // Update form action
+            var form = document.getElementById('deleteQuestionForm' + questionId);
+            var modalForm = modal.querySelector('form');
+            if (modalForm && form) {
+                // Get the action from the hidden form
+                var action = form.getAttribute('action');
+                if (action) {
+                    modalForm.setAttribute('action', action);
+                }
+                
+                // Clear existing hidden inputs
+                var existingHiddenInputs = modalForm.querySelectorAll('input[type="hidden"]');
+                existingHiddenInputs.forEach(function(input) {
+                    modalForm.removeChild(input);
+                });
+                
+                // Copy hidden inputs from the hidden form
+                var hiddenInputs = form.querySelectorAll('input[type="hidden"]');
+                hiddenInputs.forEach(function(input) {
+                    var newInput = document.createElement('input');
+                    newInput.type = 'hidden';
+                    newInput.name = input.name;
+                    newInput.value = input.value;
+                    modalForm.appendChild(newInput);
+                });
+            }
+        });
+    });
 });
 
 // Enable drag and drop for quiz questions (using jQuery)
