@@ -1,0 +1,33 @@
+<footer class="bg-dark text-light py-4 mt-auto">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+                <h5>LearnOnline</h5>
+                <p>Empowering learners worldwide with quality education.</p>
+            </div>
+            <div class="col-md-4">
+                <h5>Quick Links</h5>
+                <ul class="list-unstyled">
+                    <li><a href="{% url 'courses:home' %}" class="text-light">Home</a></li>
+                    <li><a href="{% url 'courses:course_list' %}" class="text-light">Courses</a></li>
+                    {% if user.is_authenticated %}
+                        <li><a href="{% url 'accounts:profile' %}" class="text-light">Profile</a></li>
+                    {% else %}
+                        <li><a href="{% url 'accounts:login' %}" class="text-light">Login</a></li>
+                        <li><a href="{% url 'accounts:register' %}" class="text-light">Register</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+            <div class="col-md-4">
+                <h5>Contact Us</h5>
+                <address>
+                    <strong>Email:</strong> info@learnonline.com<br>
+                    <strong>Phone:</strong> +1 (123) 456-7890
+                </address>
+            </div>
+        </div>
+        <div class="text-center mt-4">
+            <p>&copy; 2025 LearnOnline. All rights reserved.</p>
+        </div>
+    </div>
+</footer>

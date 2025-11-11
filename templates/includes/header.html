@@ -1,0 +1,24 @@
+<header class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'courses:home' %}">LearnOnline</a>
+
+        <!-- Search Form in Navbar -->
+        <form class="d-flex mx-auto" method="GET" action="{% url 'courses:course_list' %}">
+            <input class="form-control me-2" type="search" name="q" placeholder="Search courses..." aria-label="Search">
+            <button class="btn btn-outline-light" type="submit">Search</button>
+        </form>
+
+        <div class="navbar-nav ms-auto">
+            {% if user.is_authenticated %}
+                <a class="nav-link" href="{% url 'accounts:profile' %}">Profile</a>
+                {% if user.profile.is_instructor %}
+                    <a class="nav-link" href="{% url 'courses:instructor_courses' %}">Instructor Dashboard</a>
+                {% endif %}
+                <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#logoutModal">Logout</a>
+            {% else %}
+                <a class="nav-link" href="{% url 'accounts:login' %}">Login</a>
+                <a class="nav-link" href="{% url 'accounts:register' %}">Register</a>
+            {% endif %}
+        </div>
+    </div>
+</header>
