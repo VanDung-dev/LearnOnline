@@ -16,8 +16,13 @@ from .includes.views_lesson_detail import (
     lesson_detail, check_and_issue_certificate
 )
 from .includes.views_other import (
-    home, custom_page_not_found, enroll_course,
+    home, enroll_course,
     instructor_courses, delete_lesson_video, upload_image
+)
+from .includes.views_error import (
+    custom_page_not_found, custom_server_error, custom_permission_denied, custom_bad_request,
+    custom_method_not_allowed, custom_request_timeout, custom_too_many_requests,
+    custom_bad_gateway, custom_service_unavailable, custom_gateway_timeout
 )
 from .includes.views_certificate import (
     public_certificate, purchase_certificate, course_certificate
@@ -35,5 +40,8 @@ __all__ = [
     'reorder_lessons', 'reorder_quiz_questions', 'lesson_detail', 'check_and_issue_certificate',
     'public_certificate', 'purchase_certificate', 'home',
     'course_certificate', 'custom_page_not_found', 'upload_image',
-    'course_learning_process', 'create_category_ajax'
+    'course_learning_process', 'create_category_ajax',
+    'custom_server_error', 'custom_permission_denied', 'custom_bad_request',
+    'custom_method_not_allowed', 'custom_request_timeout', 'custom_too_many_requests',
+    'custom_bad_gateway', 'custom_service_unavailable', 'custom_gateway_timeout'
 ]

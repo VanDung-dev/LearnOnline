@@ -34,5 +34,14 @@ else:
     # In production, also serve static files (not ideal for production, but needed for this setup)
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
-# Custom 404 handler
+# Custom error handlers
 handler404 = 'courses.views.custom_page_not_found'
+handler500 = 'courses.views.custom_server_error'
+handler403 = 'courses.views.custom_permission_denied'
+handler400 = 'courses.views.custom_bad_request'
+handler405 = 'courses.views.custom_method_not_allowed'
+handler408 = 'courses.views.custom_request_timeout'
+handler429 = 'courses.views.custom_too_many_requests'
+handler502 = 'courses.views.custom_bad_gateway'
+handler503 = 'courses.views.custom_service_unavailable'
+handler504 = 'courses.views.custom_gateway_timeout'

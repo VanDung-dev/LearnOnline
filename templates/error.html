@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}Error{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 text-center">
+        <h1 class="display-1">{% if error_code %}{{ error_code }}{% else %}Error{% endif %}</h1>
+        <h2>{% if error_title %}{{ error_title }}{% else %}Something went wrong{% endif %}</h2>
+        <p class="lead">
+            {% if error_message %}
+                {{ error_message }}
+            {% else %}
+                Sorry, an unexpected error occurred. Please try again later or contact support if the problem persists.
+            {% endif %}
+        </p>
+        <a href="{% url 'courses:home' %}" class="btn btn-primary">Go to Homepage</a>
+    </div>
+</div>
+{% endblock %}

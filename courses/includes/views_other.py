@@ -31,13 +31,6 @@ def home(request):
     return render(request, 'home.html', context)
 
 
-# Custom 404 view
-def custom_page_not_found(request, exception):
-    print("Custom 404 view called")  # Debug print
-    print(f"Exception: {exception}")  # Debug print
-    return render(request, '404.html', status=404)
-
-
 @login_required
 def enroll_course(request, slug):
     course = get_object_or_404(Course, slug=slug, is_active=True)
