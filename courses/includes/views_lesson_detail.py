@@ -197,7 +197,7 @@ def lesson_detail(request, course_slug, lesson_slug):
                 'attempt': new_attempt,
                 'is_instructor': is_instructor,
             }
-            return render(request, 'courses/quiz_detail.html', context)
+            return render(request, 'courses/lesson_detail.html', context)
         else:
             # Show quiz preview for instructors
             context = {
@@ -206,7 +206,7 @@ def lesson_detail(request, course_slug, lesson_slug):
                 'quiz': quiz,
                 'is_instructor': is_instructor,
             }
-            return render(request, 'courses/quiz_detail.html', context)
+            return render(request, 'courses/lesson_detail.html', context)
 
     # Mark lesson as completed (for non-quiz lessons) - only for students
     if not is_instructor:
