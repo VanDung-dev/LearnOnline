@@ -1,28 +1,14 @@
 {% extends 'base.html' %}
 
 {% block title %}
-    {% if user.profile.is_admin %}
-        Admin Dashboard - Online Learning Platform
-    {% elif user.profile.is_instructor %}
-        Instructor Dashboard - Online Learning Platform
-    {% else %}
-        Student Dashboard - Online Learning Platform
-    {% endif %}
+    {{ user.profile.get_role_display }} Dashboard - Online Learning Platform
 {% endblock %}
 
 {% block content %}
 <div class="container">
     <div class="row">
         <div class="col-md-12">
-            <h1>
-                {% if user.profile.is_admin %}
-                    Admin Dashboard
-                {% elif user.profile.is_instructor %}
-                    Instructor Dashboard
-                {% else %}
-                    Student Dashboard
-                {% endif %}
-            </h1>
+            <h1>{{ user.profile.get_role_display }} Dashboard</h1>
             
             <div class="card mb-4">
                 <div class="card-header">
@@ -81,8 +67,9 @@
             <!-- Instructor Dashboard Content -->
             {% if user.profile.is_instructor %}
             <div class="card">
-                <div class="card-header">
+                <div class="card-header d-flex justify-content-between align-items-center">
                     <h5>My Courses</h5>
+                    <a href="{% url 'courses:create_course' %}" class="btn btn-primary btn-sm">Create New Course</a>
                 </div>
                 <div class="card-body">
                     {% if courses %}
@@ -114,7 +101,6 @@
                                 </tbody>
                             </table>
                         </div>
-                        <a href="{% url 'courses:create_course' %}" class="btn btn-primary">Create New Course</a>
                     {% else %}
                         <p>You haven't created any courses yet.</p>
                         <a href="{% url 'courses:create_course' %}" class="btn btn-primary">Create Your First Course</a>
@@ -187,7 +173,7 @@
                                             <td>
                                                 {% if enrollment.course.slug %}
                                                     <a href="{% url 'courses:course_detail' enrollment.course.slug %}" class="btn btn-sm btn-primary">View Course</a>
-                                                    {% if enrollment.is_completed %}
+                                                    {% if enrollment.is_completed and enrollment.certificates.first %}
                                                         <a href="{% url 'courses:course_certificate' enrollment.certificates.first.certificate_number %}" class="btn btn-sm btn-success">View Certificate</a>
                                                     {% endif %}
                                                 {% else %}
