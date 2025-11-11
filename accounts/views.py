@@ -103,12 +103,10 @@ def profile(request):
         # Student dashboard
         enrollments = request.user.enrollments.all()
         context['enrollments'] = enrollments
-        template = 'accounts/student_dashboard.html'
     elif user_role == 'instructor':
         # Instructor dashboard
         courses = Course.objects.filter(instructor=request.user)
         context['courses'] = courses
-        template = 'accounts/instructor_dashboard.html'
     elif user_role == 'admin':
         # Admin dashboard
         total_students = User.objects.students().count()
@@ -117,12 +115,12 @@ def profile(request):
         context['total_students'] = total_students
         context['total_instructors'] = total_instructors
         context['total_courses'] = total_courses
-        template = 'accounts/admin_dashboard.html'
     else:
         # Default to student dashboard
         enrollments = request.user.enrollments.all()
         context['enrollments'] = enrollments
-        template = 'accounts/student_dashboard.html'
+    
+    template = 'accounts/user_dashboard.html'
     
     return render(request, template, context)
 
