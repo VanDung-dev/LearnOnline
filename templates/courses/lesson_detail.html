@@ -204,7 +204,7 @@
                         <p class="text-info">Certificate is free with course completion.</p>
                     {% else %}
                         <p class="card-text">Price: ${{ course.certificate_price }}</p>
-                        <a href="{% url 'courses:purchase_certificate' course.slug %}" class="btn btn-warning">Purchase Certificate</a>
+                        <a href="{% url 'payments:payment_page_type' course.slug 'certificate' %}" class="btn btn-warning">Purchase Certificate</a>
                     {% endif %}
                 {% endif %}
             </div>
