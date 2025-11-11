@@ -3,7 +3,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse
 from django.core.files.storage import default_storage
-from ..models import Course
+from django.views.decorators.http import require_http_methods
+from ..models import Course, Category
 from ..forms import CourseForm
 
 @login_required
@@ -168,3 +169,39 @@ def course_learning_process(request, slug):
 def instructor_courses(request):
     courses = Course.objects.filter(instructor=request.user)
     return render(request, 'courses/instructor_courses.html', {'courses': courses})
+
+
+@require_http_methods(["POST"])
+@login_required
+def create_category_ajax(request):
+    """
+    AJAX view to create a new category
+    """
+    name = request.POST.get('name')
+    description = request.POST.get('description', '')
+    
+    if not name:
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Category name is required.'
+        })
+    
+    # Check if category already exists
+    if Category.objects.filter(name__iexact=name).exists():
+        return JsonResponse({
+            'status': 'error',
+            'message': 'A category with this name already exists.'
+        })
+    
+    # Create new category
+    category = Category.objects.create(
+        name=name,
+        description=description
+    )
+    
+    return JsonResponse({
+        'status': 'success',
+        'id': category.id,
+        'name': category.name,
+        'message': 'Category created successfully.'
+    })
