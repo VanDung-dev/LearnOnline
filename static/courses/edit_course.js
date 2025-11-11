@@ -61,36 +61,3 @@ $(document).ready(function() {
         });
     });
 });
-
-// Video handling functions for preview in list
-function loadVideoFile(videoFileUrl) {
-    const videoFrame = document.getElementById('videoFrame');
-    const videoPlayer = document.getElementById('videoPlayer');
-    
-    // Hide iframes and show video player
-    videoFrame.style.display = 'none';
-    videoPlayer.style.display = 'block';
-    
-    // Set the source for the video player
-    videoPlayer.src = videoFileUrl;
-}
-
-// Stop video when modal is closed
-document.addEventListener('DOMContentLoaded', function() {
-    const videoModal = document.getElementById('videoModal');
-    if (videoModal) {
-        videoModal.addEventListener('hidden.bs.modal', function () {
-            const videoFrame = document.getElementById('videoFrame');
-            const videoPlayer = document.getElementById('videoPlayer');
-            
-            if (videoFrame) {
-                videoFrame.src = '';
-            }
-            
-            if (videoPlayer) {
-                videoPlayer.pause();
-                videoPlayer.currentTime = 0;
-            }
-        });
-    }
-});
