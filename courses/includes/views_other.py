@@ -28,7 +28,7 @@ def home(request):
         'categories': categories,
         'courses': courses,
     }
-    return render(request, 'courses/home.html', context)
+    return render(request, 'home.html', context)
 
 
 # Custom 404 view
