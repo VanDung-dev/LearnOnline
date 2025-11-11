@@ -101,7 +101,9 @@
                                                             </button>
                                                             <button type="button" class="btn btn-sm btn-outline-danger"
                                                                     data-bs-toggle="modal"
-                                                                    data-bs-target="#deleteQuestionModal{{ question.id }}">
+                                                                    data-bs-target="#deleteQuestionModal"
+                                                                    data-question-id="{{ question.id }}"
+                                                                    data-question-text="{{ question.text }}">
                                                                 Delete
                                                             </button>
                                                         </div>
@@ -297,31 +299,18 @@
         </div>
     </div>
 </div>
-
-<!-- Delete Question Modal -->
-<div class="modal fade" id="deleteQuestionModal{{ question.id }}" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form method="post" action="{% url 'courses:edit_lesson' course_slug=course.slug module_id=module.id lesson_id=lesson.id %}">
-                {% csrf_token %}
-                <input type="hidden" name="action" value="delete_question">
-                <input type="hidden" name="question_id" value="{{ question.id }}">
-                <div class="modal-header">
-                    <h5 class="modal-title">Delete Question</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <p>Are you sure you want to delete the question "{{ question.text }}"?</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-danger">Delete Question</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
 {% endfor %}
+
+<!-- Delete Question Modal - Using common delete modal -->
+{% for question in lesson.quiz.questions.all %}
+    <form method="post" action="{% url 'courses:edit_lesson' course_slug=course.slug module_id=module.id lesson_id=lesson.id %}" id="deleteQuestionForm{{ question.id }}">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="delete_question">
+        <input type="hidden" name="question_id" value="{{ question.id }}">
+    </form>
+{% endfor %}
+
+{% include 'courses/includes/delete_modal.html' with modal_id='deleteQuestionModal' modal_title='Delete Question' item_type='question' item_name='' warning_message='This action cannot be undone.' button_text='Yes, Delete Question' %}
 
 {% if lesson.video_file %}
 <!-- Delete Video Modal -->

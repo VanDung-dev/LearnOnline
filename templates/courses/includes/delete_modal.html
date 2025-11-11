@@ -7,7 +7,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <p>Are you sure you want to delete {% if item_type %}the {{ item_type }} {% endif %}<strong>"{{ item_name }}"</strong>?</p>
+                <p>Are you sure you want to delete {% if item_type %}the {{ item_type }} {% endif %}<strong data-item-name>{{ item_name }}</strong>?</p>
                 {% if warning_message %}
                     <p class="text-danger"><strong>Warning:</strong> {{ warning_message }}</p>
                 {% endif %}
