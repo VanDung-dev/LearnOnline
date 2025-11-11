@@ -1,22 +1,18 @@
 <footer class="bg-dark text-light py-4 mt-auto">
     <div class="container">
-        <div class="row">
+        <div class="row tox-dialog__body-content--centered">
             <div class="col-md-4">
                 <h5>LearnOnline</h5>
                 <p>Empowering learners worldwide with quality education.</p>
             </div>
             <div class="col-md-4">
-                <h5>Quick Links</h5>
-                <ul class="list-unstyled">
-                    <li><a href="{% url 'courses:home' %}" class="text-light">Home</a></li>
-                    <li><a href="{% url 'courses:course_list' %}" class="text-light">Courses</a></li>
-                    {% if user.is_authenticated %}
-                        <li><a href="{% url 'accounts:profile' %}" class="text-light">Profile</a></li>
-                    {% else %}
-                        <li><a href="{% url 'accounts:login' %}" class="text-light">Login</a></li>
-                        <li><a href="{% url 'accounts:register' %}" class="text-light">Register</a></li>
-                    {% endif %}
-                </ul>
+                <h5>Follow Us</h5>
+                <div class="d-flex justify-content-start align-items-center gap-4">
+                    <a href="#" class="text-light fs-3"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="text-light fs-3"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="text-light fs-3"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="text-light fs-3"><i class="fab fa-linkedin-in"></i></a>
+                </div>
             </div>
             <div class="col-md-4">
                 <h5>Contact Us</h5>
