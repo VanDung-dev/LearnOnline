@@ -97,17 +97,32 @@ def lesson_detail(request, course_slug, lesson_slug):
                 }
                 return render(request, 'courses/lesson_detail.html', context)
 
-        # For instructors, we skip the quiz attempt creation
-        if not is_instructor:
-            # Create a new attempt
-            new_attempt = QuizAttempt.objects.create(
-                user=request.user,
-                lesson=lesson,
-                attempt_number=attempt_count + 1
-            )
-
         if request.method == 'POST' and not is_instructor:
             # Process quiz submission only for students
+            # Get the latest incomplete attempt or create a new one
+            new_attempt = QuizAttempt.objects.filter(
+                user=request.user, 
+                lesson=lesson, 
+                completed_at__isnull=True
+            ).first()
+            
+            if not new_attempt:
+                # Calculate the correct attempt number
+                latest_attempt = QuizAttempt.objects.filter(
+                    user=request.user, 
+                    lesson=lesson
+                ).order_by('-attempt_number').first()
+                
+                attempt_number = 1
+                if latest_attempt:
+                    attempt_number = latest_attempt.attempt_number + 1
+                    
+                new_attempt = QuizAttempt.objects.create(
+                    user=request.user,
+                    lesson=lesson,
+                    attempt_number=attempt_number
+                )
+
             score = 0
             total_points = 0
 
@@ -187,9 +202,41 @@ def lesson_detail(request, course_slug, lesson_slug):
                 messages.info(request,
                               f"Quiz submitted. Your score: {new_attempt.score:.2f}%. You need at least 70% to pass.")
 
-            return redirect('courses:lesson_detail', course_slug=course.slug, lesson_slug=lesson.slug)
+            # Redirect to the same page but with the completed attempt
+            context = {
+                'course': course,
+                'lesson': lesson,
+                'quiz': quiz,
+                'attempt': new_attempt,
+                'is_instructor': is_instructor,
+            }
+            return render(request, 'courses/lesson_detail.html', context)
         elif not is_instructor:
             # Show quiz form for students
+            # Get or create an attempt for the student
+            new_attempt = QuizAttempt.objects.filter(
+                user=request.user, 
+                lesson=lesson, 
+                completed_at__isnull=True
+            ).first()
+            
+            if not new_attempt:
+                # Calculate the correct attempt number
+                latest_attempt = QuizAttempt.objects.filter(
+                    user=request.user, 
+                    lesson=lesson
+                ).order_by('-attempt_number').first()
+                
+                attempt_number = 1
+                if latest_attempt:
+                    attempt_number = latest_attempt.attempt_number + 1
+                    
+                new_attempt = QuizAttempt.objects.create(
+                    user=request.user,
+                    lesson=lesson,
+                    attempt_number=attempt_number
+                )
+                
             context = {
                 'course': course,
                 'lesson': lesson,
