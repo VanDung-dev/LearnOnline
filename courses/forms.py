@@ -14,6 +14,12 @@ class CourseForm(forms.ModelForm):
             'expiration_date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Make description field not required in the form
+        # (although it's still required in the model, we'll handle that in save method)
+        self.fields['description'].required = False
+
     def clean(self):
         cleaned_data = super().clean()
         price = cleaned_data.get('price')
@@ -24,6 +30,18 @@ class CourseForm(forms.ModelForm):
             cleaned_data['certificate_price'] = 0
 
         return cleaned_data
+
+    def save(self, commit=True):
+        course = super().save(commit=False)
+        
+        # If no description provided, set it to empty string
+        # This prevents issues with the required model field
+        if not course.description:
+            course.description = ''
+            
+        if commit:
+            course.save()
+        return course
 
 
 class ModuleForm(forms.ModelForm):
