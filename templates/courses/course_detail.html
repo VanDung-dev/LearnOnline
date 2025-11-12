@@ -76,53 +76,6 @@
                 <p class="card-text">Duration: {{ course|course_duration_weeks }} week{{ course|course_duration_weeks|pluralize }}</p>
                 
                 {% if user.is_authenticated %}
-                    {% if user == course.instructor and not is_preview %}
-                        <!-- Show edit and delete options for course instructor -->
-                        <div class="d-grid gap-2">
-                                <a href="{% url 'courses:edit_course' course.slug %}" class="btn btn-secondary">Edit Course</a>
-                            <a href="{% url 'courses:delete_course' course.slug %}" class="btn btn-danger">Delete Course</a>
-                        </div>
-                    {% elif is_enrolled %}
-                        <!-- Check if user has a certificate for this course -->
-                        {% load courses_extras %}
-                        {% if user|has_certificate:course %}
-                            {% with certificate=user|get_certificate:course %}
-                            <a href="{% url 'courses:course_certificate' certificate.certificate_number %}" class="btn btn-success d-grid gap-2">View Certificate</a>
-                            {% endwith %}
-                        {% else %}
-                            {% if course.expiration_date and course.expiration_date < now %}
-                                <a href="#" class="btn btn-secondary disabled">Course Expired - No Certificate Available</a>
-                            {% elif course.price == 0 and course.certificate_price > 0 %}
-                                <!-- For free courses with paid certificates, show purchase certificate button -->
-                                <a href="{% url 'payments:payment_page_type' course.slug 'certificate' %}" class="btn btn-warning d-grid gap-2">Purchase Certificate for ${{ course.certificate_price }}</a>
-                            {% else %}
-                                <a href="#" class="btn btn-success disabled d-grid gap-2">Enrolled</a>
-                            {% endif %}
-                        {% endif %}
-                    {% elif is_instructor %}
-                        <!-- Show preview option for instructors -->
-                        <div class="alert alert-info">
-                            <p>You are the instructor of this course. You can preview lessons without enrolling.</p>
-                        </div>
-                    {% else %}
-                        {% if course.slug %}
-                            {% if course.opening_date and now < course.opening_date %}
-                                <a href="#" class="btn btn-secondary disabled">Enrollment opens {{ course.opening_date }}</a>
-                            {% elif course.closing_date and now > course.closing_date %}
-                                <a href="#" class="btn btn-secondary disabled">Enrollment closed</a>
-                            {% else %}
-                                <div class="d-grid gap-2">
-                                {% if course.price > 0 %}
-                                    <a href="{% url 'payments:payment_page' course.slug %}" class="btn btn-primary">Pay ${{ course.price }} and Enroll</a>
-                                {% else %}
-                                    <a href="{% url 'courses:enroll_course' course.slug %}" class="btn btn-primary">Enroll Now</a>
-                                {% endif %}
-                                </div>
-                            {% endif %}
-                        {% else %}
-                            <a href="#" class="btn btn-primary disabled">Enroll Now</a>
-                        {% endif %}
-                    {% endif %}
                     {% if is_enrolled or is_instructor %}
                     <div class="mt-2 d-grid gap-2">
                         <a href="{% url 'courses:course_learning_process' course.slug %}" class="btn btn-primary">View Learning Process</a>
@@ -133,6 +86,55 @@
                         <p>Course content is only available to enrolled students.</p>
                         <p>Enroll now to access all modules and lessons.</p>
                     </div>
+                    {% endif %}
+                    {% if user == course.instructor and not is_preview %}
+                        <!-- Show edit and delete options for course instructor -->
+                        <div class="mt-2 d-grid gap-2">
+                                <a href="{% url 'courses:edit_course' course.slug %}" class="btn btn-outline-secondary">Edit Course</a>
+                            <a href="{% url 'courses:delete_course' course.slug %}" class="btn btn-outline-danger">Delete Course</a>
+                        </div>
+                    {% elif is_enrolled %}
+                        <!-- Check if user has a certificate for this course -->
+                        <div class="mt-2 d-grid gap-2">
+                            {% load courses_extras %}
+                            {% if user|has_certificate:course %}
+                                {% with certificate=user|get_certificate:course %}
+                                <a href="{% url 'courses:course_certificate' certificate.certificate_number %}" class="btn btn-success d-grid gap-2">View Certificate</a>
+                                {% endwith %}
+                            {% else %}
+                                {% if course.expiration_date and course.expiration_date < now %}
+                                    <a href="#" class="btn btn-secondary disabled">Course Expired - No Certificate Available</a>
+                                {% elif course.price == 0 and course.certificate_price > 0 %}
+                                    <!-- For free courses with paid certificates, show purchase certificate button -->
+                                    <a href="{% url 'payments:payment_page_type' course.slug 'certificate' %}" class="btn btn-warning d-grid gap-2">Purchase Certificate for ${{ course.certificate_price }}</a>
+                                {% else %}
+                                    <a href="#" class="btn btn-success disabled d-grid gap-2">Enrolled</a>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    {% elif is_instructor %}
+                        <!-- Show preview option for instructors -->
+                        <div class="mt-2 alert alert-info">
+                            <p>You are the instructor of this course. You can preview lessons without enrolling.</p>
+                        </div>
+                    {% else %}
+                        <div class="mt-2 d-grid gap-2">
+                        {% if course.slug %}
+                            {% if course.opening_date and now < course.opening_date %}
+                                <a href="#" class="btn btn-secondary disabled">Enrollment opens {{ course.opening_date }}</a>
+                            {% elif course.closing_date and now > course.closing_date %}
+                                <a href="#" class="btn btn-secondary disabled">Enrollment closed</a>
+                            {% else %}
+                                {% if course.price > 0 %}
+                                    <a href="{% url 'payments:payment_page' course.slug %}" class="btn btn-primary">Pay ${{ course.price }} and Enroll</a>
+                                {% else %}
+                                    <a href="{% url 'courses:enroll_course' course.slug %}" class="btn btn-primary">Enroll Now</a>
+                                {% endif %}
+                            {% endif %}
+                        {% else %}
+                            <a href="#" class="btn btn-primary disabled">Enroll Now</a>
+                        {% endif %}
+                        </div>
                     {% endif %}
                 {% else %}
                     {% if course.opening_date and now < course.opening_date %}

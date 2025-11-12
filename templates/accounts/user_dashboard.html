@@ -89,9 +89,9 @@
                                             <td>{{ course.short_description|truncatewords:15 }}</td>
                                             <td class="text-end">
                                                 {% if course.slug %}
-                                                    <a href="{% url 'courses:course_detail' course.slug %}" class="btn btn-sm btn-primary">View</a>
-                                                    <a href="{% url 'courses:edit_course' course.slug %}" class="btn btn-sm btn-secondary">Edit</a>
-                                                    <a href="{% url 'courses:delete_course' course.slug %}" class="btn btn-sm btn-danger">Delete</a>
+                                                    <a href="{% url 'courses:course_detail' course.slug %}" class="btn btn-sm btn-outline-primary">View</a>
+                                                    <a href="{% url 'courses:edit_course' course.slug %}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                                                    <a href="{% url 'courses:delete_course' course.slug %}" class="btn btn-sm btn-outline-danger">Delete</a>
                                                 {% else %}
                                                     <span class="text-muted">No actions available</span>
                                                 {% endif %}
@@ -128,7 +128,7 @@
                                                 Issued on: {{ certificate.issued_at|date:"M d, Y" }}
                                             </small>
                                         </p>
-                                        <a href="{% url 'courses:course_certificate' certificate.certificate_number %}" class="btn btn-sm btn-success">View Certificate</a>
+                                        <a href="{% url 'courses:course_certificate' certificate.certificate_number %}" class="btn btn-sm btn-outline-success">View Certificate</a>
                                     </div>
                                 </div>
                             </div>
@@ -172,9 +172,9 @@
                                             </td>
                                             <td>
                                                 {% if enrollment.course.slug %}
-                                                    <a href="{% url 'courses:course_detail' enrollment.course.slug %}" class="btn btn-sm btn-primary">View Course</a>
+                                                    <a href="{% url 'courses:course_detail' enrollment.course.slug %}" class="btn btn-sm btn-outline-primary">View Course</a>
                                                     {% if enrollment.is_completed and enrollment.certificates.first %}
-                                                        <a href="{% url 'courses:course_certificate' enrollment.certificates.first.certificate_number %}" class="btn btn-sm btn-success">View Certificate</a>
+                                                        <a href="{% url 'courses:course_certificate' enrollment.certificates.first.certificate_number %}" class="btn btn-sm btn-outline-success">View Certificate</a>
                                                     {% endif %}
                                                 {% else %}
                                                     <span class="text-muted">Course not available</span>

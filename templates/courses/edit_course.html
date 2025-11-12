@@ -113,9 +113,10 @@
         {% endif %}
         <div id="thumbnail-preview-container">
             {% if course.thumbnail %}
-                <small class="form-text text-muted">Current thumbnail: {{ course.thumbnail.name|basename }}</small>
                 <div class="mt-2" id="current-thumbnail">
                     <img src="{{ course.thumbnail.url }}" alt="Current thumbnail" class="img-thumbnail" style="max-height: 150px;">
+                    <br>
+                    <small class="form-text text-muted">Current thumbnail: {{ course.thumbnail.name|basename }}</small>
                     <br>
                     <button type="button" id="delete-thumbnail-btn" class="btn btn-sm btn-outline-danger mt-2">Delete Thumbnail</button>
                 </div>
@@ -133,8 +134,8 @@
     
     <div class="d-flex justify-content-between">
         <div>
-            <a href="{% url 'courses:instructor_courses' %}" class="btn btn-secondary">Cancel</a>
-            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteCourseModal">Delete Course</button>
+            <a href="{% url 'courses:instructor_courses' %}" class="btn btn-outline-secondary">Cancel</a>
+            <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteCourseModal">Delete Course</button>
         </div>
         <button type="submit" class="btn btn-primary" id="course-save-btn">Update Course</button>
     </div>
@@ -148,7 +149,7 @@
     {% if course.slug %}
         <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#createModuleModal">Add Module</button>
     {% else %}
-        <button type="button" class="btn btn-sm btn-primary disabled">Add Module</button>
+        <button type="button" class="btn btn-sm btn-outline-primary disabled">Add Module</button>
     {% endif %}
 </div>
 
@@ -236,7 +237,7 @@
             {% if course.slug %}
                 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createModuleModal">Create Your First Module</button>
             {% else %}
-                <button type="button" class="btn btn-primary disabled">Create Your First Module</button>
+                <button type="button" class="btn btn-outline-primary disabled">Create Your First Module</button>
             {% endif %}
         </div>
     {% endif %}
