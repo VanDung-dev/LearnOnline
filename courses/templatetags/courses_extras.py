@@ -115,3 +115,7 @@ def youtube_embed_url(url):
         
     # Return original URL if not a recognized YouTube format
     return url
+
+@register.filter(name='sub')
+def subtract(value, arg):
+    return value - arg

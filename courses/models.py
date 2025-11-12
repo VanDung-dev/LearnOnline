@@ -204,6 +204,10 @@ class Question(models.Model):
     question_type = models.CharField(max_length=10, choices=QUESTION_TYPES, default='single')
     order = models.PositiveIntegerField(default=0)
     points = models.PositiveIntegerField(default=1)
+    max_attempts = models.PositiveIntegerField(
+        default=0,
+        help_text='Maximum number of attempts allowed for this question (0 for unlimited)'
+    )
     
     class Meta:
         ordering = ['order']

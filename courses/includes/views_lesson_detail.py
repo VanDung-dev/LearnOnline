@@ -98,6 +98,19 @@ def lesson_detail(request, course_slug, lesson_slug):
                 return render(request, 'courses/lesson_detail.html', context)
 
         if request.method == 'POST' and not is_instructor:
+            # Check if user wants to retake the quiz
+            if 'retake_quiz' in request.POST:
+                # Check if user still has attempts left
+                attempts = QuizAttempt.objects.filter(user=request.user, lesson=lesson)
+                attempt_count = attempts.count()
+                
+                if lesson.max_attempts == 0 or attempt_count < lesson.max_attempts:
+                    # Redirect to the same page to start a new attempt
+                    return redirect('courses:lesson_detail', course_slug=course.slug, lesson_slug=lesson.slug)
+                else:
+                    messages.error(request, f"You have reached the maximum number of attempts ({lesson.max_attempts}) for this quiz.")
+                    return redirect('courses:lesson_detail', course_slug=course.slug, lesson_slug=lesson.slug)
+            
             # Process quiz submission only for students
             # Get the latest incomplete attempt or create a new one
             new_attempt = QuizAttempt.objects.filter(

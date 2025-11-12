@@ -114,7 +114,11 @@
                         <h3>{{ quiz.title }}</h3>
                         <p>{{ quiz.description }}</p>
                         {% if attempt %}
-                        <h4>Quiz Attempt #{{ attempt.attempt_number }}</h4>
+                            {% if lesson.max_attempts > 0 %}
+                                <p>You have {{ lesson.max_attempts|sub:attempt.attempt_number }} attempts remaining.</p>
+                            {% else %}
+                                <p>Unlimited attempts</p>
+                            {% endif %}
                         {% endif %}
                     </div>
                     <div class="card-body">
@@ -128,6 +132,21 @@
                             <div class="alert alert-info">
                                 <h4>Quiz Results</h4>
                                 <p>Your score: {{ attempt.score|floatformat:2 }}%</p>
+                                
+                                <!-- Retake quiz option -->
+                                {% if lesson.max_attempts == 0 %}
+                                    <form method="post" style="display: inline;">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="retake_quiz" value="true">
+                                        <button type="submit" class="btn btn-warning">Take Quiz Again</button>
+                                    </form>
+                                {% elif attempt.attempt_number < lesson.max_attempts %}
+                                    <form method="post" style="display: inline;">
+                                    {% csrf_token%}
+                                        <input type="hidden" name="retake_quiz" value="true">
+                                        <button type="submit" class="btn btn-warning">Take Quiz Again</button>
+                                    </form>
+                                {% endif %}
                             </div>
                         {% endif %}
 
