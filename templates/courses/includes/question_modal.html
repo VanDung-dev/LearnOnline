@@ -1,0 +1,79 @@
+<div class="modal fade" id="{% if question %}editQuestionModal{{ question.id }}{% else %}addQuestionModal{% endif %}" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{% if question %}Edit Question{% else %}Add New Question{% endif %}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{% url 'courses:edit_lesson' course_slug=course.slug module_id=module.id lesson_id=lesson.id %}">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="{% if question %}edit_question{% else %}add_question{% endif %}">
+                {% if question %}
+                <input type="hidden" name="question_id" value="{{ question.id }}">
+                {% endif %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Question Text</label>
+                        <textarea name="question_text" class="form-control" rows="3">{% if question %}{{ question.text }}{% endif %}</textarea>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Question Type</label>
+                            <select name="question_type" class="form-control">
+                                <option value="single" {% if question and question.question_type == 'single' %}selected{% endif %}>Single Choice</option>
+                                <option value="multiple" {% if question and question.question_type == 'multiple' %}selected{% endif %}>Multiple Choice</option>
+                                <option value="essay" {% if question and question.question_type == 'essay' %}selected{% endif %}>Essay Answer</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Points</label>
+                            <input type="number" name="points" class="form-control" min="1" value="{% if question %}{{ question.points }}{% else %}1{% endif %}">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Order</label>
+                        <input type="number" name="order" class="form-control" min="0" value="{% if question %}{{ question.order }}{% else %}0{% endif %}">
+                    </div>
+
+                    <!-- Answers Section -->
+                    <div class="mb-3">
+                        <label class="form-label">Answers</label>
+                        <div id="{% if question %}answers-container-{{ question.id }}{% else %}new-answers-container{% endif %}">
+                            {% if question %}
+                                {% for answer in question.answers.all %}
+                                    <div class="answer-item mb-2">
+                                        <div class="input-group">
+                                            <input type="text" name="answer_text_{{ answer.id }}" class="form-control" value="{{ answer.text }}" placeholder="Answer text">
+                                            <div class="input-group-text">
+                                                <input type="checkbox" name="answer_correct_{{ answer.id }}" {% if answer.is_correct %}checked{% endif %}> Correct
+                                            </div>
+                                            <button class="btn btn-outline-danger remove-answer" type="button">Remove</button>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="answer-item mb-2">
+                                    <div class="input-group">
+                                        <input type="text" name="new_answer_text[]" class="form-control" placeholder="Answer text">
+                                        <div class="input-group-text">
+                                            <input type="checkbox" name="new_answer_correct[]"> Correct
+                                        </div>
+                                        <button class="btn btn-outline-danger remove-answer" type="button">Remove</button>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <button type="button" class="btn btn-sm btn-outline-secondary {% if question %}add-answer{% else %}add-new-answer{% endif %}" {% if question %}id="add-answer-{{ question.id }}"{% else %}id="add-new-answer"{% endif %} {% if question %}data-question-id="{{ question.id }}"{% endif %}>{% if question %}Add Answer{% else %}Add Answer{% endif %}</button>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">{% if question %}Save Changes{% else %}Add Question{% endif %}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -123,44 +123,45 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Add new answer in add question modal
-    const addNewAnswerButton = document.getElementById('add-new-answer');
-    if (addNewAnswerButton) {
-        addNewAnswerButton.addEventListener('click', function() {
+    // Add new answer functionality
+    document.addEventListener('click', function(e) {
+        // Handle add new answer for new question
+        if (e.target.id === 'add-new-answer') {
             const container = document.getElementById('new-answers-container');
-            const newItem = document.createElement('div');
-            newItem.className = 'answer-item mb-2';
-            newItem.innerHTML = `
-                <div class="input-group">
-                    <input type="text" name="new_answer_text[]" class="form-control" placeholder="Answer text">
-                    <div class="input-group-text">
-                        <input type="checkbox" name="new_answer_correct[]"> Correct
+            if (container) {
+                const newItem = document.createElement('div');
+                newItem.className = 'answer-item mb-2';
+                newItem.innerHTML = `
+                    <div class="input-group">
+                        <input type="text" name="new_answer_text[]" class="form-control" placeholder="Answer text">
+                        <div class="input-group-text">
+                            <input type="checkbox" name="new_answer_correct[]"> Correct
+                        </div>
+                        <button class="btn btn-outline-danger remove-answer" type="button">Remove</button>
                     </div>
-                    <button class="btn btn-outline-danger remove-answer" type="button">Remove</button>
-                </div>
-            `;
-            container.appendChild(newItem);
-        });
-    }
-    
-    // Add new answer in edit question modals
-    document.querySelectorAll('.add-answer').forEach(button => {
-        button.addEventListener('click', function() {
-            const questionId = this.getAttribute('data-question-id');
+                `;
+                container.appendChild(newItem);
+            }
+        } 
+        // Handle add new answer for existing questions
+        else if (e.target.id && e.target.id.startsWith('add-answer-')) {
+            const questionId = e.target.getAttribute('data-question-id');
             const container = document.getElementById(`answers-container-${questionId}`);
-            const newItem = document.createElement('div');
-            newItem.className = 'answer-item mb-2';
-            newItem.innerHTML = `
-                <div class="input-group">
-                    <input type="text" name="new_answer_text_${questionId}[]" class="form-control" placeholder="Answer text">
-                    <div class="input-group-text">
-                        <input type="checkbox" name="new_answer_correct_${questionId}[]"> Correct
+            if (container) {
+                const newItem = document.createElement('div');
+                newItem.className = 'answer-item mb-2';
+                newItem.innerHTML = `
+                    <div class="input-group">
+                        <input type="text" name="new_answer_text_${questionId}[]" class="form-control" placeholder="Answer text">
+                        <div class="input-group-text">
+                            <input type="checkbox" name="new_answer_correct_${questionId}[]"> Correct
+                        </div>
+                        <button class="btn btn-outline-danger remove-answer" type="button">Remove</button>
                     </div>
-                    <button class="btn btn-outline-danger remove-answer" type="button">Remove</button>
-                </div>
-            `;
-            container.appendChild(newItem);
-        });
+                `;
+                container.appendChild(newItem);
+            }
+        }
     });
     
     // Remove answer functionality
