@@ -136,9 +136,10 @@
                                 </div>
                             </div>
 
-                            <div class="mb-3" id="max-attempts-section">
-                                <label for="lesson_max_attempts" class="form-label">Maximum Quiz Attempts (0 for unlimited)</label>
-                                <input type="number" class="form-control" id="lesson_max_attempts" name="max_attempts" min="0" value="{{ lesson.max_attempts }}">
+                            <div class="mb-3" id="max-check-section">
+                                <label for="lesson_max_check" class="form-label">Maximum Quiz Checks (0 for unlimited)</label>
+                                <input type="number" class="form-control" id="lesson_max_check" name="max_check" min="0" value="{{ lesson.max_check }}">
+                                <small class="form-text text-muted">Number of times students can check their answers before final submission.</small>
                             </div>
                         </div>
 

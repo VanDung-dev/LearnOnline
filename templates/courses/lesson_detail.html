@@ -77,52 +77,92 @@
             {% endif %}
         {% elif lesson.lesson_type == 'quiz' %}
             <!-- QUIZ LESSON SECTION -->
-            {% if max_attempts_reached %}
-                <div class="alert alert-warning">
-                    <h4>Maximum Attempts Reached</h4>
-                    <p>You have reached the maximum number of attempts ({{ lesson.max_attempts }}) for this quiz.</p>
-                    
-                    <h5>Your Previous Attempts:</h5>
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Attempt #</th>
-                                <th>Score</th>
-                                <th>Date</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for attempt in attempts %}
-                            <tr>
-                                <td>{{ attempt.attempt_number }}</td>
-                                <td>
-                                    {% if attempt.score is not None %}
-                                        {{ attempt.score }}%
-                                    {% else %}
-                                        Not graded yet
-                                    {% endif %}
-                                </td>
-                                <td>{{ attempt.started_at }}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+            {% if already_submitted %}
+                <div class="alert alert-info">
+                    <h4>Quiz Submitted</h4>
+                    <p>You have already submitted this quiz. No retakes allowed.</p>
+                    <p><strong>Your Score: {{ attempt.score|floatformat:2 }}%</strong></p>
+                    {% if attempt.score >= 70 %}
+                        <p class="text-success">✓ You passed this quiz!</p>
+                    {% else %}
+                        <p class="text-danger">You need at least 70% to pass.</p>
+                    {% endif %}
+                </div>
+
+                <!-- Show quiz results -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>{{ quiz.title }} - Review</h3>
+                    </div>
+                    <div class="card-body">
+                        {% for question in quiz.questions.all %}
+                            <div class="mb-4">
+                                <h5>Question {{ forloop.counter }}: {{ question.text }}</h5>
+                                <p><small class="text-muted">{{ question.points }} point{{ question.points|pluralize }}</small></p>
+
+                                {% if question.question_type == 'single' %}
+                                    {% for answer in question.answers.all %}
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="radio" disabled
+                                                {% for user_answer in attempt.user_answers.all %}
+                                                    {% if user_answer.question == question and answer in user_answer.selected_answers.all %}checked{% endif %}
+                                                {% endfor %}>
+                                            <label class="form-check-label">{{ answer.text }}
+                                                {% if answer.is_correct %}
+                                                    <span class="badge bg-success">Correct Answer</span>
+                                                {% endif %}
+                                                {% for user_answer in attempt.user_answers.all %}
+                                                    {% if user_answer.question == question and answer in user_answer.selected_answers.all %}
+                                                        {% if not answer.is_correct %}
+                                                            <span class="badge bg-danger">Your Incorrect Answer</span>
+                                                        {% else %}
+                                                            <span class="badge bg-primary">Your Answer</span>
+                                                        {% endif %}
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </label>
+                                        </div>
+                                    {% endfor %}
+                                {% elif question.question_type == 'multiple' %}
+                                    {% for answer in question.answers.all %}
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" disabled
+                                                {% for user_answer in attempt.user_answers.all %}
+                                                    {% if user_answer.question == question and answer in user_answer.selected_answers.all %}checked{% endif %}
+                                                {% endfor %}>
+                                            <label class="form-check-label">{{ answer.text }}
+                                                {% if answer.is_correct %}
+                                                    <span class="badge bg-success">Correct Answer</span>
+                                                {% endif %}
+                                                {% for user_answer in attempt.user_answers.all %}
+                                                    {% if user_answer.question == question and answer in user_answer.selected_answers.all %}
+                                                        <span class="badge bg-primary">Your Selection</span>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </label>
+                                        </div>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
                 </div>
             {% else %}
                 <div class="card">
                     <div class="card-header">
                         <h3>{{ quiz.title }}</h3>
                         <p>{{ quiz.description }}</p>
-                        {% if attempt %}
-                            {% if lesson.max_attempts > 0 %}
-                                <p>You are on attempt {{ attempt.attempt_number }} of {{ lesson.max_attempts }}.</p>
+                        {% if not is_instructor %}
+                            {% if lesson.max_check > 0 %}
+                                <p><strong>Remaining Checks:</strong>
+                                    <span class="badge bg-primary">{{ remaining_checks }}</span> / {{ lesson.max_check }}
+                                </p>
                             {% else %}
-                                <p>Unlimited attempts</p>
+                                <p><strong>Checks:</strong> <span class="badge bg-success">Unlimited</span></p>
                             {% endif %}
-                        {% elif lesson.max_attempts > 0 %}
-                            <p>Total attempts allowed: {{ lesson.max_attempts }}</p>
-                        {% else %}
-                            <p>Unlimited attempts</p>
+                            {% if temp_score is not None %}
+                                <p><strong>Temporary Score:</strong> <span class="badge bg-info">{{ temp_score|floatformat:2 }}%</span></p>
+                            {% endif %}
                         {% endif %}
                     </div>
                     <div class="card-body">
@@ -130,28 +170,6 @@
                         <div class="alert alert-info">
                             <p>As an instructor, you are previewing this quiz. Students will be able to submit answers when taking the quiz.</p>
                         </div>
-                        {% endif %}
-                        
-                        {% if attempt and attempt.completed_at %}
-                            <div class="alert alert-info">
-                                <h4>Quiz Results</h4>
-                                <p>Your score: {{ attempt.score|floatformat:2 }}%</p>
-                                
-                                <!-- Retake quiz option -->
-                                {% if lesson.max_attempts == 0 %}
-                                    <form method="post" style="display: inline;">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="retake_quiz" value="true">
-                                        <button type="submit" class="btn btn-warning">Take Quiz Again</button>
-                                    </form>
-                                {% elif attempt.attempt_number < lesson.max_attempts %}
-                                    <form method="post" style="display: inline;">
-                                    {% csrf_token%}
-                                        <input type="hidden" name="retake_quiz" value="true">
-                                        <button type="submit" class="btn btn-warning">Take Quiz Again</button>
-                                    </form>
-                                {% endif %}
-                            </div>
                         {% endif %}
 
                         <form method="post">
@@ -161,22 +179,32 @@
                                 <div class="mb-4">
                                     <h5>Question {{ forloop.counter }}: {{ question.text }}</h5>
                                     <p><small class="text-muted">{{ question.points }} point{{ question.points|pluralize }}</small></p>
-                                    
+
                                     {% if question.question_type == 'single' %}
                                         {% for answer in question.answers.all %}
                                             <div class="form-check mb-2">
-                                                <input class="form-check-input" type="radio" name="question_{{ question.id }}" id="answer_{{ answer.id }}" value="{{ answer.id }}" {% if is_instructor or attempt and attempt.completed_at %}disabled{% endif %} {% if attempt and attempt.completed_at %}{% for user_answer in attempt.user_answers.all %}{% if user_answer.question == question and answer in user_answer.selected_answers.all %}checked{% endif %}{% endfor %}{% endif %}>
-                                                <label class="form-check-label" for="answer_{{ answer.id }}">{{ answer.text }} 
+                                                <input class="form-check-input" type="radio"
+                                                    name="question_{{ question.id }}"
+                                                    id="answer_{{ answer.id }}"
+                                                    value="{{ answer.id }}"
+                                                    {% if is_instructor %}disabled{% endif %}>
+                                                <label class="form-check-label" for="answer_{{ answer.id }}">
+                                                    {{ answer.text }}
                                                     {% if is_instructor and answer.is_correct %}
                                                         <span class="badge bg-success">Correct</span>
-                                                    {% elif attempt and attempt.completed_at and answer.is_correct %}
-                                                        <span class="badge bg-success">Correct Answer</span>
-                                                    {% elif attempt and attempt.completed_at %}
-                                                        {% for user_answer in attempt.user_answers.all %}
-                                                            {% if user_answer.question == question and answer in user_answer.selected_answers.all %}
-                                                                <span class="badge bg-primary">Your Answer</span>
-                                                                {% if not answer.is_correct %}
-                                                                    <span class="badge bg-danger">Incorrect</span>
+                                                    {% endif %}
+                                                    {% if check_results %}
+                                                        {% for qid, result in check_results.items %}
+                                                            {% if qid == question.id %}
+                                                                {% if answer.id in result.selected %}
+                                                                    {% if result.correct %}
+                                                                        <span class="badge bg-success">✓ Correct</span>
+                                                                    {% else %}
+                                                                        <span class="badge bg-danger">✗ Incorrect</span>
+                                                                    {% endif %}
+                                                                {% endif %}
+                                                                {% if answer.is_correct %}
+                                                                    <span class="badge bg-info">Correct Answer</span>
                                                                 {% endif %}
                                                             {% endif %}
                                                         {% endfor %}
@@ -187,18 +215,30 @@
                                     {% elif question.question_type == 'multiple' %}
                                         {% for answer in question.answers.all %}
                                             <div class="form-check mb-2">
-                                                <input class="form-check-input" type="checkbox" name="question_{{ question.id }}" id="answer_{{ answer.id }}" value="{{ answer.id }}" {% if is_instructor or attempt and attempt.completed_at %}disabled{% endif %} {% if attempt and attempt.completed_at %}{% for user_answer in attempt.user_answers.all %}{% if user_answer.question == question and answer in user_answer.selected_answers.all %}checked{% endif %}{% endfor %}{% endif %}>
-                                                <label class="form-check-label" for="answer_{{ answer.id }}">{{ answer.text }} 
+                                                <input class="form-check-input" type="checkbox"
+                                                    name="question_{{ question.id }}"
+                                                    id="answer_{{ answer.id }}"
+                                                    value="{{ answer.id }}"
+                                                    {% if is_instructor %}disabled{% endif %}>
+                                                <label class="form-check-label" for="answer_{{ answer.id }}">
+                                                    {{ answer.text }}
                                                     {% if is_instructor and answer.is_correct %}
                                                         <span class="badge bg-success">Correct</span>
-                                                    {% elif attempt and attempt.completed_at and answer.is_correct %}
-                                                        <span class="badge bg-success">Correct Answer</span>
-                                                    {% elif attempt and attempt.completed_at %}
-                                                        {% for user_answer in attempt.user_answers.all %}
-                                                            {% if user_answer.question == question and answer in user_answer.selected_answers.all %}
-                                                                <span class="badge bg-primary">Your Answer</span>
-                                                                {% if not answer.is_correct %}
-                                                                    <span class="badge bg-danger">Incorrect</span>
+                                                    {% endif %}
+                                                    {% if check_results %}
+                                                        {% for qid, result in check_results.items %}
+                                                            {% if qid == question.id %}
+                                                                {% if answer.id in result.selected %}
+                                                                    <span class="badge bg-primary">Your Selection</span>
+                                                                {% endif %}
+                                                                {% if result.correct %}
+                                                                    {% if answer.is_correct %}
+                                                                        <span class="badge bg-success">✓ Correct</span>
+                                                                    {% endif %}
+                                                                {% else %}
+                                                                    {% if answer.is_correct %}
+                                                                        <span class="badge bg-info">Should Select</span>
+                                                                    {% endif %}
                                                                 {% endif %}
                                                             {% endif %}
                                                         {% endfor %}
@@ -206,28 +246,22 @@
                                                 </label>
                                             </div>
                                         {% endfor %}
-                                    {% elif question.question_type == 'essay' %}
-                                        <div class="mb-3">
-                                            {% if attempt and attempt.completed_at %}
-                                                {% for user_answer in attempt.user_answers.all %}
-                                                    {% if user_answer.question == question %}
-                                                        <p><strong>Your answer:</strong></p>
-                                                        <p>{{ user_answer.selected_answers.first.text }}</p>
-                                                    {% endif %}
-                                                {% endfor %}
-                                            {% else %}
-                                                <textarea class="form-control" name="question_{{ question.id }}" rows="5" placeholder="Enter your answer here..." {% if is_instructor %}disabled{% endif %}></textarea>
-                                                <small class="text-muted">This is an essay question that will be manually graded by the instructor.</small>
-                                            {% endif %}
-                                        </div>
                                     {% endif %}
                                 </div>
                             {% empty %}
                                 <p class="text-muted">No questions available for this quiz.</p>
                             {% endfor %}
-                            
-                            {% if not is_instructor and not attempt.completed_at %}
-                            <button type="submit" class="btn btn-primary">Submit Quiz</button>
+
+                            {% if not is_instructor %}
+                            <div class="d-flex gap-2">
+                                <button type="submit" name="check_answers" class="btn btn-info"
+                                    {% if lesson.max_check > 0 and remaining_checks <= 0 %}disabled{% endif %}>
+                                    Check Answers
+                                </button>
+                                <button type="submit" name="submit_quiz" class="btn btn-primary">
+                                    Submit Quiz (Final)
+                                </button>
+                            </div>
                             {% endif %}
                         </form>
                     </div>
