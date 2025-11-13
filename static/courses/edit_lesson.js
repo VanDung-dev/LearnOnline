@@ -129,13 +129,15 @@ document.addEventListener('DOMContentLoaded', function() {
         if (e.target.id === 'add-new-answer') {
             const container = document.getElementById('new-answers-container');
             if (container) {
+                // Count existing answers to set the correct index for the new checkbox
+                const existingAnswers = container.querySelectorAll('.answer-item').length;
                 const newItem = document.createElement('div');
                 newItem.className = 'answer-item mb-2';
                 newItem.innerHTML = `
                     <div class="input-group">
                         <input type="text" name="new_answer_text[]" class="form-control" placeholder="Answer text">
                         <div class="input-group-text">
-                            <input type="checkbox" name="new_answer_correct[]"> Correct
+                            <input type="checkbox" name="new_answer_correct[]" value="${existingAnswers}"> Correct
                         </div>
                         <button class="btn btn-outline-danger remove-answer" type="button">Remove</button>
                     </div>
@@ -160,6 +162,26 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                 `;
                 container.appendChild(newItem);
+            }
+        }
+    });
+    
+    // Handle checkbox changes for new answers to ensure only one correct answer for single choice
+    document.addEventListener('change', function(e) {
+        if (e.target.name === 'new_answer_correct[]' && e.target.checked) {
+            // Find the question type for new questions
+            const questionTypeSelect = document.querySelector('select[name="question_type"]');
+            if (questionTypeSelect && questionTypeSelect.value === 'single') {
+                // Uncheck all other checkboxes in the same container
+                const container = e.target.closest('#new-answers-container');
+                if (container) {
+                    const checkboxes = container.querySelectorAll('input[name="new_answer_correct[]"]');
+                    checkboxes.forEach(checkbox => {
+                        if (checkbox !== e.target) {
+                            checkbox.checked = false;
+                        }
+                    });
+                }
             }
         }
     });
