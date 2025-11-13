@@ -16,13 +16,15 @@ function handleSingleChoiceQuestion() {
         if (e.target.id === 'add-new-single-choice-answer') {
             const container = document.getElementById('new-single-choice-answers-container');
             if (container) {
+                // Count existing answers to set proper index
+                const answerCount = container.querySelectorAll('.answer-item').length;
                 const newItem = document.createElement('div');
                 newItem.className = 'answer-item mb-2';
                 newItem.innerHTML = `
                     <div class="input-group">
                         <input type="text" name="new_answer_text[]" class="form-control" placeholder="Answer text" required>
                         <div class="input-group-text">
-                            <input type="radio" name="new_correct_answer" value="0"> Correct
+                            <input type="radio" name="new_correct_answer" value="${answerCount}"> Correct
                         </div>
                         <button class="btn btn-outline-danger remove-answer" type="button">Remove</button>
                     </div>
@@ -35,13 +37,15 @@ function handleSingleChoiceQuestion() {
             const questionId = e.target.getAttribute('data-question-id');
             const container = document.getElementById(`single-choice-answers-container-${questionId}`);
             if (container) {
+                // Count existing answers to set proper index
+                const answerCount = container.querySelectorAll('.answer-item').length;
                 const newItem = document.createElement('div');
                 newItem.className = 'answer-item mb-2';
                 newItem.innerHTML = `
                     <div class="input-group">
                         <input type="text" name="new_answer_text_${questionId}[]" class="form-control" placeholder="Answer text" required>
                         <div class="input-group-text">
-                            <input type="radio" name="new_correct_answer_${questionId}" value="0"> Correct
+                            <input type="radio" name="new_correct_answer_${questionId}" value="${answerCount}"> Correct
                         </div>
                         <button class="btn btn-outline-danger remove-answer" type="button">Remove</button>
                     </div>

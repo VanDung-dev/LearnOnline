@@ -88,7 +88,7 @@ def edit_lesson(request, course_slug, module_id, lesson_id):
 
                 for i, answer_text in enumerate(answer_texts):
                     if answer_text:
-                        is_correct = (str(i) == correct_answer_index) if correct_answer_index else False
+                        is_correct = (str(i) == correct_answer_index) if correct_answer_index is not None else False
                         Answer.objects.create(
                             question=question,
                             text=answer_text,
