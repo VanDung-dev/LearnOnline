@@ -78,9 +78,16 @@
                             <div class="card">
                                 <div class="card-header d-flex justify-content-between align-items-center">
                                     <h5>Questions and Answers</h5>
-                                    <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addQuestionModal">
-                                        Add Question
-                                    </button>
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-sm btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown">
+                                            Add Question
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#addSingleChoiceQuestionModal">Single Choice Question</a></li>
+                                            <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#addMultipleChoiceQuestionModal">Multiple Choice Question</a></li>
+                                            <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#addEssayQuestionModal">Essay Question</a></li>
+                                        </ul>
+                                    </div>
                                 </div>
                                 <div class="card-body">
                                     {% if lesson.quiz and lesson.quiz.questions.all %}
@@ -97,7 +104,7 @@
                                                         <div>
                                                             <button type="button" class="btn btn-sm btn-outline-secondary"
                                                                     data-bs-toggle="modal"
-                                                                    data-bs-target="#editQuestionModal{{ question.id }}">
+                                                                    data-bs-target="{% if question.question_type == 'single' %}#editSingleChoiceQuestionModal{{ question.id }}{% elif question.question_type == 'multiple' %}#editMultipleChoiceQuestionModal{{ question.id }}{% else %}#editEssayQuestionModal{{ question.id }}{% endif %}">
                                                                 Edit
                                                             </button>
                                                             <button type="button" class="btn btn-sm btn-outline-danger"
@@ -170,12 +177,20 @@
     </div>
 </div>
 
-<!-- Add Question Modal -->
-{% include 'courses/includes/question_modal.html' %}
+<!-- Add specialized question modals -->
+{% include 'courses/includes/single_choice_question_modal.html' %}
+{% include 'courses/includes/multiple_choice_question_modal.html' %}
+{% include 'courses/includes/essay_question_modal.html' %}
 
 <!-- Edit Question Modals -->
 {% for question in lesson.quiz.questions.all %}
-    {% include 'courses/includes/question_modal.html' with question=question %}
+    {% if question.question_type == 'single' %}
+        {% include 'courses/includes/single_choice_question_modal.html' with question=question %}
+    {% elif question.question_type == 'multiple' %}
+        {%include 'courses/includes/multiple_choice_question_modal.html' with question=question %}
+    {% elif question.question_type == 'essay' %}
+        {% include 'courses/includes/essay_question_modal.html' with question=question %}
+    {% endif %}
 {% endfor %}
 
 <!-- Delete Question Modal - Using common delete modal -->

@@ -66,10 +66,10 @@ def edit_lesson(request, course_slug, module_id, lesson_id):
         # Handle quiz configuration actions
         action = request.POST.get('action')
         
-        if action == 'add_question' and lesson.lesson_type == 'quiz':
-            # Add new question
+        if action == 'add_single_choice_question' and lesson.lesson_type == 'quiz':
+            # Add new single choice question
             question_text = request.POST.get('question_text')
-            question_type = request.POST.get('question_type', 'single')
+            question_type = 'single'
             points = request.POST.get('points', 1)
             order = request.POST.get('order', 0)
 
@@ -82,34 +82,129 @@ def edit_lesson(request, course_slug, module_id, lesson_id):
                     order=order
                 )
 
-                # Add answers if not an essay question
-                if question_type != 'essay':
-                    answer_texts = request.POST.getlist('new_answer_text[]')
-                    answer_corrects = request.POST.getlist('new_answer_correct[]')
+                # Add answers
+                answer_texts = request.POST.getlist('new_answer_text[]')
+                correct_answer_index = request.POST.get('new_correct_answer')
 
-                    for i, answer_text in enumerate(answer_texts):
-                        if answer_text:
-                            is_correct = str(i) in answer_corrects if answer_corrects else False
-                            Answer.objects.create(
-                                question=question,
-                                text=answer_text,
-                                is_correct=is_correct
-                            )
+                for i, answer_text in enumerate(answer_texts):
+                    if answer_text:
+                        is_correct = (str(i) == correct_answer_index) if correct_answer_index else False
+                        Answer.objects.create(
+                            question=question,
+                            text=answer_text,
+                            is_correct=is_correct
+                        )
 
-                messages.success(request, 'Question added successfully!')
+                messages.success(request, 'Single choice question added successfully!')
             else:
                 messages.error(request, 'Question text is required!')
             
-            # Refresh the page to show updated content
+            return redirect('courses:edit_lesson', course_slug=course.slug,module_id=module.id, lesson_id=lesson.id)
+            
+        elif action == 'add_multiple_choice_question' and lesson.lesson_type == 'quiz':
+            # Add new multiple choice question
+            question_text = request.POST.get('question_text')
+            question_type = 'multiple'
+            points = request.POST.get('points', 1)
+            order = request.POST.get('order', 0)
+
+            if question_text:
+                question =Question.objects.create(
+                    quiz=quiz,
+                    text=question_text,
+                    question_type=question_type,
+                    points=points,
+                    order=order
+                )
+
+                # Add answers
+                answer_texts = request.POST.getlist('new_answer_text[]')
+                answer_corrects = request.POST.getlist('new_answer_correct[]')
+
+                for i, answer_text in enumerate(answer_texts):
+                    if answer_text:
+                        is_correct = str(i) in answer_corrects if answer_corrects else False
+                        Answer.objects.create(
+                            question=question,
+                            text=answer_text,
+                            is_correct=is_correct
+                        )
+
+                messages.success(request, 'Multiplechoice question added successfully!')
+            else:
+                messages.error(request, 'Question text is required!')
+            
             return redirect('courses:edit_lesson', course_slug=course.slug, module_id=module.id, lesson_id=lesson.id)
             
-        elif action == 'edit_question' and lesson.lesson_type == 'quiz':
-            # Edit existing question
+        elif action == 'add_essay_question' and lesson.lesson_type == 'quiz':
+            # Add new essay question
+            question_text = request.POST.get('question_text')
+            question_type = 'essay'
+            points = request.POST.get('points', 1)
+            order = request.POST.get('order', 0)
+
+            if question_text:
+                question =Question.objects.create(
+                    quiz=quiz,
+                    text=question_text,
+                    question_type=question_type,
+                    points=points,
+                    order=order
+                )
+
+                messages.success(request, 'Essay question added successfully!')
+            else:
+                messages.error(request, 'Question text is required!')
+            
+            return redirect('courses:edit_lesson', course_slug=course.slug, module_id=module.id, lesson_id=lesson.id)
+            
+        elif action == 'edit_single_choice_question' and lesson.lesson_type == 'quiz':
+            # Edit existing single choice question
             question_id = request.POST.get('question_id')
             question = get_object_or_404(Question, id=question_id, quiz=quiz)
 
             question.text = request.POST.get('question_text', question.text)
-            question.question_type = request.POST.get('question_type', question.question_type)
+            question.question_type = 'single'
+            question.points = request.POST.get('points', question.points)
+            question.order = request.POST.get('order', question.order)
+            question.save()
+
+            # Update existing answers
+            for answer in question.answers.all():
+                answer_text_key = f'answer_text_{answer.id}'
+                if answer_text_key in request.POST:
+                    answer.text = request.POST[answer_text_key]
+                    answer.save()
+
+            # Update correct answer
+            correct_answer_id = request.POST.get('correct_answer')
+            for answer in question.answers.all():
+                answer.is_correct = str(answer.id) == correct_answer_id
+                answer.save()
+
+            # Addnew answers
+            new_answer_texts = request.POST.getlist(f'new_answer_text_{question.id}[]')
+            new_correct_answer_index = request.POST.get(f'new_correct_answer_{question.id}')
+
+            for i, answer_text in enumerate(new_answer_texts):
+                if answer_text:
+                    is_correct = (str(i) == new_correct_answer_index) if new_correct_answer_index else False
+                    Answer.objects.create(
+                        question=question,
+                        text=answer_text,
+                        is_correct=is_correct
+                    )
+
+            messages.success(request, 'Single choice question updated successfully!')
+            return redirect('courses:edit_lesson', course_slug=course.slug, module_id=module.id, lesson_id=lesson.id)
+            
+        elif action == 'edit_multiple_choice_question' and lesson.lesson_type == 'quiz':
+            # Edit existing multiple choice question
+            question_id = request.POST.get('question_id')
+            question = get_object_or_404(Question, id=question_id, quiz=quiz)
+
+            question.text = request.POST.get('question_text', question.text)
+            question.question_type = 'multiple'
             question.points = request.POST.get('points', question.points)
             question.order = request.POST.get('order', question.order)
             question.save()
@@ -125,20 +220,33 @@ def edit_lesson(request, course_slug, module_id, lesson_id):
                     answer.save()
 
             # Add new answers
-            if question.question_type != 'essay':
-                new_answer_texts = request.POST.getlist(f'new_answer_text_{question.id}[]')
-                new_answer_corrects = request.POST.getlist(f'new_answer_correct_{question.id}[]')
+            new_answer_texts = request.POST.getlist(f'new_answer_text_{question.id}[]')
+            new_answer_corrects = request.POST.getlist(f'new_answer_correct_{question.id}[]')
 
-                for i, answer_text in enumerate(new_answer_texts):
-                    if answer_text:
-                        is_correct = str(i) in new_answer_corrects if new_answer_corrects else False
-                        Answer.objects.create(
-                            question=question,
-                            text=answer_text,
-                            is_correct=is_correct
-                        )
+            for i, answer_text in enumerate(new_answer_texts):
+                if answer_text:
+                    is_correct = str(i) in new_answer_corrects if new_answer_corrects else False
+                    Answer.objects.create(
+                        question=question,
+                        text=answer_text,
+                        is_correct=is_correct
+                    )
 
-            messages.success(request, 'Question updated successfully!')
+            messages.success(request, 'Multiple choice question updated successfully!')
+            return redirect('courses:edit_lesson', course_slug=course.slug, module_id=module.id, lesson_id=lesson.id)
+            
+        elif action == 'edit_essay_question' and lesson.lesson_type == 'quiz':
+            # Edit existing essay question
+            question_id = request.POST.get('question_id')
+            question = get_object_or_404(Question, id=question_id, quiz=quiz)
+
+            question.text = request.POST.get('question_text', question.text)
+            question.question_type = 'essay'
+            question.points = request.POST.get('points', question.points)
+            question.order = request.POST.get('order', question.order)
+            question.save()
+
+            messages.success(request, 'Essay question updated successfully!')
             return redirect('courses:edit_lesson', course_slug=course.slug, module_id=module.id, lesson_id=lesson.id)
             
         elif action == 'delete_question' and lesson.lesson_type == 'quiz':
