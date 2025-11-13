@@ -11,9 +11,9 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AddField(
-            model_name='question',
-            name='max_attempts',
-            field=models.PositiveIntegerField(default=0, help_text='Maximum number of attempts allowed for this question (0 for unlimited)'),
+            model_name='lesson',
+            name='max_check',
+            field=models.PositiveIntegerField(default=0, help_text='Maximum number of checks allowed for this quiz (0 for unlimited)'),
         ),
         migrations.AlterField(
             model_name='course',
