@@ -105,13 +105,15 @@ function handleMultipleChoiceQuestion() {
         if (e.target.id === 'add-new-multiple-choice-answer') {
             const container = document.getElementById('new-multiple-choice-answers-container');
             if (container) {
+                // Count existing answers to set proper index
+                const answerCount = container.querySelectorAll('.answer-item').length;
                 const newItem = document.createElement('div');
                 newItem.className = 'answer-item mb-2';
                 newItem.innerHTML = `
                     <div class="input-group">
                         <input type="text" name="new_answer_text[]" class="form-control" placeholder="Answer text" required>
                         <div class="input-group-text">
-                            <input type="checkbox" name="new_answer_correct[]" value="0"> Correct
+                            <input type="checkbox" name="new_answer_correct[]" value="${answerCount}"> Correct
                         </div>
                         <button class="btn btn-outline-danger remove-answer" type="button">Remove</button>
                     </div>
@@ -124,13 +126,15 @@ function handleMultipleChoiceQuestion() {
             const questionId = e.target.getAttribute('data-question-id');
             const container = document.getElementById(`multiple-choice-answers-container-${questionId}`);
             if (container) {
+                // Count existing answers toset proper index
+                const answerCount = container.querySelectorAll('.answer-item').length;
                 const newItem = document.createElement('div');
                 newItem.className = 'answer-item mb-2';
                 newItem.innerHTML = `
                     <div class="input-group">
                         <input type="text" name="new_answer_text_${questionId}[]" class="form-control" placeholder="Answer text" required>
                         <div class="input-group-text">
-                            <input type="checkbox" name="new_answer_correct_${questionId}[]"> Correct
+                            <input type="checkbox" name="new_answer_correct_${questionId}[]" value="${answerCount}"> Correct
                         </div>
                         <button class="btn btn-outline-danger remove-answer" type="button">Remove</button>
                     </div>
