@@ -123,130 +123,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Add new answer functionality
-    document.addEventListener('click', function(e) {
-        // Handle add new answer for new single choice question
-        if (e.target.id === 'add-new-single-choice-answer') {
-            const container = document.getElementById('new-single-choice-answers-container');
-            if (container) {
-                const newItem = document.createElement('div');
-                newItem.className = 'answer-item mb-2';
-                newItem.innerHTML = `
-                    <div class="input-group">
-                        <input type="text" name="new_answer_text[]" class="form-control" placeholder="Answer text" required>
-                        <div class="input-group-text">
-                            <input type="radio" name="new_correct_answer" value="0"> Correct
-                        </div>
-                        <button class="btn btn-outline-danger remove-answer" type="button">Remove</button>
-                    </div>
-                `;
-                container.appendChild(newItem);
-            }
-        } 
-        // Handle add new answer for existing single choice questions
-        else if (e.target.id && e.target.id.startsWith('add-single-choice-answer-')) {
-            const questionId = e.target.getAttribute('data-question-id');
-            const container = document.getElementById(`single-choice-answers-container-${questionId}`);
-            if (container) {
-                const newItem = document.createElement('div');
-                newItem.className = 'answer-item mb-2';
-                newItem.innerHTML = `
-                    <div class="input-group">
-                        <input type="text" name="new_answer_text_${questionId}[]" class="form-control" placeholder="Answer text" required>
-                        <div class="input-group-text">
-                            <input type="radio" name="new_correct_answer_${questionId}" value="0"> Correct
-                        </div>
-                        <button class="btn btn-outline-danger remove-answer" type="button">Remove</button>
-                    </div>
-                `;
-                container.appendChild(newItem);
-            }
-        }
-        // Handle add new answer for new multiple choice question
-        else if (e.target.id === 'add-new-multiple-choice-answer') {
-            const container = document.getElementById('new-multiple-choice-answers-container');
-            if (container) {
-                const newItem = document.createElement('div');
-                newItem.className = 'answer-item mb-2';
-                newItem.innerHTML = `
-                    <div class="input-group">
-                        <input type="text" name="new_answer_text[]" class="form-control" placeholder="Answer text" required>
-                        <div class="input-group-text">
-                            <input type="checkbox" name="new_answer_correct[]" value="0"> Correct
-                        </div>
-                        <button class="btn btn-outline-danger remove-answer" type="button">Remove</button>
-                    </div>
-                `;
-                container.appendChild(newItem);
-            }
-        } 
-        // Handle add new answer for existing multiple choice questionselse if (e.target.id && e.target.id.startsWith('add-multiple-choice-answer-')) {
-        const questionId = e.target.getAttribute('data-question-id');
-        const container = document.getElementById(`multiple-choice-answers-container-${questionId}`);
-        if (container) {
-            const newItem = document.createElement('div');
-            newItem.className = 'answer-item mb-2';
-            newItem.innerHTML = `
-                <div class="input-group">
-                    <input type="text" name="new_answer_text_${questionId}[]" class="form-control" placeholder="Answer text" required>
-                    <div class="input-group-text">
-                        <input type="checkbox" name="new_answer_correct_${questionId}[]"> Correct
-                    </div>
-                    <button class="btn btn-outline-danger remove-answer" type="button">Remove</button>
-                </div>
-            `;
-            container.appendChild(newItem);
-        }
-    });
-    
-    // Handle radio button changes for single choice questions to ensure only one correctanswer
-    document.addEventListener('change', function(e) {
-        // Handle new single choice question
-        if (e.target.name === 'new_correct_answer' && e.target.checked) {
-            const container = e.target.closest('#new-single-choice-answers-container');
-            if (container) {
-                const radios = container.querySelectorAll('input[name="new_correct_answer"]');
-                radios.forEach(radio => {
-                    if (radio !== e.target) {
-                        radio.checked = false;
-                    }
-                });
-            }
-        }
-        // Handle existing single choice questions
-        else if (e.target.name && e.target.name.startsWith('new_correct_answer_') &&e.target.checked) {
-            const questionId = e.target.name.split('_')[3]; // Extract question ID
-            const container = e.target.closest(`#single-choice-answers-container-${questionId}`);
-            if (container) {
-                const radios = container.querySelectorAll(`input[name="new_correct_answer_${questionId}"]`);
-                radios.forEach(radio => {
-                    if (radio !== e.target) {
-                        radio.checked = false;
-                    }
-                });
-            }
-        }
-        // Handle existing single choice question edit mode
-        else if (e.target.name && e.target.name.startsWith('correct_answer') && e.target.checked) {
-            constquestionId = e.target.name.split('_')[2]; // Extract question ID
-            const container = e.target.closest(`#single-choice-answers-container-${questionId}`);
-            if (container) {
-                const radios = container.querySelectorAll(`input[name="correct_answer"]`);
-                radios.forEach(radio => {
-                    if (radio !== e.target) {
-                        radio.checked = false;
-                    }
-                });
-            }
-        }
-    });
-    
-    // Remove answer functionality
-    document.addEventListener('click', function(e) {
-        if (e.target.classList.contains('remove-answer')) {
-            e.target.closest('.answer-item').remove();
-        }
-    });
+    // Initialize question handlers
+    initializeQuestionHandlers();
     
     // Handle delete question buttons
     var deleteQuestionButtons = document.querySelectorAll('[data-bs-target^="#deleteQuestionModal"]');
@@ -291,6 +169,16 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+// Load question handlers module
+function loadQuestionHandlers() {
+    const script = document.createElement('script');
+    script.src = '/static/courses/includes/question_handlers.js';
+    document.head.appendChild(script);
+}
+
+// Load the question handlers
+loadQuestionHandlers();
 
 // Enable drag and drop for quiz questions (using jQuery)
 $(document).ready(function() {
