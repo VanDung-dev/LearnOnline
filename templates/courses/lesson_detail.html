@@ -115,10 +115,14 @@
                         <p>{{ quiz.description }}</p>
                         {% if attempt %}
                             {% if lesson.max_attempts > 0 %}
-                                <p>You have {{ lesson.max_attempts|sub:attempt.attempt_number }} attempts remaining.</p>
+                                <p>You are on attempt {{ attempt.attempt_number }} of {{ lesson.max_attempts }}.</p>
                             {% else %}
                                 <p>Unlimited attempts</p>
                             {% endif %}
+                        {% elif lesson.max_attempts > 0 %}
+                            <p>Total attempts allowed: {{ lesson.max_attempts }}</p>
+                        {% else %}
+                            <p>Unlimited attempts</p>
                         {% endif %}
                     </div>
                     <div class="card-body">
