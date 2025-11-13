@@ -155,9 +155,9 @@ class Lesson(models.Model):
         help_text="If checked, only students who purchased certificate can access this lesson"
     )
     created_at = models.DateTimeField(auto_now_add=True)
-    max_attempts = models.PositiveIntegerField(
+    max_check = models.PositiveIntegerField(
         default=0,
-        help_text="Maximum number of attempts allowed for this quiz (0 for unlimited)"
+        help_text="Maximum number of checks allowed for this quiz (0 for unlimited)"
     )
 
     class Meta:
@@ -204,10 +204,6 @@ class Question(models.Model):
     question_type = models.CharField(max_length=10, choices=QUESTION_TYPES, default='single')
     order = models.PositiveIntegerField(default=0)
     points = models.PositiveIntegerField(default=1)
-    max_attempts = models.PositiveIntegerField(
-        default=0,
-        help_text='Maximum number of attempts allowed for this question (0 for unlimited)'
-    )
     
     class Meta:
         ordering = ['order']

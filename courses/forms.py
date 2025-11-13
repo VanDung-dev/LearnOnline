@@ -56,14 +56,14 @@ class ModuleForm(forms.ModelForm):
 class LessonForm(forms.ModelForm):
     class Meta:
         model = Lesson
-        fields = ['title', 'lesson_type', 'content', 'video_url', 'video_file', 'max_attempts', 'order', 'is_published', 'is_locked']
+        fields = ['title', 'lesson_type', 'content', 'video_url', 'video_file', 'max_check', 'order', 'is_published', 'is_locked']
         widgets = {
             'content': forms.Textarea(attrs={'rows': 10}),
             'title': forms.TextInput(attrs={'class': 'form-control'}),
             'lesson_type': forms.Select(attrs={'class': 'form-control'}),
             'video_url': forms.URLInput(attrs={'class': 'form-control'}),
             'video_file': forms.FileInput(attrs={'class': 'form-control'}),
-            'max_attempts': forms.NumberInput(attrs={'class': 'form-control', 'min': '0'}),
+            'max_check': forms.NumberInput(attrs={'class': 'form-control', 'min': '0'}),
             'order': forms.NumberInput(attrs={'class': 'form-control', 'min': '0'}),
         }
     

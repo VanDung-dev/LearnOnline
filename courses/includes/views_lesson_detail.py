@@ -77,184 +77,232 @@ def lesson_detail(request, course_slug, lesson_slug):
                 # For instructors, continue to show the lesson detail page
                 quiz = None
 
-        # Students: Check attempts
+        # Students: Check if already submitted
         if not is_instructor:
-            attempts = QuizAttempt.objects.filter(user=request.user, lesson=lesson)
-            attempt_count = attempts.count()
+            submitted_attempt = QuizAttempt.objects.filter(
+                user=request.user,
+                lesson=lesson,
+                completed_at__isnull=False
+            ).first()
 
-            # Check if user has exceeded max attempts
-            if lesson.max_attempts > 0 and attempt_count >= lesson.max_attempts:
-                messages.error(request,
-                               f"You have reached the maximum number of attempts ({lesson.max_attempts}) for this quiz.")
-                # Show previous attempts
+            if submitted_attempt:
+                # User has already submitted, show results only
                 context = {
                     'course': course,
                     'lesson': lesson,
                     'quiz': quiz,
-                    'attempts': attempts,
-                    'max_attempts_reached': True,
+                    'attempt': submitted_attempt,
+                    'already_submitted': True,
                     'is_instructor': is_instructor,
                 }
                 return render(request, 'courses/lesson_detail.html', context)
 
         if request.method == 'POST' and not is_instructor:
-            # Check if user wants to retake the quiz
-            if 'retake_quiz' in request.POST:
-                # Check if user still has attempts left
-                attempts = QuizAttempt.objects.filter(user=request.user, lesson=lesson)
-                attempt_count = attempts.count()
-                
-                if lesson.max_attempts == 0 or attempt_count < lesson.max_attempts:
-                    # Redirect to the same page to start a new attempt
-                    return redirect('courses:lesson_detail', course_slug=course.slug, lesson_slug=lesson.slug)
-                else:
-                    messages.error(request, f"You have reached the maximum number of attempts ({lesson.max_attempts}) for this quiz.")
-                    return redirect('courses:lesson_detail', course_slug=course.slug, lesson_slug=lesson.slug)
-            
-            # Process quiz submission only for students
-            # Get the latest incomplete attempt or create a new one
-            new_attempt = QuizAttempt.objects.filter(
-                user=request.user, 
-                lesson=lesson, 
+            # Get or create current attempt
+            current_attempt = QuizAttempt.objects.filter(
+                user=request.user,
+                lesson=lesson,
                 completed_at__isnull=True
             ).first()
-            
-            if not new_attempt:
-                # Calculate the correct attempt number
-                latest_attempt = QuizAttempt.objects.filter(
-                    user=request.user, 
-                    lesson=lesson
-                ).order_by('-attempt_number').first()
-                
-                attempt_number = 1
-                if latest_attempt:
-                    attempt_number = latest_attempt.attempt_number + 1
-                    
-                new_attempt = QuizAttempt.objects.create(
+
+            if not current_attempt:
+                current_attempt = QuizAttempt.objects.create(
                     user=request.user,
                     lesson=lesson,
-                    attempt_number=attempt_number
+                    attempt_number=1
                 )
 
-            score = 0
-            total_points = 0
+            # Initialize check count in session if not exists
+            session_key = f'quiz_check_count_{lesson.id}'
+            if session_key not in request.session:
+                request.session[session_key] = 0
 
-            for question in quiz.questions.all():
-                # Get selected answers
-                if question.question_type == 'single':
-                    answer_id = request.POST.get(f'question_{question.id}')
-                    if answer_id:
-                        try:
-                            selected_answer = Answer.objects.get(id=answer_id, question=question)
-                            # Save user answer
-                            user_answer = UserAnswer.objects.create(quiz_attempt=new_attempt, question=question)
-                            user_answer.selected_answers.add(selected_answer)
+            # Handle Check Answers
+            if 'check_answers' in request.POST:
+                # Increment check count
+                request.session[session_key] += 1
+                check_count = request.session[session_key]
 
-                            # Check if answer is correct
-                            if selected_answer.is_correct:
+                # Calculate score temporarily
+                score = 0
+                total_points = 0
+                check_results = {}
+
+                for question in quiz.questions.all():
+                    if question.question_type in ['single', 'multiple']:
+                        if question.question_type == 'single':
+                            answer_id = request.POST.get(f'question_{question.id}')
+                            if answer_id:
+                                try:
+                                    selected_answer = Answer.objects.get(id=answer_id, question=question)
+                                    check_results[question.id] = {
+                                        'selected': [selected_answer.id],
+                                        'correct': selected_answer.is_correct
+                                    }
+                                    if selected_answer.is_correct:
+                                        score += question.points
+                                except Answer.DoesNotExist:
+                                    pass
+                        elif question.question_type == 'multiple':
+                            answer_ids = request.POST.getlist(f'question_{question.id}')
+                            if answer_ids:
+                                selected_answers = Answer.objects.filter(id__in=answer_ids, question=question)
+                                correct_answers = set(question.answers.filter(is_correct=True).values_list('id', flat=True))
+                                selected_answer_ids = set(selected_answers.values_list('id', flat=True))
+
+                                check_results[question.id] = {
+                                    'selected': list(selected_answer_ids),
+                                    'correct': correct_answers == selected_answer_ids
+                                }
+
+                                if correct_answers == selected_answer_ids:
+                                    score += question.points
+
+                        total_points += question.points
+
+                temp_score = (score / total_points * 100) if total_points > 0 else 0
+
+                # Check if max_check reached, auto submit
+                remaining_checks = lesson.max_check - check_count if lesson.max_check > 0 else -1
+
+                if lesson.max_check > 0 and check_count >= lesson.max_check:
+                    # Auto submit
+                    messages.warning(request, f"You have used all {lesson.max_check} checks. Auto-submitting your quiz...")
+                    # Process final submission (reuse submission code below)
+                    request.POST = request.POST.copy()
+                    request.POST['submit_quiz'] = 'true'
+                else:
+                    messages.info(request, f"Temporary Score: {temp_score:.2f}%. Remaining checks: {remaining_checks if remaining_checks >= 0 else 'Unlimited'}")
+
+                    context = {
+                        'course': course,
+                        'lesson': lesson,
+                        'quiz': quiz,
+                        'attempt': current_attempt,
+                        'check_results': check_results,
+                        'temp_score': temp_score,
+                        'remaining_checks': remaining_checks,
+                        'is_instructor': is_instructor,
+                        'user_answers': request.POST,
+                    }
+                    return render(request, 'courses/lesson_detail.html', context)
+
+            # Handle Submit Quiz (final submission)
+            if 'submit_quiz' in request.POST or (lesson.max_check > 0 and request.session.get(session_key, 0) >= lesson.max_check):
+                # Use current_attempt for final submission
+                new_attempt = current_attempt
+
+                score = 0
+                total_points = 0
+
+                for question in quiz.questions.all():
+                    # Get selected answers (only for single/multiple choice)
+                    if question.question_type == 'single':
+                        answer_id = request.POST.get(f'question_{question.id}')
+                        if answer_id:
+                            try:
+                                selected_answer = Answer.objects.get(id=answer_id, question=question)
+                                # Save user answer
+                                user_answer, created = UserAnswer.objects.get_or_create(
+                                    quiz_attempt=new_attempt,
+                                    question=question
+                                )
+                                user_answer.selected_answers.clear()
+                                user_answer.selected_answers.add(selected_answer)
+
+                                # Check if answer is correct
+                                if selected_answer.is_correct:
+                                    score += question.points
+                                total_points += question.points
+                            except Answer.DoesNotExist:
+                                pass
+                    elif question.question_type == 'multiple':
+                        answer_ids = request.POST.getlist(f'question_{question.id}')
+                        if answer_ids:
+                            selected_answers = Answer.objects.filter(id__in=answer_ids, question=question)
+                            # Save user answers
+                            user_answer, created = UserAnswer.objects.get_or_create(
+                                quiz_attempt=new_attempt,
+                                question=question
+                            )
+                            user_answer.selected_answers.set(selected_answers)
+
+                            # Check if all selected answers are correct and no incorrect answers are selected
+                            correct_answers = set(question.answers.filter(is_correct=True).values_list('id', flat=True))
+                            selected_answer_ids = set(selected_answers.values_list('id', flat=True))
+
+                            if correct_answers == selected_answer_ids:
                                 score += question.points
                             total_points += question.points
-                        except Answer.DoesNotExist:
-                            pass
-                elif question.question_type == 'multiple':
-                    answer_ids = request.POST.getlist(f'question_{question.id}')
-                    if answer_ids:
-                        selected_answers = Answer.objects.filter(id__in=answer_ids, question=question)
-                        # Save user answers
-                        user_answer = UserAnswer.objects.create(quiz_attempt=new_attempt, question=question)
-                        user_answer.selected_answers.set(selected_answers)
 
-                        # Check if all selected answers are correct and no incorrect answers are selected
-                        correct_answers = set(question.answers.filter(is_correct=True).values_list('id', flat=True))
-                        selected_answer_ids = set(selected_answers.values_list('id', flat=True))
+                # Calculate and save score
+                if total_points > 0:
+                    new_attempt.score = (score / total_points) * 100
+                else:
+                    new_attempt.score = 0
+                new_attempt.completed_at = timezone.now()
+                new_attempt.save()
 
-                        if correct_answers == selected_answer_ids:
-                            score += question.points
-                        total_points += question.points
-                elif question.question_type == 'essay':
-                    # Handle essay questions
-                    essay_answer = request.POST.get(f'question_{question.id}')
-                    if essay_answer:
-                        # Save essay answer in the selected_answers field as a special "answer"
-                        essay_answer_obj, created = Answer.objects.get_or_create(
-                            question=question,
-                            text=essay_answer,
-                            defaults={'is_correct': False}  # Essays are manually graded
-                        )
-                        user_answer = UserAnswer.objects.create(quiz_attempt=new_attempt, question=question)
-                        user_answer.selected_answers.add(essay_answer_obj)
+                # Clear session check count
+                if session_key in request.session:
+                    del request.session[session_key]
 
-                        # For essay questions, we don't automatically score them
-                        # They need to be manually graded by the instructor
-                        total_points += question.points
+                # Mark lesson as completed if score is high enough (e.g., 70%)
+                if new_attempt.score >= 70:
+                    progress, created = Progress.objects.get_or_create(
+                        user=request.user,
+                        lesson=lesson
+                    )
+                    if not progress.completed:
+                        progress.completed = True
+                        progress.completed_at = timezone.now()
+                        progress.save()
 
-            # Calculate and save score
-            if total_points > 0:
-                new_attempt.score = (score / total_points) * 100
-            else:
-                new_attempt.score = 0
-            new_attempt.completed_at = timezone.now()
-            new_attempt.save()
+                    # Check if course is completed and issue certificate if needed
+                    check_and_issue_certificate(request.user, course)
 
-            # Mark lesson as completed if score is high enough (e.g., 70%)
-            if new_attempt.score >= 70:
-                progress, created = Progress.objects.get_or_create(
-                    user=request.user,
-                    lesson=lesson
-                )
-                if not progress.completed:
-                    progress.completed = True
-                    progress.completed_at = timezone.now()
-                    progress.save()
+                    messages.success(request, f"Quiz submitted successfully! Your score: {new_attempt.score:.2f}%")
+                else:
+                    messages.info(request,
+                                  f"Quiz submitted. Your score: {new_attempt.score:.2f}%. You need at least 70% to pass.")
 
-                # Check if course is completed and issue certificate if needed
-                check_and_issue_certificate(request.user, course)
-
-                messages.success(request, f"Quiz submitted successfully! Your score: {new_attempt.score:.2f}%")
-            else:
-                messages.info(request,
-                              f"Quiz submitted. Your score: {new_attempt.score:.2f}%. You need at least 70% to pass.")
-
-            # Redirect to the same page but with the completed attempt
-            context = {
-                'course': course,
-                'lesson': lesson,
-                'quiz': quiz,
-                'attempt': new_attempt,
-                'is_instructor': is_instructor,
-            }
-            return render(request, 'courses/lesson_detail.html', context)
+                # Redirect to the same page but with the completed attempt
+                context = {
+                    'course': course,
+                    'lesson': lesson,
+                    'quiz': quiz,
+                    'attempt': new_attempt,
+                    'already_submitted': True,
+                    'is_instructor': is_instructor,
+                }
+                return render(request, 'courses/lesson_detail.html', context)
         elif not is_instructor:
-            # Show quiz form for students
+            # Show quiz form for students (GET request)
             # Get or create an attempt for the student
-            new_attempt = QuizAttempt.objects.filter(
-                user=request.user, 
-                lesson=lesson, 
+            current_attempt = QuizAttempt.objects.filter(
+                user=request.user,
+                lesson=lesson,
                 completed_at__isnull=True
             ).first()
-            
-            if not new_attempt:
-                # Calculate the correct attempt number
-                latest_attempt = QuizAttempt.objects.filter(
-                    user=request.user, 
-                    lesson=lesson
-                ).order_by('-attempt_number').first()
-                
-                attempt_number = 1
-                if latest_attempt:
-                    attempt_number = latest_attempt.attempt_number + 1
-                    
-                new_attempt = QuizAttempt.objects.create(
+
+            if not current_attempt:
+                current_attempt = QuizAttempt.objects.create(
                     user=request.user,
                     lesson=lesson,
-                    attempt_number=attempt_number
+                    attempt_number=1
                 )
-                
+
+            # Calculate remaining checks
+            session_key = f'quiz_check_count_{lesson.id}'
+            check_count = request.session.get(session_key, 0)
+            remaining_checks = lesson.max_check - check_count if lesson.max_check > 0 else -1
+
             context = {
                 'course': course,
                 'lesson': lesson,
                 'quiz': quiz,
-                'attempt': new_attempt,
+                'attempt': current_attempt,
+                'remaining_checks': remaining_checks,
                 'is_instructor': is_instructor,
             }
             return render(request, 'courses/lesson_detail.html', context)
