@@ -154,10 +154,10 @@ def edit_lesson(request, course_slug, module_id, lesson_id):
             quiz_form = QuizForm(request.POST, instance=quiz)
             if quiz_form.is_valid():
                 quiz_form.save()
-                # Also update lesson max_attempts if provided
-                max_attempts = request.POST.get('max_attempts')
-                if max_attempts is not None:
-                    lesson.max_attempts = max_attempts
+                # Also update lesson max_check if provided
+                max_check = request.POST.get('max_check')
+                if max_check is not None:
+                    lesson.max_check = max_check
                     lesson.save()
                 messages.success(request, 'Quiz updated successfully!')
             else:

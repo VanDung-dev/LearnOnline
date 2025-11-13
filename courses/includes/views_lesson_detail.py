@@ -4,7 +4,7 @@ from django.http import Http404
 from django.contrib import messages
 from django.utils import timezone
 from ..models import (Course, Lesson, Enrollment, Progress, Certificate,
-                      Quiz, Answer, QuizAttempt, UserAnswer)
+                      Quiz, Answer,QuizAttempt, UserAnswer)
 
 
 @login_required
@@ -130,11 +130,20 @@ def lesson_detail(request, course_slug, lesson_slug):
 
                 for question in quiz.questions.all():
                     if question.question_type in ['single', 'multiple']:
+                        # Save user answers during check phase
                         if question.question_type == 'single':
-                            answer_id = request.POST.get(f'question_{question.id}')
+                            answer_id= request.POST.get(f'question_{question.id}')
                             if answer_id:
                                 try:
                                     selected_answer = Answer.objects.get(id=answer_id, question=question)
+                                    # Save user answer during check phase
+                                    user_answer, created = UserAnswer.objects.get_or_create(
+                                        quiz_attempt=current_attempt,
+                                        question=question
+                                    )
+                                    user_answer.selected_answers.clear()
+                                    user_answer.selected_answers.add(selected_answer)
+                                    
                                     check_results[question.id] = {
                                         'selected': [selected_answer.id],
                                         'correct': selected_answer.is_correct
@@ -147,6 +156,13 @@ def lesson_detail(request, course_slug, lesson_slug):
                             answer_ids = request.POST.getlist(f'question_{question.id}')
                             if answer_ids:
                                 selected_answers = Answer.objects.filter(id__in=answer_ids, question=question)
+                                #Save user answers during check phase
+                                user_answer, created = UserAnswer.objects.get_or_create(
+                                    quiz_attempt=current_attempt,
+                                    question=question
+                                )
+                                user_answer.selected_answers.set(selected_answers)
+
                                 correct_answers = set(question.answers.filter(is_correct=True).values_list('id', flat=True))
                                 selected_answer_ids = set(selected_answers.values_list('id', flat=True))
 
@@ -159,6 +175,8 @@ def lesson_detail(request, course_slug, lesson_slug):
                                     score += question.points
 
                         total_points += question.points
+                #Save the attempt with updated answers
+                current_attempt.save()
 
                 temp_score = (score / total_points * 100) if total_points > 0 else 0
 
@@ -196,44 +214,29 @@ def lesson_detail(request, course_slug, lesson_slug):
                 total_points = 0
 
                 for question in quiz.questions.all():
-                    # Get selected answers (only for single/multiple choice)
-                    if question.question_type == 'single':
-                        answer_id = request.POST.get(f'question_{question.id}')
-                        if answer_id:
-                            try:
-                                selected_answer = Answer.objects.get(id=answer_id, question=question)
-                                # Save user answer
-                                user_answer, created = UserAnswer.objects.get_or_create(
-                                    quiz_attempt=new_attempt,
-                                    question=question
-                                )
-                                user_answer.selected_answers.clear()
-                                user_answer.selected_answers.add(selected_answer)
-
-                                # Check if answer is correct
+                    # Get saved answers from the attempt
+                    try:
+                        user_answer = UserAnswer.objects.get(quiz_attempt=new_attempt, question=question)
+                        
+                        if question.question_type == 'single':
+                            # For single choice, check if the selected answer is correct
+                            selected_answers = user_answer.selected_answers.all()
+                            if selected_answers.exists():
+                                selected_answer = selected_answers.first()
                                 if selected_answer.is_correct:
                                     score += question.points
                                 total_points += question.points
-                            except Answer.DoesNotExist:
-                                pass
-                    elif question.question_type == 'multiple':
-                        answer_ids = request.POST.getlist(f'question_{question.id}')
-                        if answer_ids:
-                            selected_answers = Answer.objects.filter(id__in=answer_ids, question=question)
-                            # Save user answers
-                            user_answer, created = UserAnswer.objects.get_or_create(
-                                quiz_attempt=new_attempt,
-                                question=question
-                            )
-                            user_answer.selected_answers.set(selected_answers)
-
-                            # Check if all selected answers are correct and no incorrect answers are selected
+                        elif question.question_type == 'multiple':
+                            # For multiple choice, check if all selected answers match exactly the correct answers
                             correct_answers = set(question.answers.filter(is_correct=True).values_list('id', flat=True))
-                            selected_answer_ids = set(selected_answers.values_list('id', flat=True))
+                            selected_answer_ids = set(user_answer.selected_answers.values_list('id', flat=True))
 
                             if correct_answers == selected_answer_ids:
                                 score += question.points
                             total_points += question.points
+                    except UserAnswer.DoesNotExist:
+                        # No answer provided for this question
+                        total_points += question.points
 
                 # Calculate and save score
                 if total_points > 0:
