@@ -126,3 +126,10 @@ def upload_image(request):
     image_url = settings.MEDIA_URL + path.replace('\\', '/')
 
     return JsonResponse({'location': image_url})
+
+
+def support(request):
+    """
+    Display support page with contact information and FAQ
+    """
+    return render(request, 'courses/support.html')
