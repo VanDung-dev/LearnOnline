@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Support{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-12 text-center mb-5">
+            <h1 class="display-4 fw-bold mb-3">How Can We Help You?</h1>
+            <p class="lead text-muted">Find answers to common questions or contact our support team</p>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <h2 class="mb-4">Frequently Asked Questions</h2>
+                    
+                    <div class="accordion" id="faqAccordion">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingOne">
+                                <button class="accordion-button fw-medium" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                    How do I enroll in a course?
+                                </button>
+                            </h2>
+                            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    <p>To enroll in a course:</p>
+                                    <ol>
+                                        <li>Browse courses on our <a href="{% url 'courses:course_list' %}">Courses page</a></li>
+                                        <li>Click on the course you're interested in</li>
+                                        <li>Click the "Enroll Now" button</li>
+                                        <li>You'll be redirected to a confirmation page once enrolled</li>
+                                    </ol>
+                                    <p>After enrolling, you can access the course content from your dashboard.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingTwo">
+                                <button class="accordion-button collapsed fw-medium" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                    How do I access my courses?
+                                </button>
+                            </h2>
+                            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    <p>Once you've enrolled in a course, you can access it in two ways:</p>
+                                    <ol>
+                                        <li>Go to your <a href="{% url 'accounts:profile' %}">Profile</a> and click on "My Enrolled Courses"</li>
+                                        <li>Visit the <a href="{% url 'courses:course_list' %}">Courses page</a> and click on "Continue Learning" for any enrolled course</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingThree">
+                                <button class="accordion-button collapsed fw-medium" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                    How do I get a certificate?
+                                </button>
+                            </h2>
+                            <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    <p>To receive a certificate:</p>
+                                    <ol>
+                                        <li>Complete all lessons in a course</li>
+                                        <li>Pass any required assessments with the minimum score</li>
+                                        <li>On the course completion page, you'll see an option to purchase a certificate</li>
+                                        <li>After payment, you can download your certificate immediately</li>
+                                    </ol>
+                                    <p>Note that certificates are only available for courses that offer them.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingFour">
+                                <button class="accordion-button collapsed fw-medium" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                                    What payment methods do you accept?
+                                </button>
+                            </h2>
+                            <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    <p>We accept major credit and debit cards including Visa, Mastercard, and American Express. We also support payments through PayPal.</p>
+                                    <p>All transactions are secured with industry-standard encryption to protect your financial information.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingFive">
+                                <button class="accordion-button collapsed fw-medium" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+                                    How do I reset my password?
+                                </button>
+                            </h2>
+                            <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    <p>If you've forgotten your password:</p>
+                                    <ol>
+                                        <li>Go to the <a href="{% url 'accounts:login' %}">Login page</a></li>
+                                        <li>Click on "Forgot Password?"</li>
+                                        <li>Enter your email address</li>
+                                        <li>Check your inbox for a password reset email</li>
+                                        <li>Click the link in the email and follow instructions to set a new password</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4 text-center">
+                    <div class="mb-4">
+                        <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                            <i class="bi bi-headset text-primary fs-1"></i>
+                        </div>
+                    </div>
+                    <h3 class="mb-3">Contact Support</h3>
+                    <p class="text-muted">Can't find what you're looking for? Our support team is here to help.</p>
+                    
+                    <div class="d-grid gap-3">
+                        <a href="mailto:info@learnonline.com" class="btn btn-primary">
+                            <i class="bi bi-envelope-fill me-2"></i>Email Us
+                        </a>
+                        <a href="tel:+11234567890" class="btn btn-outline-primary">
+                            <i class="bi bi-telephone-fill me-2"></i>Call Us
+                        </a>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <h5 class="mb-3">Support Hours</h5>
+                    <p class="mb-1">Monday - Friday: 9:00 AM - 6:00 PM EST</p>
+                    <p class="mb-1">Saturday: 10:00 AM - 4:00 PM EST</p>
+                    <p class="mb-0 text-muted">Sunday: Closed</p>
+                </div>
+            </div>
+            
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h4 class="mb-3">Community Support</h4>
+                    <p>Join our community forums to connect with other learners and instructors.</p>
+                    <a href="#" class="btn btn-outline-secondary w-100">
+                        <i class="bi bi-chat-fill me-2"></i>Visit Community Forums
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
