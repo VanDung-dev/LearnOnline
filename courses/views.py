@@ -16,7 +16,7 @@ from .includes.views_lesson_detail import (
     lesson_detail, check_and_issue_certificate
 )
 from .includes.views_other import (
-    home, enroll_course,
+    home, enroll_course, support,
     instructor_courses, delete_lesson_video, upload_image
 )
 from .includes.views_error import (
@@ -43,5 +43,6 @@ __all__ = [
     'course_learning_process', 'create_category_ajax',
     'custom_server_error', 'custom_permission_denied', 'custom_bad_request',
     'custom_method_not_allowed', 'custom_request_timeout', 'custom_too_many_requests',
-    'custom_bad_gateway', 'custom_service_unavailable', 'custom_gateway_timeout'
+    'custom_bad_gateway', 'custom_service_unavailable', 'custom_gateway_timeout',
+    'support'
 ]

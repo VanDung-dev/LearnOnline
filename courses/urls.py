@@ -33,4 +33,7 @@ urlpatterns = [
     path('certificate/<str:certificate_id>/', views.course_certificate, name='course_certificate'),
     path('certificate/public/<str:certificate_id>/', views.public_certificate, name='public_certificate'),
     path('courses/<slug:slug>/purchase-certificate/', views.purchase_certificate, name='purchase_certificate'),
+    
+    # Support page
+    path('support/', views.support, name='support'),
 ]
