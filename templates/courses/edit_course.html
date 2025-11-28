@@ -137,7 +137,7 @@
             <a href="{% url 'courses:instructor_courses' %}" class="btn btn-outline-secondary">Cancel</a>
             <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteCourseModal">Delete Course</button>
         </div>
-        <button type="submit" class="btn btn-primary" id="course-save-btn">Update Course</button>
+        <button type="submit" class="btn btn-primary" id="course-save-btn" onclick="validateRequiredCourseForm(event)">Update Course</button>
     </div>
 </form>
 
@@ -265,4 +265,5 @@
 <script src="{% static 'courses/edit_course.js' %}"></script>
 <script src="{% static 'courses/course_management.js' %}"></script>
 <script src="{% static 'courses/category_modal.js' %}"></script>
+<script src="{% static 'courses/includes/required.js' %}"></script>
 {% endblock %}
