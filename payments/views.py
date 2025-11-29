@@ -56,7 +56,14 @@ def process_payment(request, course_slug, purchase_type='course'):
         return JsonResponse({'error': 'Invalid request method'}, status=400)
     
     course = get_object_or_404(Course, slug=course_slug)
-    
+
+    # Check if course has expired
+    from django.utils import timezone
+    if course.expiration_date and timezone.now() > course.expiration_date:
+        return JsonResponse(
+            {'error': 'This course has expired and is no longer available for enrollment or certificate purchase.'},
+            status=400)
+
     # Get payment details from form
     card_number = request.POST.get('card_number')
     expiry_date = request.POST.get('expiry_date')
@@ -91,6 +98,7 @@ def process_payment(request, course_slug, purchase_type='course'):
             currency='USD',
             status='completed',  # In a real app, this would depend on payment processor response
             payment_method=card_type,
+            purchase_type='course',
             transaction_id=str(uuid.uuid4()).replace('-', '')[:20].upper()
         )
         
@@ -130,6 +138,7 @@ def process_payment(request, course_slug, purchase_type='course'):
             currency='USD',
             status='completed',  # In a real app, this would depend on payment processor response
             payment_method=card_type,
+            purchase_type='certificate',
             transaction_id=str(uuid.uuid4()).replace('-', '')[:20].upper()
         )
         
@@ -137,16 +146,10 @@ def process_payment(request, course_slug, purchase_type='course'):
         if course.certificate_price == 0:
             payment.status = 'completed'
             payment.save()
-        
-        # Create certificate if payment successful
+
+        # Don't create certificate here - let check_and_issue_certificate handle it
+        # Just redirect user back to course
         if payment.status == 'completed':
-            # Create certificate
-            certificate = Certificate.objects.create(
-                user=request.user,
-                course=course,
-                enrollment=enrollment
-            )
-            
             messages.success(request, f'Certificate payment successful! You now have access to locked content.')
             return JsonResponse({
                 'success': True,
