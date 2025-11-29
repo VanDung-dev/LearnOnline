@@ -3,8 +3,10 @@ from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.contrib import messages
 from django.utils import timezone
+from django.db import models
 from ..models import (Course, Lesson, Enrollment, Progress, Certificate,
-                      Quiz, Answer,QuizAttempt, UserAnswer)
+                      Quiz, Answer, QuizAttempt, UserAnswer)
+from payments.models import Payment
 
 
 @login_required
@@ -396,13 +398,34 @@ def check_and_issue_certificate(user, course):
             # Course has expired, don't issue certificate
             return
 
-        # Create certificate if it doesn't exist and course hasn't expired
-        certificate, created = Certificate.objects.get_or_create(
+        # Check if certificate should be free or if user has paid for it
+        # Certificate is free if:
+        # 1. Course price > 0 (course is paid, so certificate is free)
+        # 2. Course price == 0 and certificate_price == 0 (both free)
+        is_certificate_free = course.is_certificate_free()
+
+        # Check if user has paid for certificate or course
+        has_paid = Payment.objects.filter(
             user=user,
             course=course,
-            enrollment=enrollment
-        )
+            enrollment=enrollment,
+            status='completed'
+        ).filter(
+            # Either paid for course or paid for certificate
+            models.Q(amount__gt=0) & (
+                models.Q(payment_method__isnull=False)
+            )
+        ).exists()
 
-        if created:
-            # Notify user about certificate
-            pass  # We could send a message here if needed
+        # Only create certificate if it's free or user has paid
+        if is_certificate_free or has_paid:
+            # Create certificate if it doesn't exist and course hasn't expired
+            certificate, created = Certificate.objects.get_or_create(
+                user=user,
+                course=course,
+                enrollment=enrollment
+            )
+
+            if created:
+                # Notify user about certificate
+                pass  # We could send a message here if needed
