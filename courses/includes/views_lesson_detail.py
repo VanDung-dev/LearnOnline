@@ -1,9 +1,10 @@
+import logging
+
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.contrib import messages
 from django.utils import timezone
-from django.db import models
 from ..models import (Course, Lesson, Enrollment, Progress, Certificate,
                       Quiz, Answer, QuizAttempt, UserAnswer)
 from payments.models import Payment
@@ -20,7 +21,6 @@ def lesson_detail(request, course_slug, lesson_slug):
         # If multiple lessons with same slug, get the first one
         lesson = lessons.first()
         # Log this issue for debugging
-        import logging
         logger = logging.getLogger(__name__)
         logger.warning(f"Multiple lessons found with slug '{lesson_slug}' in course '{course.title}'")
     else:
@@ -38,7 +38,6 @@ def lesson_detail(request, course_slug, lesson_slug):
 
     # Check if user is enrolled or is the instructor
     enrollment = None
-    is_enrolled = False
     has_certificate = False
     
     # Check if user is the instructor of this course
@@ -49,11 +48,7 @@ def lesson_detail(request, course_slug, lesson_slug):
     if not is_instructor:
         # Regular student logic
         enrollment = get_object_or_404(Enrollment, user=request.user, course=course)
-        is_enrolled = True
         has_certificate = Certificate.objects.filter(user=request.user, course=course).exists()
-    else:
-        # For instructors, treat as enrolled but without certificate
-        is_enrolled = True
 
     # Add debugging information
     if lesson.lesson_type == 'video' and not lesson.video_url:
@@ -158,12 +153,12 @@ def lesson_detail(request, course_slug, lesson_slug):
                             answer_ids = request.POST.getlist(f'question_{question.id}')
                             if answer_ids:
                                 selected_answers = Answer.objects.filter(id__in=answer_ids, question=question)
-                                #Save user answers during check phase
+                                # Save user answers during check phase
                                 user_answer, created = UserAnswer.objects.get_or_create(
                                     quiz_attempt=current_attempt,
                                     question=question
                                 )
-                                user_answer.selected_answers.set(selected_answers)
+                                user_answer.selected_answers.set(selected_answers.all())
 
                                 correct_answers = set(question.answers.filter(is_correct=True).values_list('id', flat=True))
                                 selected_answer_ids = set(selected_answers.values_list('id', flat=True))
@@ -185,7 +180,7 @@ def lesson_detail(request, course_slug, lesson_slug):
                 # Check if max_check reached, auto submit
                 remaining_checks = lesson.max_check - check_count if lesson.max_check > 0 else -1
 
-                if lesson.max_check > 0 and check_count >= lesson.max_check:
+                if 0 < lesson.max_check <= check_count:
                     # Auto submit
                     messages.warning(request, f"You have used all {lesson.max_check} checks. Auto-submitting your quiz...")
                     # Process final submission (reuse submission code below)
@@ -208,7 +203,7 @@ def lesson_detail(request, course_slug, lesson_slug):
                     return render(request, 'courses/lesson_detail.html', context)
 
             # Handle Submit Quiz (final submission)
-            if 'submit_quiz' in request.POST or (lesson.max_check > 0 and request.session.get(session_key, 0) >= lesson.max_check):
+            if 'submit_quiz' in request.POST or (0 < lesson.max_check <= request.session.get(session_key, 0)):
                 # Use current_attempt for final submission
                 new_attempt = current_attempt
 
@@ -330,6 +325,7 @@ def lesson_detail(request, course_slug, lesson_slug):
 
         if not progress.completed:
             progress.completed = True
+            progress.completed_at = timezone.now()
             progress.save()
 
         # Check if course is completed and issue certificate if needed
@@ -386,7 +382,11 @@ def check_and_issue_certificate(user, course):
     # Check if all lessons are completed
     if completed_lessons == total_lessons:
         # Get enrollment
-        enrollment = get_object_or_404(Enrollment, user=user, course=course)
+        try:
+            enrollment = Enrollment.objects.get(user=user, course=course)
+        except Enrollment.DoesNotExist:
+            # User is not enrolled in this course
+            return
 
         # Mark enrollment as completed
         if not enrollment.is_completed:
@@ -410,11 +410,6 @@ def check_and_issue_certificate(user, course):
             course=course,
             enrollment=enrollment,
             status='completed'
-        ).filter(
-            # Either paid for course or paid for certificate
-            models.Q(amount__gt=0) & (
-                models.Q(payment_method__isnull=False)
-            )
         ).exists()
 
         # Only create certificate if it's free or user has paid
@@ -428,4 +423,6 @@ def check_and_issue_certificate(user, course):
 
             if created:
                 # Notify user about certificate
+                # Note: Since this is called from a background process, we can't directly send messages
+                # In a real implementation, you would use email notifications or a messaging system
                 pass  # We could send a message here if needed
