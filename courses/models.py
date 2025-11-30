@@ -83,7 +83,7 @@ class Course(models.Model):
         """Check if certificate is free for students"""
         # Certificate is free only if course has a price (course is paid)
         # or if course is free but certificate is explicitly set to free (price=0)
-        return self.price > 0
+        return self.price > 0 or self.certificate_price == 0
 
 
 class Module(models.Model):
@@ -131,7 +131,6 @@ class Module(models.Model):
                 break
         
         # Calculate deadline
-        from django.utils import timezone
         from datetime import timedelta
         return start_date + timedelta(days=cumulative_days)
 
