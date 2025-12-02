@@ -1,7 +1,11 @@
+import os
+
 from django.db import models
 from django.contrib.auth.models import User
 from django.urls import reverse
 from django.utils.text import slugify
+from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
 
 
 class Category(models.Model):
@@ -60,7 +64,23 @@ class Course(models.Model):
     def __str__(self):
         return self.title
 
+    def clean(self):
+        # Validate thumbnail
+        if self.thumbnail:
+            # Check file size (limit to 5MB)
+            if self.thumbnail.size > 5242880:  # 5MB in bytes
+                raise ValidationError(_('Thumbnail size must be less than 5MB.'))
+            
+            # Check file extension
+            valid_extensions = ['.jpg', '.jpeg', '.png', '.gif']
+            ext = os.path.splitext(self.thumbnail.name)[1].lower()
+            if ext not in valid_extensions:
+                raise ValidationError(_('Unsupported file extension for thumbnail. Allowed extensions are: %s' % ', '.join(valid_extensions)))
+
     def save(self, *args, **kwargs):
+        # Clean the instance before saving
+        self.clean()
+        
         # Automatically set certificate_price to 0 if course price > 0
         # This ensures students don't have to pay twice for the course and certificate
         if self.price > 0:
@@ -164,7 +184,23 @@ class Lesson(models.Model):
     class Meta:
         ordering = ['order']
 
+    def clean(self):
+        # Validate video file
+        if self.video_file:
+            # Check file size (limit to 100MB)
+            if self.video_file.size > 104857600:  # 100MB in bytes
+                raise ValidationError(_('Video file size must beless than 100MB.'))
+            
+            # Check file extension
+            valid_extensions = ['.mp4', '.avi', '.mov', '.wmv', '.flv', '.webm']
+            ext =os.path.splitext(self.video_file.name)[1].lower()
+            if ext not in valid_extensions:
+                raise ValidationError(_('Unsupported file extension. Allowed extensions are: %s' % ', '.join(valid_extensions)))
+
     def save(self, *args, **kwargs):
+        # Clean the instance before saving
+        self.clean()
+        
         if not self.slug:
             self.slug = slugify(self.title)
             # Ensure uniqueness within the course (not just within the module)
