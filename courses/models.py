@@ -169,6 +169,9 @@ class Lesson(models.Model):
     content = models.TextField(blank=True)
     video_url = models.URLField(blank=True, null=True)
     video_file = models.FileField(upload_to='lesson_videos/', blank=True, null=True)
+    #Video metadata
+    video_duration = models.DurationField(blank=True, null=True, help_text="Video duration in HH:MM:SS format")
+    video_size = models.PositiveIntegerField(blank=True, null=True, help_text="Video file size in bytes")
     order = models.PositiveIntegerField(default=0)
     is_published = models.BooleanField(default=True)
     is_locked = models.BooleanField(
@@ -187,20 +190,29 @@ class Lesson(models.Model):
     def clean(self):
         # Validate video file
         if self.video_file:
-            # Check file size (limit to 100MB)
-            if self.video_file.size > 104857600:  # 100MB in bytes
-                raise ValidationError(_('Video file size must beless than 100MB.'))
+            # Check file size (limit to 500MB)
+            if self.video_file.size > 524288000:  # 500MB in bytes
+                raise ValidationError(_('Video file size must be less than 500MB.'))
             
             # Check file extension
-            valid_extensions = ['.mp4', '.avi', '.mov', '.wmv', '.flv', '.webm']
-            ext =os.path.splitext(self.video_file.name)[1].lower()
+            valid_extensions = ['.mp4', '.avi', '.mov', '.wmv', '.flv', '.webm', '.mkv', '.m4v']
+            ext = os.path.splitext(self.video_file.name)[1].lower()
             if ext not in valid_extensions:
                 raise ValidationError(_('Unsupported file extension. Allowed extensions are: %s' % ', '.join(valid_extensions)))
+            
+            # Additional validation for MP4 files
+            if ext == '.mp4':
+                # Could add more specific MP4 validation here if needed
+                pass
 
     def save(self, *args, **kwargs):
         # Clean the instance before saving
         self.clean()
         
+        # Update video metadata if a video file is provided
+        if self.video_file and hasattr(self.video_file, 'size'):
+            self.video_size = self.video_file.size
+            
         if not self.slug:
             self.slug = slugify(self.title)
             # Ensure uniqueness within the course (not just within the module)

@@ -56,16 +56,24 @@ class ModuleForm(forms.ModelForm):
 class LessonForm(forms.ModelForm):
     class Meta:
         model = Lesson
-        fields = ['title', 'lesson_type', 'content', 'video_url', 'video_file', 'max_check', 'order', 'is_published', 'is_locked']
+        fields = ['title', 'lesson_type', 'content', 'video_url', 'video_file', 'video_duration', 'order', 'is_published', 'is_locked']
         widgets = {
             'content': forms.Textarea(attrs={'rows': 10}),
             'title': forms.TextInput(attrs={'class': 'form-control'}),
             'lesson_type': forms.Select(attrs={'class': 'form-control'}),
-            'video_url': forms.URLInput(attrs={'class': 'form-control'}),
+            'video_url': forms.URLInput(attrs={'class': 'form-control','placeholder': 'https://www.youtube.com/watch?v=...'}),
             'video_file': forms.FileInput(attrs={'class': 'form-control'}),
+            'video_duration': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'HH:MM:SS'}),
             'max_check': forms.NumberInput(attrs={'class': 'form-control', 'min': '0'}),
             'order': forms.NumberInput(attrs={'class': 'form-control', 'min': '0'}),
         }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Add help text forvideo fields
+        self.fields['video_url'].help_text = "Enter a YouTube or Vimeo URL"
+        self.fields['video_file'].help_text = "Upload a video file (MP4, AVI, MOV, WMV, FLV, WEBM, MKV, M4V - max 500MB)"
+        self.fields['video_duration'].help_text = "Enter video duration in HH:MM:SS format (optional)"
     
     def clean(self):
         cleaned_data = super().clean()
@@ -73,6 +81,7 @@ class LessonForm(forms.ModelForm):
         content = cleaned_data.get('content')
         video_url = cleaned_data.get('video_url')
         video_file = cleaned_data.get('video_file')
+        video_duration = cleaned_data.get('video_duration')
         
         # Validate based on lesson type
         if lesson_type == 'text' and not content:
@@ -84,6 +93,22 @@ class LessonForm(forms.ModelForm):
                 raise forms.ValidationError("Either Video URL or Video File is required for video lessons.")
             if video_url and video_file:
                 raise forms.ValidationError("Please provide either Video URL or Video File, not both.")
+            
+            # Validate video URL format if provided
+            if video_url:
+                youtube_pattern = r'(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})'
+                vimeo_pattern = r'(?:https?:\/\/)?(?:www\.)?vimeo\.com\/(?:channels\/(?:\w+\/)?|groups\/(?:[^\/]*)\/videos\/|album\/(?:\d+)\/video\/|video\/|)(\d+)(?:[^\d]|$)'
+                
+                import re
+                if not re.match(youtube_pattern, video_url) and not re.match(vimeo_pattern, video_url):
+                    raise forms.ValidationError("Please enter a valid YouTube or Vimeo URL.")
+            
+            # Validate video duration format if provided
+            if video_duration:
+                duration_pattern = r'^([0-9]{1,2}):([0-5][0-9]):([0-5][0-9])$'
+                import re
+                if not re.match(duration_pattern, video_duration):
+                    raise forms.ValidationError("Please enter video duration in HH:MM:SS format.")
         
         # For quiz type, no specific validation needed at creation time
         # Quiz configuration will be handled separately
