@@ -53,21 +53,37 @@
             <!-- VIDEO LESSON SECTION -->
             {% if lesson.video_url %}
                 <div class="video-container mb-4">
-                    <iframe width="100%"
-                            height="400"
-                            src="{{ lesson.video_url|youtube_embed_url }}"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-                            allowfullscreen
-                            loading="lazy"
-                            referrerpolicy="no-referrer-when-downgrade">
-                    </iframe>
+                    <div class="ratio ratio-16x9">
+                        <iframe src="{{ lesson.video_url|youtube_embed_url }}"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+                                allowfullscreen
+                                loading="lazy"
+                                referrerpolicy="no-referrer-when-downgrade">
+                        </iframe>
+                    </div>
+                    <div class="mt-2 d-flex justify-content-between">
+                        <small class = "text-muted">External video source: {{ lesson.video_url|urlize }}</small>
+                        {% if lesson.video_duration%}
+                            <small class="text-muted">Duration: {{ lesson.video_duration }}</small>
+                        {% endif%}
+                    </div>
                 </div>
             {% elif lesson.video_file %}
                 <div class="video-container mb-4">
-                    <video width="100%" height="400" controls>
-                        <source src="{{ lesson.video_file.url }}" type="video/mp4">
-                        Your browser does not support the video tag.
-                    </video>
+                    <div class="ratio ratio-16x9">
+                        <video controls>
+                            <source src="{{ lesson.video_file.url }}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                    <div class="mt-2 d-flex justify-content-between">
+                        <small class="text-muted">Uploadedvideo file: {{ lesson.video_file.name|truncatechars:50 }}</small>
+                        {% if lesson.video_duration %}
+                            <small class="text-muted">Duration: {{ lesson.video_duration }}</small>
+                        {% elif lesson.video_size%}
+                            <small class="text-muted">Size: {{ lesson.video_size|filesizeformat }}</small>
+                        {% endif%}
+                    </div>
                 </div>
             {% else %}
                 <!-- Show a message when video URL is missing -->
