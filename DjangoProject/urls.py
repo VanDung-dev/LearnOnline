@@ -28,11 +28,12 @@ urlpatterns = [
     path('payments/', include('payments.urls')),
 ]
 
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-else:
-    # In production, also serve static files (not ideal for production, but needed for this setup)
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+# Serve media files in development and production
+# In production, it's recommended to serve media files via web server (nginx, Apache, CDN, etc.)
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+# Serve static files in development and production
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 # Custom error handlers
 handler404 = 'courses.views.custom_page_not_found'
