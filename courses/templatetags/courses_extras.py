@@ -1,4 +1,5 @@
 import os
+import re
 from django import template
 from django.utils import timezone
 from ..models import Certificate, Enrollment
@@ -87,33 +88,31 @@ def module_deadline(module, user):
 @register.filter
 def youtube_embed_url(url):
     """
-    Convert YouTube URL to embed format
+    Convert YouTube or Vimeo URL to embed format
     """
     if not url:
         return ''
-        
-    # Handle various YouTube URL formats
-    import re
     
-    # Regex pattern to match YouTube URLs and extract video ID
-    patterns = [
-        r'(?:v=|be\/|embed\/|v\/|watch\?.*v=)([\w-]{11})',
-        r'(?:https?:\/\/)?(?:www\.)?youtu\.be\/([\w-]{11})'
+    # Handle YouTube URLs
+    youtube_patterns = [
+        r'(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})',
+        r'(?:www\.)?youtube\.com\/watch\?v=([a-zA-Z0-9_-]{11})'
     ]
     
-    for pattern in patterns:
+    for pattern in youtube_patterns:
         match = re.search(pattern, url)
         if match:
             video_id = match.group(1)
-            break
-    else:
-        video_id = None
+            return f'https://www.youtube.com/embed/{video_id}'
     
-    if video_id:
-        # Make sure we return a proper embed URL
-        return f'https://www.youtube.com/embed/{video_id}'
-        
-    # Return original URL if not a recognized YouTube format
+    # Handle Vimeo URLs
+    vimeo_pattern = r'vimeo\.com\/(?:channels\/(?:\w+\/)?|groups\/(?:[^\/]*)\/videos\/|album\/(?:\d+)\/video\/|video\/|)(\d+)(?:[^\d]|$)'
+    vimeo_match = re.search(vimeo_pattern, url)
+    if vimeo_match:
+        video_id = vimeo_match.group(1)
+        return f'https://player.vimeo.com/video/{video_id}'
+
+    # Return original URL if not a recognized format
     return url
 
 @register.filter(name='sub')
