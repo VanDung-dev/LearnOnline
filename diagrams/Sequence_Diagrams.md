@@ -1,12 +1,13 @@
 ## Sequence Diagrams
 
 ### Student Enrolls in Course
+
+#### 1. Student Authentication and Course Selection
 ```mermaid
 sequenceDiagram
     actor Student
     participant System
     participant Course
-    participant Enrollment
 
     Student->>System: login()
     System-->>Student: authenticated
@@ -15,6 +16,16 @@ sequenceDiagram
     Student->>System: selectCourse(courseId)
     System->>Course: findById(courseId)
     Course-->>System: return course
+    System-->>Student: showCourseDetails()
+```
+
+#### 2. Enrollment Process
+```mermaid
+sequenceDiagram
+    actor Student
+    participant System
+    participant Enrollment
+
     System->>Enrollment: check(student, course)
     Enrollment-->>System: notEnrolled
     System->>Enrollment: create(student, course)
@@ -23,13 +34,13 @@ sequenceDiagram
 ```
 
 ### Instructor Creates Course with Modules and Lessons
+
+#### 1. Instructor Authentication and Course Creation
 ```mermaid
 sequenceDiagram
     actor Instructor
     participant System
     participant Course
-    participant Module
-    participant Lesson
 
     Instructor->>System: login()
     System-->>Instructor: authenticated
@@ -37,6 +48,15 @@ sequenceDiagram
     System->>Course: create(title, description, instructor)
     Course-->>System: courseCreated
     System-->>Instructor: courseDetails()
+```
+
+#### 2. Adding Modules and Lessons
+```mermaid
+sequenceDiagram
+    actor Instructor
+    participant System
+    participant Module
+    participant Lesson
 
     Instructor->>System: addModule(courseId, moduleTitle)
     System->>Module: create(courseId, title)
@@ -50,6 +70,8 @@ sequenceDiagram
 ```
 
 ### Student Takes Quiz and Gets Certificate
+
+#### 1. Quiz Taking Process
 ```mermaid
 sequenceDiagram
     actor Student
@@ -58,7 +80,6 @@ sequenceDiagram
     participant Quiz
     participant Question
     participant Answer
-    participant Certificate
 
     Student->>System: accessLesson(lessonId)
     System->>Lesson: findById(lessonId)
@@ -72,6 +93,15 @@ sequenceDiagram
     Question-->>System: scores
     System->>Answer: calculateScore()
     Answer-->>System: finalScore
+    System-->>Student: showScore()
+```
+
+#### 2. Certificate Generation
+```mermaid
+sequenceDiagram
+    actor Student
+    participant System
+    participant Certificate
 
     System->>Certificate: checkCompletion(student, course)
     Certificate-->>System: completed
