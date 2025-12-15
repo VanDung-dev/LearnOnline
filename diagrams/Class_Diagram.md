@@ -123,7 +123,7 @@ classDiagram
     User "1" -- "0..*" Progress : has
     User "1" -- "0..*" Certificate : has
     User "1" -- "0..*" Payment : has
-    User "1" -- "0..*" QuizAttempt : has
+    User "1" -- "0..*" QuizAttempt : performs
 
     Category "1" -- "0..*" Course : contains
     Course "1" -- "0..*" Module : has
@@ -133,18 +133,18 @@ classDiagram
 
     Module "1" -- "0..*" Lesson : has
 
-    Lesson "1" -- "1" Quiz : can have
+    Lesson "1" -- "0..1" Quiz : has
     Lesson "1" -- "0..*" Progress : tracks
-    Lesson "1" -- "0..*" QuizAttempt : for
+    Lesson "1" -- "0..*" QuizAttempt : has_attempts_for
 
     Quiz "1" -- "0..*" Question : has
 
     Question "1" -- "0..*" Answer : has
-    Question "1" -- "0..*" UserAnswer : has
+    Question "1" -- "0..*" UserAnswer : for
 
     Enrollment "1" -- "1" Certificate : can result in
     Enrollment "1" -- "0..*" Payment : can have
 
     QuizAttempt "1" -- "0..*" UserAnswer : contains
-    Answer "0..*" -- "0..*" UserAnswer : selected in
+    UserAnswer "0..*" -- "0..*" Answer : selects
 ```
