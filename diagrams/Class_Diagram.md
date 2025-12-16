@@ -114,9 +114,6 @@ classDiagram
         +completed_at: datetime
     }
 
-    class UserAnswer {
-    }
-
     User "1" -- "1" Profile : has
     User "1" -- "0..*" Course : created
     User "1" -- "0..*" Enrollment : has
@@ -126,6 +123,7 @@ classDiagram
     User "1" -- "0..*" QuizAttempt : performs
 
     Category "1" -- "0..*" Course : contains
+    
     Course "1" -- "0..*" Module : has
     Course "1" -- "0..*" Enrollment : has
     Course "1" -- "0..*" Certificate : for
@@ -140,11 +138,7 @@ classDiagram
     Quiz "1" -- "0..*" Question : has
 
     Question "1" -- "0..*" Answer : has
-    Question "1" -- "0..*" UserAnswer : for
 
     Enrollment "1" -- "1" Certificate : can result in
     Enrollment "1" -- "0..*" Payment : can have
-
-    QuizAttempt "1" -- "0..*" UserAnswer : contains
-    UserAnswer "0..*" -- "0..*" Answer : selects
 ```
