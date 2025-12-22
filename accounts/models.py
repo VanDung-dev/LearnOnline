@@ -59,5 +59,3 @@ class Profile(models.Model):
     
     def is_admin(self):
         return self.role == self.ADMIN
-    
-    objects = CustomUserManager()
