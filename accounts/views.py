@@ -6,10 +6,12 @@ from django.contrib.auth import logout, authenticate
 from django.contrib.auth.views import LoginView
 from django.contrib.auth.forms import AuthenticationForm
 from django.urls import reverse_lazy
+from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy
 from django.views import View
 from django.http import HttpResponseRedirect
 from django.core.exceptions import ValidationError
+from django_ratelimit.decorators import ratelimit
 from courses.models import Course
 from .forms import UserRegistrationForm, UserUpdateForm, ProfileUpdateForm
 
@@ -59,6 +61,17 @@ class CustomLoginView(LoginView):
             return reverse_lazy('accounts:profile')
         else:
             return reverse_lazy('courses:home')
+
+    @method_decorator(ratelimit(key='ip', rate='5/5m', method='POST', block=False))
+    def post(self, request, *args, **kwargs):
+        # Check if rate limited
+        if getattr(request, 'limited', False):
+            messages.error(
+                request,
+                'Too many login attempts. Please try again in 5 minutes.'
+            )
+            return redirect('accounts:login')
+        return super().post(request, *args, **kwargs)
 
 
 class CustomLogoutView(View):
