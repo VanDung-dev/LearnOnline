@@ -6,6 +6,7 @@ app_name = 'courses'
 urlpatterns = [
     path('', views.home, name='home'),
     path('courses/', views.course_list, name='course_list'),
+    path('courses/search/autocomplete/', views.search_autocomplete, name='search_autocomplete'),
     path('courses/upload_image/', views.upload_image, name='upload_image'),
     path('courses/<slug:slug>/', views.course_detail, name='course_detail'),
     path('courses/<slug:slug>/learning-process/', views.course_learning_process, name='course_learning_process'),
