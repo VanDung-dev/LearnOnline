@@ -116,14 +116,96 @@ def delete_course(request, slug):
 
 
 def course_list(request):
-    courses = Course.objects.filter(is_active=True).select_related('category', 'instructor').prefetch_related('modules')
-
+    """
+    Display list of courses with search, filter, and sorting functionality.
+    
+    Query Parameters:
+        q: Search query (searches title, description, instructor name)
+        category: Filter by category ID
+        is_free: Filter free courses only (true/false)
+        min_price: Minimum price filter
+        max_price: Maximum price filter
+        ordering: Sort order (newest, oldest, price_low, price_high, popular)
+    """
+    from django.db.models import Q, Count
+    
+    courses = Course.objects.filter(is_active=True)
+    
+    # Search query
+    query = request.GET.get('q', '').strip()
+    if query:
+        courses = courses.filter(
+            Q(title__icontains=query) |
+            Q(short_description__icontains=query) |
+            Q(description__icontains=query) |
+            Q(instructor__username__icontains=query) |
+            Q(instructor__first_name__icontains=query) |
+            Q(instructor__last_name__icontains=query) |
+            Q(category__name__icontains=query)
+        )
+    
+    # Category filter
+    category_id = request.GET.get('category', '').strip()
+    if category_id and category_id.isdigit():
+        courses = courses.filter(category_id=int(category_id))
+    
+    # Free courses filter
+    is_free = request.GET.get('is_free', '').lower()
+    if is_free == 'true':
+        courses = courses.filter(price=0)
+    
+    # Price range filters
+    min_price = request.GET.get('min_price', '').strip()
+    if min_price:
+        try:
+            courses = courses.filter(price__gte=float(min_price))
+        except ValueError:
+            pass
+    
+    max_price = request.GET.get('max_price', '').strip()
+    if max_price:
+        try:
+            courses = courses.filter(price__lte=float(max_price))
+        except ValueError:
+            pass
+    
+    # Ordering
+    ordering = request.GET.get('ordering', 'newest')
+    if ordering == 'oldest':
+        courses = courses.order_by('created_at')
+    elif ordering == 'price_low':
+        courses = courses.order_by('price', '-created_at')
+    elif ordering == 'price_high':
+        courses = courses.order_by('-price', '-created_at')
+    elif ordering == 'popular':
+        courses = courses.annotate(
+            enrollment_count=Count('enrollments')
+        ).order_by('-enrollment_count', '-created_at')
+    else:  # newest (default)
+        courses = courses.order_by('-created_at')
+    
+    # Optimize query
+    courses = courses.select_related('category', 'instructor').prefetch_related('modules')
+    
+    # Get all categories for filter dropdown
+    categories = Category.objects.all().order_by('name')
+    
     # Pagination - 12 courses per page
     paginator = Paginator(courses, 12)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
-    return render(request, 'courses/course_list.html', {'courses': page_obj,'page_obj': page_obj})
+    return render(request, 'courses/course_list.html', {
+        'courses': page_obj,
+        'page_obj': page_obj,
+        'query': query,
+        'categories': categories,
+        'selected_category': category_id,
+        'is_free': is_free == 'true',
+        'min_price': min_price,
+        'max_price': max_price,
+        'ordering': ordering,
+    })
 
 
 def course_detail(request, slug):
