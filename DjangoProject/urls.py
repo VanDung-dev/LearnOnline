@@ -26,6 +26,7 @@ urlpatterns = [
     path('', include('courses.urls')),
     path('accounts/', include('accounts.urls')),
     path('payments/', include('payments.urls')),
+    path('api/', include('api.urls')),  # REST API
 ]
 
 # Serve media files in development and production
