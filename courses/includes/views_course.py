@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.core.paginator import Paginator
 from django.http import JsonResponse
 from django.core.files.storage import default_storage
 from django.views.decorators.http import require_http_methods
@@ -115,8 +116,14 @@ def delete_course(request, slug):
 
 
 def course_list(request):
-    courses = Course.objects.filter(is_active=True)
-    return render(request, 'courses/course_list.html', {'courses': courses})
+    courses = Course.objects.filter(is_active=True).select_related('category', 'instructor').prefetch_related('modules')
+
+    # Pagination - 12 courses per page
+    paginator = Paginator(courses, 12)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, 'courses/course_list.html', {'courses': page_obj,'page_obj': page_obj})
 
 
 def course_detail(request, slug):
