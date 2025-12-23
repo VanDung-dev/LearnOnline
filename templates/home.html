@@ -68,12 +68,15 @@
         
         <div class="mt-4">
             <h3>Popular Search Terms</h3>
+            {% if popular_searches %}
             <div class="d-flex flex-wrap gap-2">
-                <a href="{% url 'courses:course_list' %}?q=python" class="btn btn-outline-secondary btn-sm">Python</a>
-                <a href="{% url 'courses:course_list' %}?q=web development" class="btn btn-outline-secondary btn-sm">Web Development</a>
-                <a href="{% url 'courses:course_list' %}?q=data science" class="btn btn-outline-secondary btn-sm">Data Science</a>
-                <a href="{% url 'courses:course_list' %}?q=machine learning" class="btn btn-outline-secondary btn-sm">Machine Learning</a>
+                {% for term in popular_searches %}
+                <a href="{% url 'courses:course_list' %}?q={{ term.query }}" class="btn btn-outline-secondary btn-sm">{{ term.query }}</a>
+                {% endfor %}
             </div>
+            {% else %}
+            <p class="text-muted">No popular searches yet.</p>
+            {% endif %}
         </div>
     </div>
 </div>
