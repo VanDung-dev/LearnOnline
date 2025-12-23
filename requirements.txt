@@ -6,20 +6,12 @@ python-decouple>=3.0
 python-dotenv>=1.0.0
 django-ratelimit>=4.1.0
 
-# Testing
-pytest>=7.0
-pytest-django>=4.5
-pytest-cov>=4.0
-coverage>=7.0
-
-# Code quality
-flake8>=6.0
-black>=23.0
-isort>=5.12
-
-# Type checking (optional)
-mypy>=1.0
-django-stubs>=4.0
+# Async Task Processing (Celery + Redis)
+celery>=5.3.6
+redis>=5.0.1
+django-celery-results>=2.5.1
+django-celery-beat>=2.6.0
+eventlet>=0.33.3  # Required for Celery on Windows
 
 # REST API
 djangorestframework>=3.14.0
@@ -28,3 +20,17 @@ djangorestframework-stubs>=3.14.0
 drf-spectacular>=0.26.0
 django-cors-headers>=4.3.0
 django-filter>=23.0
+
+# Testing
+pytest>=7.0
+pytest-django>=4.5
+pytest-cov>=4.0
+coverage>=7.0
+
+# Code Quality & Tooling
+flake8>=6.0
+black>=23.0
+isort>=5.12
+mypy>=1.0
+django-stubs>=4.0
+pre-commit>=3.5.0
