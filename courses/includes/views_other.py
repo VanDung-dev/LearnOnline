@@ -14,6 +14,8 @@ from django.conf import settings
 from ..models import Course, Lesson, Enrollment, Module, Category
 
 
+from ..services.search_service import get_popular_search_terms
+
 def home(request):
     categories = Category.objects.all()
     # Show all active courses (regardless of opening date) but respect closing date
@@ -23,10 +25,13 @@ def home(request):
     courses = courses.filter(
         models.Q(closing_date__isnull=True) | models.Q(closing_date__gte=now)
     )[:6]
+    
+    popular_searches = get_popular_search_terms(limit=10)
 
     context = {
         'categories': categories,
         'courses': courses,
+        'popular_searches': popular_searches,
     }
     return render(request, 'home.html', context)
 

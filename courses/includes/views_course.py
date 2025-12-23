@@ -7,6 +7,8 @@ from django.core.files.storage import default_storage
 from django.views.decorators.http import require_http_methods
 from ..models import Course, Category
 from ..forms import CourseForm
+from ..services.search_service import log_search_query
+
 
 @login_required
 def create_course(request):
@@ -134,6 +136,9 @@ def course_list(request):
     # Search query
     query = request.GET.get('q', '').strip()
     if query:
+        # Log search query
+        log_search_query(query, request.user if request.user.is_authenticated else None)
+
         courses = courses.filter(
             Q(title__icontains=query) |
             Q(short_description__icontains=query) |
@@ -143,6 +148,7 @@ def course_list(request):
             Q(instructor__last_name__icontains=query) |
             Q(category__name__icontains=query)
         )
+
     
     # Category filter
     category_id = request.GET.get('category', '').strip()
