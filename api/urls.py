@@ -77,6 +77,7 @@ urlpatterns = [
     path('search/courses/', search_views.SearchCoursesView.as_view(), name='search-courses'),
     path('search/lessons/', search_views.SearchLessonsView.as_view(), name='search-lessons'),
     path('search/', search_views.SearchGlobalView.as_view(), name='search-global'),
+    path('search/popular/', search_views.PopularSearchTermsView.as_view(), name='search-popular'),
     path('search/autocomplete/', search_views.AutocompleteView.as_view(), name='search-autocomplete'),
 
     # ============================================

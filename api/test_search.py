@@ -318,3 +318,36 @@ class GlobalSearchAPITestCase(APITestCase):
         response = self.client.get(self.search_url, {'q': 'Python'})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertGreater(len(response.data['categories']), 0)
+
+
+class PopularSearchTermsTests(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser', password='password')
+        self.url = reverse('search-popular')
+        
+        # Create some search history
+        from courses.services.search_service import log_search_query
+        log_search_query("python", self.user)
+        log_search_query("python", self.user)
+        log_search_query("django", self.user)
+
+    def test_get_popular_terms(self):
+        """Test retrieving popular search terms"""
+        response = self.client.get(self.url)
+        
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.data
+        self.assertTrue(len(data) >= 2)
+        # Order is not guaranteed to be stable for same count, but python is 2, django is 1
+        self.assertEqual(data[0]['query'], 'python')
+        self.assertEqual(data[0]['count'], 2)
+        self.assertEqual(data[1]['query'], 'django')
+        self.assertEqual(data[1]['count'], 1)
+
+    def test_popular_terms_limit(self):
+        """Test limit parameter"""
+        response = self.client.get(self.url, {'limit': 1})
+        
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['query'], 'python')

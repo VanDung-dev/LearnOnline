@@ -22,6 +22,8 @@ from .search_serializers import (
 from .pagination import StandardResultsSetPagination
 
 
+from courses.services.search_service import log_search_query
+
 class SearchCoursesView(APIView):
     """
     Search courses by title, description, or instructor name.
@@ -54,8 +56,12 @@ class SearchCoursesView(APIView):
         query = serializer.validated_data["q"].strip().lower()
         filters = serializer.validated_data
 
+        # Log search query
+        log_search_query(query, request.user if request.user.is_authenticated else None)
+
         # Build search query
         queryset = Course.objects.filter(is_active=True)
+
 
         # Full-text search across multiple fields
         search_query = (
@@ -333,3 +339,28 @@ class SearchGlobalView(APIView):
         ]
 
         return Response(results)
+
+
+class PopularSearchTermsView(APIView):
+    """
+    Get popular search terms.
+    Returns a list of popular search queries from the last 30 days.
+    """
+
+    permission_classes = [AllowAny]
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(name="limit", description="Number of results", required=False, type=int),
+        ],
+        description="Get popular search terms",
+        tags=["search"],
+    )
+    def get(self, request):
+        limit = int(request.query_params.get("limit", 10))
+        # Cap limit at 50
+        limit = min(limit, 50)
+        
+        popular_terms = get_popular_search_terms(limit=limit)
+        
+        return Response(popular_terms)
