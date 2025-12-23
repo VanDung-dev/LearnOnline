@@ -15,6 +15,7 @@ from django.core.exceptions import ValidationError
 from django_ratelimit.decorators import ratelimit
 from courses.models import Course
 from .forms import UserRegistrationForm, UserUpdateForm, ProfileUpdateForm
+from accounts.tasks import send_activation_email_task
 
 
 class CustomAuthenticationForm(AuthenticationForm):
@@ -90,7 +91,7 @@ class CustomLogoutView(View):
             return HttpResponseRedirect(reverse_lazy('courses:home'))
 
 
-def register(request, send_activation_email_task=None):
+def register(request):
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST)
         if form.is_valid():
