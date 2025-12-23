@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ discussion.title }} - {{ course.title }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/discussions.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4" data-discussion-id="{{ discussion.id }}" data-current-user="{{ user_id }}">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'courses:course_detail' course.slug %}">{{ course.title }}</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'discussions:discussion_list' course.slug %}">Discussions</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ discussion.title }}</li>
+        </ol>
+    </nav>
+
+    <!-- Main Question -->
+    <div class="card mb-4 discussion-post">
+        <div class="card-body">
+            <div class="d-flex">
+                <div class="vote-column me-3 text-center">
+                    <button class="btn btn-link vote-btn upvote" data-type="discussion" data-id="{{ discussion.id }}" data-val="1">
+                        <i class="fas fa-chevron-up"></i>
+                    </button>
+                    <div class="vote-count h5 mb-0" id="discussion-score-{{ discussion.id }}">{{ discussion.vote_count }}</div>
+                    <button class="btn btn-link vote-btn downvote" data-type="discussion" data-id="{{ discussion.id }}" data-val="-1">
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                </div>
+                <div class="flex-grow-1">
+                    <h3 class="card-title">
+                        {{ discussion.title }}
+                        {% if discussion.is_resolved %}
+                        <span class="badge bg-success fs-6 align-middle"><i class="fas fa-check"></i> Solved</span>
+                        {% endif %}
+                    </h3>
+                    <p class="card-text">{{ discussion.body|linebreaks }}</p>
+                    <div class="text-muted small">
+                        Asked by <strong>{{ discussion.author.get_full_name|default:discussion.author.username }}</strong>
+                        on {{ discussion.created_at|date:"M d, Y H:i" }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Replies -->
+    <h4 class="mb-3">{{ discussion.replies.count }} Replies</h4>
+    
+    <div class="replies-list mb-4">
+        {% for reply in discussion.replies.all %}
+        <div class="card mb-3 reply-post {% if reply.is_answer %}border-success answer-highlight{% endif %}" id="reply-{{ reply.id }}">
+            <div class="card-body">
+                <div class="d-flex">
+                    <div class="vote-column me-3 text-center">
+                        <button class="btn btn-link vote-btn upvote" data-type="reply" data-id="{{ reply.id }}" data-val="1">
+                            <i class="fas fa-chevron-up"></i>
+                        </button>
+                        <div class="vote-count h5 mb-0" id="reply-score-{{ reply.id }}">{{ reply.vote_count }}</div>
+                        <button class="btn btn-link vote-btn downvote" data-type="reply" data-id="{{ reply.id }}" data-val="-1">
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        
+                        {% if reply.is_answer %}
+                        <div class="mt-2 text-success" title="Accepted Answer">
+                            <i class="fas fa-check fa-lg"></i>
+                        </div>
+                        {% elif not discussion.is_resolved and is_instructor or discussion.author == user %}
+                        <button class="btn btn-link text-muted mt-2 mark-answer-btn" data-id="{{ reply.id }}" title="Mark as Answer">
+                            <i class="fas fa-check"></i>
+                        </button>
+                        {% endif %}
+                    </div>
+                    <div class="flex-grow-1">
+                        <p class="card-text">{{ reply.body|linebreaks }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="text-muted small">
+                                Answered by <strong>{{ reply.author.get_full_name|default:reply.author.username }}</strong>
+                                on {{ reply.created_at|date:"M d, Y H:i" }}
+                                {% if reply.author == course.instructor %}
+                                <span class="badge bg-primary ms-1">Instructor</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Reply Form -->
+    <div class="card">
+        <div class="card-header">Your Answer</div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                {% for field in reply_form %}
+                <div class="mb-3">
+                    {{ field }}
+                    {% if field.errors %}
+                    <div class="invalid-feedback d-block">{{ field.errors }}</div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+                <button type="submit" class="btn btn-primary">Post Answer</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/discussions.js' %}"></script>
+{% endblock %}

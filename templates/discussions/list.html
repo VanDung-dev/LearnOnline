@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Discussions - {{ course.title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Discussions for {{ course.title }}</h2>
+        <a href="{% url 'discussions:discussion_create' course.slug %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> New Discussion
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="list-group list-group-flush">
+            {% for discussion in discussions %}
+            <a href="{% url 'discussions:discussion_detail' course.slug discussion.pk %}" class="list-group-item list-group-item-action">
+                <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1">
+                        {% if discussion.is_resolved %}
+                        <span class="badge bg-success mr-2"><i class="fas fa-check"></i> Solved</span>
+                        {% endif %}
+                        {{ discussion.title }}
+                    </h5>
+                    <small class="text-muted">{{ discussion.created_at|timesince }} ago</small>
+                </div>
+                <p class="mb-1 text-truncate" style="max-width: 80%;">{{ discussion.body }}</p>
+                <small>By {{ discussion.author.get_full_name|default:discussion.author.username }} • {{ discussion.reply_count }} replies</small>
+            </a>
+            {% empty %}
+            <div class="list-group-item text-center py-5">
+                <p class="mb-0 text-muted">No discussions yet. Be the first to ask a question!</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    {% if is_paginated %}
+    <nav aria-label="Page navigation" class="mt-4">
+        <ul class="pagination request-pagination justify-content-center">
+             {% if page_obj.has_previous %}
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
+            {% endif %}
+            <li class="page-item active"><span class="page-link">{{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span></li>
+            {% if page_obj.has_next %}
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+{% endblock %}
