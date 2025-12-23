@@ -12,8 +12,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
 
-from app.accounts.models import Profile
-from app.courses.models import (
+from apps.accounts.models import Profile
+from apps.courses.models import (
     Category, Course, Module, Lesson, Quiz,
     Enrollment, Progress, Certificate, QuizAttempt
 )

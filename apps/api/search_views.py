@@ -10,7 +10,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
 
-from app.courses.models import Category, Course, Lesson
+from apps.courses.models import Category, Course, Lesson
 
 from .search_serializers import (
     SearchCourseSerializer,
@@ -22,7 +22,7 @@ from .search_serializers import (
 from .pagination import StandardResultsSetPagination
 
 
-from app.courses.services.search_service import log_search_query, get_popular_search_terms
+from apps.courses.services.search_service import log_search_query, get_popular_search_terms
 
 class SearchCoursesView(APIView):
     """

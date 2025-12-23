@@ -4,7 +4,7 @@ Custom permissions for the API.
 
 from rest_framework import permissions
 
-from app.courses.models import Enrollment
+from apps.courses.models import Enrollment
 
 
 class IsOwnerOrReadOnly(permissions.BasePermission):

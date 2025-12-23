@@ -7,7 +7,7 @@ from django.contrib import messages
 from django.utils import timezone
 from ..models import (Course, Lesson, Enrollment, Progress, Certificate,
                       Quiz, Answer, QuizAttempt, UserAnswer)
-from app.payments.models import Payment
+from apps.payments.models import Payment
 
 
 @login_required

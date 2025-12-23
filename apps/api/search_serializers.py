@@ -5,7 +5,7 @@ Handles serialization of search results with relevance highlighting.
 
 from rest_framework import serializers
 
-from app.courses.models import Course, Lesson
+from apps.courses.models import Course, Lesson
 
 
 class SearchCourseSerializer(serializers.ModelSerializer):

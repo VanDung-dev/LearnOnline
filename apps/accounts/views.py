@@ -13,9 +13,9 @@ from django.views import View
 from django.http import HttpResponseRedirect
 from django.core.exceptions import ValidationError
 from django_ratelimit.decorators import ratelimit
-from app.courses.models import Course
+from apps.courses.models import Course
 from .forms import UserRegistrationForm, UserUpdateForm, ProfileUpdateForm
-from app.accounts.tasks import send_activation_email_task
+from apps.accounts.tasks import send_activation_email_task
 
 
 class CustomAuthenticationForm(AuthenticationForm):

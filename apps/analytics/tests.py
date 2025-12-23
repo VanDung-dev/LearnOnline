@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
-from app.courses.models import Course, Enrollment, Module, Lesson, Progress, Category
-from app.analytics.services import get_student_progress, get_instructor_stats
+from apps.courses.models import Course, Enrollment, Module, Lesson, Progress, Category
+from apps.analytics.services import get_student_progress, get_instructor_stats
 
 class AnalyticsServiceTests(TestCase):
     def setUp(self):

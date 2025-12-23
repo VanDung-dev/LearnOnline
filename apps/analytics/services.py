@@ -1,8 +1,8 @@
 from django.db.models import Count, Sum
 from django.db.models.functions import TruncMonth, TruncDate
 from django.utils import timezone
-from app.courses.models import Course, Enrollment, Progress, Lesson
-from app.payments.models import Payment
+from apps.courses.models import Course, Enrollment, Progress, Lesson
+from apps.payments.models import Payment
 
 def get_student_progress(user):
     """

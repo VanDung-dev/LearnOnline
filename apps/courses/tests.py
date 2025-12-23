@@ -83,7 +83,7 @@ class CourseExpirationTestCase(TestCase):
         )
         
         # Simulate checking for certificate issuance
-        from app.courses.views import check_and_issue_certificate
+        from apps.courses.views import check_and_issue_certificate
         check_and_issue_certificate(self.user, self.expiring_course)
         
         # Check that certificate was issued
@@ -135,7 +135,7 @@ class CourseExpirationTestCase(TestCase):
         )
         
         # Simulate checking for certificate issuance
-        from app.courses.views import check_and_issue_certificate
+        from apps.courses.views import check_and_issue_certificate
         check_and_issue_certificate(self.user, expired_course)
         
         # Check that certificate was NOT issued
