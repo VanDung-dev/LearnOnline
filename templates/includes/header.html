@@ -10,6 +10,20 @@
 
         <div class="navbar-nav ms-auto">
             {% if user.is_authenticated %}
+                <!-- Notification Bell -->
+                <div class="nav-item dropdown me-3">
+                    <a class="nav-link dropdown-toggle hidden-arrow" href="#" id="navbarDropdownMenuLink"
+                       role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-bell-fill"></i>
+                        <span class="badge rounded-pill badge-notification bg-danger d-none" id="notification-badge">0</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuLink">
+                        <li><h6 class="dropdown-header">Notifications</h6></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-center small" href="#">View all</a></li>
+                    </ul>
+                </div>
+
                 <a class="nav-link" href="{% url 'accounts:profile' %}">Profile</a>
                 {% if user.profile.is_instructor %}
                     <a class="nav-link" href="{% url 'courses:instructor_courses' %}">Instructor Dashboard</a>
