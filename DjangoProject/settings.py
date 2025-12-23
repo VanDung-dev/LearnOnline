@@ -17,7 +17,7 @@ from decouple import config
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 import sys
-sys.path.append(str(BASE_DIR / 'app'))
+sys.path.append(str(BASE_DIR / 'apps'))
 
 
 # Quick-start development settings - unsuitable for production
@@ -53,12 +53,12 @@ INSTALLED_APPS = [
     'django_celery_results',
     'django_celery_beat',
     # Local apps
-    "app.courses",
-    "app.accounts",
-    "app.payments",
-    "app.api",
-    "app.notifications",
-    "app.analytics",
+    "apps.courses",
+    "apps.accounts",
+    "apps.payments",
+    "apps.api",
+    "apps.notifications",
+    "apps.analytics",
 ]
 
 MIDDLEWARE = [

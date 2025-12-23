@@ -23,12 +23,12 @@ from django.views.generic import RedirectView
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('home/', RedirectView.as_view(url='/', permanent=True)),
-    path('', include('app.courses.urls')),
-    path('accounts/', include('app.accounts.urls')),
-    path('payments/', include('app.payments.urls')),
-    path('notifications/', include('app.notifications.urls')),
-    path('analytics/', include('app.analytics.urls', namespace='analytics')),
-    path('api/', include('app.api.urls')),  # REST API
+    path('', include('apps.courses.urls')),
+    path('accounts/', include('apps.accounts.urls')),
+    path('payments/', include('apps.payments.urls')),
+    path('notifications/', include('apps.notifications.urls')),
+    path('analytics/', include('apps.analytics.urls', namespace='analytics')),
+    path('api/', include('apps.api.urls')),  # REST API
 ]
 
 # Serve media files in development and production
@@ -39,13 +39,13 @@ urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 # Custom error handlers
-handler404 = 'app.courses.views.custom_page_not_found'
-handler500 = 'app.courses.views.custom_server_error'
-handler403 = 'app.courses.views.custom_permission_denied'
-handler400 = 'app.courses.views.custom_bad_request'
-handler405 = 'app.courses.views.custom_method_not_allowed'
-handler408 = 'app.courses.views.custom_request_timeout'
-handler429 = 'app.courses.views.custom_too_many_requests'
-handler502 = 'app.courses.views.custom_bad_gateway'
-handler503 = 'app.courses.views.custom_service_unavailable'
-handler504 = 'app.courses.views.custom_gateway_timeout'
+handler404 = 'apps.courses.views.custom_page_not_found'
+handler500 = 'apps.courses.views.custom_server_error'
+handler403 = 'apps.courses.views.custom_permission_denied'
+handler400 = 'apps.courses.views.custom_bad_request'
+handler405 = 'apps.courses.views.custom_method_not_allowed'
+handler408 = 'apps.courses.views.custom_request_timeout'
+handler429 = 'apps.courses.views.custom_too_many_requests'
+handler502 = 'apps.courses.views.custom_bad_gateway'
+handler503 = 'apps.courses.views.custom_service_unavailable'
+handler504 = 'apps.courses.views.custom_gateway_timeout'
