@@ -15,15 +15,24 @@ services:
       - DJANGO_SETTINGS_MODULE=DjangoProject.settings_docker
     depends_on:
       - db
+      - redis
 
   db:
     image: postgres:13
     volumes:
       - postgres_data:/var/lib/postgresql/data
-   environment:
+    environment:
       - POSTGRES_DB=learnonline
       - POSTGRES_USER=learnonline_user
       - POSTGRES_PASSWORD=learnonline_password
 
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
 volumes:
   postgres_data:
+  redis_data:
