@@ -23,11 +23,11 @@ from django.views.generic import RedirectView
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('home/', RedirectView.as_view(url='/', permanent=True)),
-    path('', include('courses.urls')),
-    path('accounts/', include('accounts.urls')),
-    path('payments/', include('payments.urls')),
-    path('notifications/', include('notifications.urls')),
-    path('api/', include('api.urls')),  # REST API
+    path('', include('app.courses.urls')),
+    path('accounts/', include('app.accounts.urls')),
+    path('payments/', include('app.payments.urls')),
+    path('notifications/', include('app.notifications.urls')),
+    path('api/', include('app.api.urls')),  # REST API
 ]
 
 # Serve media files in development and production
