@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse
 
-from courses.models import Course, Enrollment, Certificate
+from app.courses.models import Course, Enrollment, Certificate
 from .models import Payment
 
 

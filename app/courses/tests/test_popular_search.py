@@ -2,8 +2,8 @@ from django.test import TestCase
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from datetime import timedelta
-from courses.models import SearchQuery
-from courses.services.search_service import log_search_query, get_popular_search_terms
+from app.courses.models import SearchQuery
+from app.courses.services.search_service import log_search_query, get_popular_search_terms
 
 User = get_user_model()
 

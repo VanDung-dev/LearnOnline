@@ -8,7 +8,7 @@ from django.urls import reverse
 from rest_framework.test import APITestCase, APIClient
 from rest_framework import status
 
-from courses.models import Category, Course
+from app.courses.models import Category, Course
 
 
 class AuthAPITestCase(APITestCase):

@@ -7,7 +7,7 @@ from django.urls import reverse
 from rest_framework.test import APITestCase, APIClient
 from rest_framework import status
 
-from courses.models import Category, Course, Module, Lesson
+from app.courses.models import Category, Course, Module, Lesson
 
 
 class SearchCoursesAPITestCase(APITestCase):
@@ -326,7 +326,7 @@ class PopularSearchTermsTests(APITestCase):
         self.url = reverse('search-popular')
         
         # Create some search history
-        from courses.services.search_service import log_search_query
+        from app.courses.services.search_service import log_search_query
         log_search_query("python", self.user)
         log_search_query("python", self.user)
         log_search_query("django", self.user)

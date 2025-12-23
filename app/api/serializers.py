@@ -8,8 +8,8 @@ from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
-from accounts.models import Profile
-from courses.models import (
+from app.accounts.models import Profile
+from app.courses.models import (
     Category,
     Course,
     Module,

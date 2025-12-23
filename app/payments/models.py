@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from courses.models import Course, Enrollment
+from app.courses.models import Course, Enrollment
 
 
 class Payment(models.Model):
