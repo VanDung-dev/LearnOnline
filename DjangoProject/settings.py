@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.sites",
     # Third-party apps
     "rest_framework",
     "rest_framework_simplejwt",
@@ -87,6 +88,8 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "DjangoProject.wsgi.application"
+
+SITE_ID = 1
 
 
 # Database
@@ -259,4 +262,8 @@ CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = TIME_ZONE
+
+# Development: Run tasks locally/sync (No Redis required)
+# Change to False in production
+CELERY_TASK_ALWAYS_EAGER = True
 
