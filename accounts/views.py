@@ -1,3 +1,4 @@
+from django.contrib.sites.shortcuts import get_current_site
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -89,12 +90,18 @@ class CustomLogoutView(View):
             return HttpResponseRedirect(reverse_lazy('courses:home'))
 
 
-def register(request):
+def register(request, send_activation_email_task=None):
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            messages.success(request, 'Registration successful. You can now log in.')
+            
+            # Send activation email asynchronously
+            current_site = get_current_site(request)
+            protocol = 'https' if request.is_secure() else 'http'
+            send_activation_email_task.delay(user.id, current_site.domain, protocol)
+            
+            messages.success(request, 'Registration successful. Please check your email for activation instructions.')
             return redirect('accounts:login')
     else:
         form = UserRegistrationForm()
