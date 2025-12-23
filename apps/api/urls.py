@@ -16,12 +16,15 @@ from drf_spectacular.views import (
 
 from . import views
 from . import search_views
+from apps.discussions import api_views as discussion_views
 
 # Create a router for viewsets
 router = DefaultRouter()
 router.register(r'categories', views.CategoryViewSet, basename='category')
 router.register(r'courses', views.CourseViewSet, basename='course')
 router.register(r'progress', views.ProgressViewSet, basename='progress')
+router.register(r'discussions', discussion_views.DiscussionViewSet, basename='discussion')
+router.register(r'replies', discussion_views.ReplyViewSet, basename='reply')
 
 urlpatterns = [
     # Router URLs
