@@ -28,6 +28,7 @@ urlpatterns = [
     path('payments/', include('apps.payments.urls')),
     path('notifications/', include('apps.notifications.urls')),
     path('analytics/', include('apps.analytics.urls', namespace='analytics')),
+    path('', include('apps.discussions.urls')),
     path('api/', include('apps.api.urls')),  # REST API
 ]
 
