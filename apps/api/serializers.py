@@ -9,6 +9,7 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
 from apps.accounts.models import Profile
+from apps.organization.models import School, InstructorInvite
 from apps.courses.models import (
     Category,
     Course,
@@ -44,6 +45,8 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     user = UserSerializer(read_only=True)
     role_display = serializers.CharField(source="get_role_display", read_only=True)
+    school_id = serializers.PrimaryKeyRelatedField(source="school", read_only=True)
+    school_name = serializers.CharField(source="school.name", read_only=True)
 
     class Meta:
         model = Profile
@@ -57,8 +60,28 @@ class ProfileSerializer(serializers.ModelSerializer):
             "website",
             "role",
             "role_display",
+            "employee_id",
+            "school_id",
+            "school_name",
         ]
         read_only_fields = ["id", "user"]
+
+
+class InstructorInviteSerializer(serializers.ModelSerializer):
+    school = serializers.PrimaryKeyRelatedField(read_only=True)
+
+    class Meta:
+        model = InstructorInvite
+        fields = [
+            "id",
+            "email",
+            "school",
+            "token",
+            "status",
+            "accepted_at",
+            "created_at",
+        ]
+        read_only_fields = ["id", "token", "status", "accepted_at", "created_at", "school"]
 
 
 class RegisterSerializer(serializers.ModelSerializer):

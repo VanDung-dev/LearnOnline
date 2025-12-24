@@ -64,3 +64,17 @@ class IsAdminOrReadOnly(permissions.BasePermission):
         if request.method in permissions.SAFE_METHODS:
             return True
         return request.user and request.user.is_staff
+
+
+class IsSchoolAdmin(permissions.BasePermission):
+    """
+    Permission to allow only School Admins.
+    """
+
+    def has_permission(self, request, view):
+        user = request.user
+        if not user or not user.is_authenticated:
+            return False
+        if not hasattr(user, 'profile'):
+            return False
+        return user.profile.is_school_admin()

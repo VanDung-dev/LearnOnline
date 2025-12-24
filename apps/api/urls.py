@@ -40,6 +40,22 @@ urlpatterns = [
     path('auth/change-password/', views.ChangePasswordView.as_view(), name='api-change-password'),
 
     # ============================================
+    # Organization / Instructor Invite URLs
+    # ============================================
+    path('schools/<int:school_id>/instructor-invites/', views.InstructorInviteCreateView.as_view(), name='api-instructor-invite-create'),
+    path('instructor-invites/accept/', views.InstructorInviteAcceptView.as_view(), name='api-instructor-invite-accept'),
+    path('schools/<int:school_id>/join/', views.StudentJoinSchoolView.as_view(), name='api-student-join-school'),
+
+    # ============================================
+    # School Admin (Tenant-filtered) URLs
+    # ============================================
+    path('schools/<int:school_id>/admin/courses/', views.SchoolAdminCoursesView.as_view(), name='api-admin-courses'),
+    path('schools/<int:school_id>/admin/enrollments/', views.SchoolAdminEnrollmentsView.as_view(), name='api-admin-enrollments'),
+    path('schools/<int:school_id>/admin/certificates/', views.SchoolAdminCertificatesView.as_view(), name='api-admin-certificates'),
+    path('schools/<int:school_id>/admin/instructors/', views.SchoolAdminInstructorsView.as_view(), name='api-admin-instructors'),
+    path('schools/<int:school_id>/admin/students/', views.SchoolAdminStudentsView.as_view(), name='api-admin-students'),
+
+    # ============================================
     # Nested Course URLs
     # ============================================
     path(
