@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from .managers import CustomUserManager
+from apps.organization.models import School
 
 
 # Extend the User model manager
@@ -14,11 +15,13 @@ User.add_to_class('objects', CustomUserManager())
 class Profile(models.Model):
     STUDENT = 'student'
     INSTRUCTOR = 'instructor'
+    SCHOOL_ADMIN = 'school_admin'
     ADMIN = 'admin'
     
     ROLE_CHOICES = [
         (STUDENT, 'Student'),
         (INSTRUCTOR, 'Instructor'),
+        (SCHOOL_ADMIN, 'School Admin'),
         (ADMIN, 'Admin'),
     ]
     
@@ -29,6 +32,8 @@ class Profile(models.Model):
     profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
     website = models.URLField(blank=True)
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default=STUDENT)
+    school = models.ForeignKey(School, on_delete=models.SET_NULL, null=True, blank=True, related_name='profiles')
+    employee_id = models.CharField(max_length=50, blank=True, help_text='Staff/Instructor ID within the school')
     
     def clean(self):
         # Validate profile picture
@@ -56,6 +61,9 @@ class Profile(models.Model):
     
     def is_instructor(self):
         return self.role == self.INSTRUCTOR
+    
+    def is_school_admin(self):
+        return self.role == self.SCHOOL_ADMIN
     
     def is_admin(self):
         return self.role == self.ADMIN

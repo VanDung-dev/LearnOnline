@@ -8,12 +8,7 @@ class UserRegistrationForm(UserCreationForm):
     email = forms.EmailField(required=True)
     first_name = forms.CharField(max_length=30, required=True)
     last_name = forms.CharField(max_length=30, required=True)
-    ROLE_CHOICES = [
-        (Profile.STUDENT, 'Student'),
-        (Profile.INSTRUCTOR, 'Instructor'),
-    ]
-    
-    role = forms.ChoiceField(choices=ROLE_CHOICES, required=True)
+    # Role selection is removed from public registration. All new users are students by default.
 
     class Meta:
         model = User
@@ -28,7 +23,8 @@ class UserRegistrationForm(UserCreationForm):
             user.save()
             # Create or update profile with selected role
             profile, created = Profile.objects.get_or_create(user=user)
-            profile.role = self.cleaned_data['role']
+            # Force default role as STUDENT to prevent public instructor signups
+            profile.role = Profile.STUDENT
             profile.save()
         return user
 
