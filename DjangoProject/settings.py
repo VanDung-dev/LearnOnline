@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     # Local apps
     "apps.courses",
     "apps.accounts",
+    "apps.organization",
     "apps.payments",
     "apps.api",
     "apps.notifications",
@@ -68,6 +69,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'apps.organization.middleware.SchoolAccessControlMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django_ratelimit.middleware.RatelimitMiddleware',
