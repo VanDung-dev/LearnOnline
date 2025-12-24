@@ -43,17 +43,7 @@
                             <div class="text-danger">{{ form.email.errors }}</div>
                         {% endif %}
                     </div>
-                    <div class="mb-3">
-                        <label for="{{ form.role.id_for_label }}" class="form-label">Role</label>
-                        <select class="form-control" id="{{ form.role.id_for_label }}" name="{{ form.role.html_name }}" required>
-                            {% for choice in form.role.field.choices %}
-                                <option value="{{ choice.0 }}">{{ choice.1 }}</option>
-                            {% endfor %}
-                        </select>
-                        {% if form.role.errors %}
-                            <div class="text-danger">{{ form.role.errors }}</div>
-                        {% endif %}
-                    </div>
+                    {# Role selection removed: new users are always registered as Student by default #}
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="{{ form.password1.id_for_label }}" class="form-label">Password</label>
