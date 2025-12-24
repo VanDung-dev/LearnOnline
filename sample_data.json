@@ -16,6 +16,45 @@
   },
   {
     "model": "auth.user",
+    "pk": 6,
+    "fields": {
+      "username": "admin_school_a",
+      "password": "pbkdf2_sha256$260000$example$example=",
+      "email": "admin@unia.edu.vn",
+      "first_name": "School",
+      "last_name": "AdminA",
+      "is_staff": true,
+      "is_superuser": false,
+      "is_active": true,
+      "date_joined": "2025-01-06T10:00:00Z"
+    }
+  },
+  {
+    "model": "organization.school",
+    "pk": 1,
+    "fields": {
+      "name": "Đại học A",
+      "code": "uni_a",
+      "domain": "unia.edu.vn",
+      "status": "active",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "organization.school",
+    "pk": 2,
+    "fields": {
+      "name": "Cao đẳng B",
+      "code": "col_b",
+      "domain": "colb.edu.vn",
+      "status": "active",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "auth.user",
     "pk": 2,
     "fields": {
       "username": "instructor_john",
@@ -87,6 +126,18 @@
   },
   {
     "model": "accounts.profile",
+    "pk": 6,
+    "fields": {
+      "user": 6,
+      "role": "school_admin",
+      "bio": "School Admin for Đại học A",
+      "location": "Campus A",
+      "birth_date": "1982-02-02",
+      "school": 1
+    }
+  },
+  {
+    "model": "accounts.profile",
     "pk": 2,
     "fields": {
       "user": 2,
@@ -94,7 +145,9 @@
       "bio": "Python expert with 10 years of experience.",
       "location": "San Francisco, CA",
       "birth_date": "1985-05-15",
-      "website": "https://johndoe.dev"
+      "website": "https://johndoe.dev",
+      "school": 1,
+      "employee_id": "GV001"
     }
   },
   {
@@ -106,7 +159,9 @@
       "bio": "Frontend wizard primarily focused on React and Vue.",
       "location": "New York, NY",
       "birth_date": "1990-08-20",
-      "website": "https://janesmith.io"
+      "website": "https://janesmith.io",
+      "school": 2,
+      "employee_id": "GV002"
     }
   },
   {
