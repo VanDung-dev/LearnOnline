@@ -49,7 +49,11 @@
                 <div class="card-header bg-white py-4">
                     <h1 class="text-center mb-0">{% if purchase_type == 'certificate' %}Purchase Certificate{% else %}Complete Your Purchase{% endif %}</h1>
                 </div>
-                <div class="card-body p-4 p-md-5">
+                <div class="card-body p-4 p-md-5 position-relative" id="payment-form-container">
+                    <!-- Error summary (aria-live for accessibility) -->
+                    <div id="error-summary" class="alert alert-danger alert-dismissible fade show d-none" role="alert" aria-live="polite">
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
                     {% if purchase_type == 'certificate' %}
                     <div class="alert alert-warning d-flex align-items-center mb-4">
                         <i class="bi bi-award-fill me-2 fs-4"></i>
@@ -70,7 +74,7 @@
                     </div>
                     {% endif %}
                     
-                    <form id="payment-form">
+                    <form id="payment-form" novalidate>
                         {% csrf_token %}
                         <input type="hidden" name="course_slug" value="{{ course.slug }}">
                         <input type="hidden" name="purchase_type" value="{{ purchase_type }}">
@@ -96,6 +100,7 @@
                                             </div>
                                         </div>
                                         <input type="hidden" name="card_type" id="card_type" value="">
+                                        <div class="invalid-feedback d-block d-none" id="card_type_error">Please select a card type.</div>
                                     </div>
                                     
                                     <div class="mb-3">
@@ -104,7 +109,8 @@
                                             <span class="input-group-text bg-white">
                                                 <i class="bi bi-credit-card"></i>
                                             </span>
-                                            <input type="text" class="form-control form-control-lg" id="card_number" name="card_number" placeholder="1234 5678 9012 3456" required>
+                                            <input type="text" class="form-control form-control-lg" id="card_number" name="card_number" placeholder="1234 5678 9012 3456" required autocomplete="cc-number" inputmode="numeric" pattern="[0-9 ]{12,23}">
+                                            <div class="invalid-feedback" id="card_number_error"></div>
                                         </div>
                                     </div>
                                     
@@ -115,7 +121,8 @@
                                                 <span class="input-group-text bg-white">
                                                     <i class="bi bi-calendar"></i>
                                                 </span>
-                                                <input type="text" class="form-control form-control-lg" id="expiry_date" name="expiry_date" placeholder="MM/YY" required>
+                                                <input type="text" class="form-control form-control-lg" id="expiry_date" name="expiry_date" placeholder="MM/YY" required autocomplete="cc-exp" inputmode="numeric" pattern="[0-9/]{5}">
+                                                <div class="invalid-feedback" id="expiry_date_error"></div>
                                             </div>
                                         </div>
                                         <div class="col-md-6 mb-3">
@@ -124,7 +131,8 @@
                                                 <span class="input-group-text bg-white">
                                                     <i class="bi bi-lock"></i>
                                                 </span>
-                                                <input type="text" class="form-control form-control-lg" id="cvv" name="cvv" placeholder="123" required>
+                                                <input type="text" class="form-control form-control-lg" id="cvv" name="cvv" placeholder="123" required autocomplete="cc-csc" inputmode="numeric" pattern="[0-9]{3,4}">
+                                                <div class="invalid-feedback" id="cvv_error"></div>
                                             </div>
                                         </div>
                                     </div>
@@ -146,6 +154,10 @@
                             </a>
                         </div>
                     </form>
+                    <div id="form-overlay" class="form-overlay d-none" aria-hidden="true">
+                        <div class="spinner-border text-primary" role="status" aria-label="Processing"></div>
+                        <div class="mt-2">Processing...</div>
+                    </div>
                 </div>
                 <div class="card-footer bg-white py-3">
                     <div class="d-flex justify-content-center align-items-center text-muted">

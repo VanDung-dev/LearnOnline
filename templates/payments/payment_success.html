@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Payment Successful{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-12 col-lg-8">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body p-4 p-md-5">
+          <div class="d-flex align-items-center mb-3">
+            <div class="bg-success bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3" style="width:64px;height:64px;">
+              <i class="bi bi-check2-circle text-success fs-2"></i>
+            </div>
+            <div>
+              <h2 class="mb-0">Payment successful</h2>
+              <small class="text-muted">Thank you for your purchase!</small>
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <h5 class="mb-3">Order details</h5>
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item px-0 d-flex justify-content-between">
+                <span>Course</span>
+                <span class="fw-medium">{{ course.title }}</span>
+              </li>
+              <li class="list-group-item px-0 d-flex justify-content-between">
+                <span>Transaction ID</span>
+                <code class="fw-medium">{{ payment.transaction_id }}</code>
+              </li>
+              <li class="list-group-item px-0 d-flex justify-content-between">
+                <span>Amount</span>
+                <span class="fw-bold">${{ payment.amount }} {{ payment.currency }}</span>
+              </li>
+              <li class="list-group-item px-0 d-flex justify-content-between">
+                <span>Payment method</span>
+                <span class="text-capitalize">{{ payment.payment_method }}</span>
+              </li>
+              <li class="list-group-item px-0 d-flex justify-content-between">
+                <span>Purchased</span>
+                <span>{{ payment.created_at|date:"Y-m-d H:i" }}</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="d-grid gap-3 d-md-flex">
+            {% if first_lesson_url %}
+            <a href="{{ first_lesson_url }}" class="btn btn-primary btn-lg flex-fill">
+              <i class="bi bi-play-circle me-2"></i> Start learning
+            </a>
+            {% else %}
+            <a href="{% url 'courses:course_detail' course.slug %}" class="btn btn-primary btn-lg flex-fill">
+              <i class="bi bi-book me-2"></i> View course
+            </a>
+            {% endif %}
+            <a href="{% url 'courses:support' %}" class="btn btn-outline-secondary btn-lg flex-fill">
+              <i class="bi bi-question-circle me-2"></i> Need help?
+            </a>
+          </div>
+
+          <hr class="my-4">
+          <div class="text-muted small">
+            We do not store your raw card details. Your payment was processed over a secure connection.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
