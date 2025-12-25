@@ -200,6 +200,17 @@ CACHES = {
 SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
 
 # ============================================
+# Payments configuration
+# ============================================
+# Driver: mock (default) | stripe | vnpay | momo (placeholders)
+PAYMENTS_DRIVER = config("PAYMENTS_DRIVER", default="mock")
+PAYMENTS_WEBHOOK_SECRET = config("PAYMENTS_WEBHOOK_SECRET", default="dev_secret")
+STRIPE_SECRET_KEY = config("STRIPE_SECRET_KEY", default="")
+STRIPE_WEBHOOK_SECRET = config("STRIPE_WEBHOOK_SECRET", default="")
+VNPAY_TMN_CODE = config("VNPAY_TMN_CODE", default="")
+VNPAY_HASH_SECRET = config("VNPAY_HASH_SECRET", default="")
+
+# ============================================
 # Django REST Framework Configuration
 # ============================================
 
