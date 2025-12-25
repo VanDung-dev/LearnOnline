@@ -4,9 +4,11 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse
 from django.urls import reverse
+from django.views.decorators.csrf import csrf_exempt
 
 from apps.courses.models import Course, Enrollment, Certificate
 from .models import Payment
+from .services.payment_service import get_payment_service, PaymentStatus
 
 
 @login_required
@@ -83,6 +85,7 @@ def process_payment(request, course_slug, purchase_type='course'):
     cvv = request.POST.get('cvv')
     card_type = request.POST.get('card_type')
     purchase_type = request.POST.get('purchase_type', purchase_type)  # Get from form if available
+    client_token = request.POST.get('client_token')  # idempotency key from client
     
     # Validate card details (in a real app, this would be done by a payment processor)
     missing_fields = {}
@@ -104,6 +107,40 @@ def process_payment(request, course_slug, purchase_type='course'):
             'redirect_url': None,
         }, status=400)
     
+    # Prepare service and idempotency
+    service = get_payment_service()
+    if not client_token:
+        # fallback: generate a server-side token if client didn't send one
+        client_token = str(uuid.uuid4())
+
+    # If an idempotent payment exists for this context, re-use it
+    existing = Payment.objects.filter(
+        user=request.user,
+        course=course,
+        purchase_type=purchase_type,
+        idempotency_key=client_token,
+    ).first()
+    if existing:
+        if existing.status == 'completed':
+            success_url = reverse('payments:payment_success', kwargs={'transaction_id': existing.transaction_id})
+            return JsonResponse({
+                'success': True,
+                'code': None,
+                'message': 'Payment already completed',
+                'errors': {},
+                'transaction_id': existing.transaction_id,
+                'redirect_url': success_url,
+            })
+        # If still pending/failed, return a generic response
+        return JsonResponse({
+            'success': False,
+            'code': 'payment_in_progress',
+            'message': 'A payment is already in progress for this order. Please wait or try again shortly.',
+            'errors': {},
+            'transaction_id': existing.transaction_id,
+            'redirect_url': None,
+        }, status=409)
+
     # Handle course purchase
     if purchase_type == 'course':
         # Check if user is already enrolled and has certificate
@@ -118,33 +155,40 @@ def process_payment(request, course_slug, purchase_type='course'):
                 'redirect_url': None,
             }, status=400)
         
-        # Create or get enrollment
-        enrollment, created = Enrollment.objects.get_or_create(
-            user=request.user,
-            course=course,
-            defaults={'enrolled_at': None}  # Will be set automatically
-        )
-        
-        # Create payment record
+        # Create payment record in pending state (no enrollment yet)
         payment = Payment.objects.create(
             user=request.user,
             course=course,
-            enrollment=enrollment,
+            enrollment=None,
             amount=course.price,
             currency='USD',
-            status='completed',  # In a real app, this would depend on payment processor response
+            status='pending',
             payment_method=card_type,
             purchase_type='course',
-            transaction_id=str(uuid.uuid4()).replace('-', '')[:20].upper()
+            transaction_id=str(uuid.uuid4()).replace('-', '')[:20].upper(),
+            idempotency_key=client_token,
         )
-        
-        # If course price is 0, mark as completed immediately
-        if course.price == 0:
-            payment.status = 'completed'
-            payment.save()
-        
-        # Redirect to success page
+
+        # Call gateway (mock completes immediately)
+        result = service.create_payment(
+            user_id=request.user.id,
+            course_id=course.id,
+            purchase_type='course',
+            amount=str(course.price),
+            currency=payment.currency,
+            idempotency_key=client_token,
+            metadata={"payment_id": payment.id},
+        )
+
+        payment.processor_transaction_id = result.processor_transaction_id
+        payment.status = result.status if result.success else 'failed'
+        payment.save()
+
         if payment.status == 'completed':
+            # Create enrollment on success
+            enrollment, _ = Enrollment.objects.get_or_create(user=request.user, course=course)
+            payment.enrollment = enrollment
+            payment.save(update_fields=["enrollment", "updated_at"])
             messages.success(request, f'Payment successful! You now have access to {course.title}.')
             success_url = reverse('payments:payment_success', kwargs={'transaction_id': payment.transaction_id})
             return JsonResponse({
@@ -155,6 +199,15 @@ def process_payment(request, course_slug, purchase_type='course'):
                 'transaction_id': payment.transaction_id,
                 'redirect_url': success_url,
             })
+        else:
+            return JsonResponse({
+                'success': False,
+                'code': 'payment_failed',
+                'message': result.message or 'Payment failed',
+                'errors': {},
+                'transaction_id': payment.transaction_id,
+                'redirect_url': None,
+            }, status=400)
     
     # Handle certificate purchase
     elif purchase_type == 'certificate':
@@ -172,25 +225,34 @@ def process_payment(request, course_slug, purchase_type='course'):
                 'redirect_url': None,
             }, status=400)
         
-        # Create payment record
+        # Create payment record (pending)
         payment = Payment.objects.create(
             user=request.user,
             course=course,
-            enrollment=enrollment,
+            enrollment=enrollment,  # enrollment exists prior to certificate purchase
             amount=course.certificate_price,
             currency='USD',
-            status='completed',  # In a real app, this would depend on payment processor response
+            status='pending',
             payment_method=card_type,
             purchase_type='certificate',
-            transaction_id=str(uuid.uuid4()).replace('-', '')[:20].upper()
+            transaction_id=str(uuid.uuid4()).replace('-', '')[:20].upper(),
+            idempotency_key=client_token,
         )
-        
-        # If certificate price is 0, mark as completed immediately
-        if course.certificate_price == 0:
-            payment.status = 'completed'
-            payment.save()
 
-        # Redirect to success page
+        result = service.create_payment(
+            user_id=request.user.id,
+            course_id=course.id,
+            purchase_type='certificate',
+            amount=str(course.certificate_price),
+            currency=payment.currency,
+            idempotency_key=client_token,
+            metadata={"payment_id": payment.id},
+        )
+
+        payment.processor_transaction_id = result.processor_transaction_id
+        payment.status = result.status if result.success else 'failed'
+        payment.save()
+
         if payment.status == 'completed':
             messages.success(request, 'Certificate payment successful! You now have access to locked content.')
             success_url = reverse('payments:payment_success', kwargs={'transaction_id': payment.transaction_id})
@@ -202,6 +264,15 @@ def process_payment(request, course_slug, purchase_type='course'):
                 'transaction_id': payment.transaction_id,
                 'redirect_url': success_url,
             })
+        else:
+            return JsonResponse({
+                'success': False,
+                'code': 'payment_failed',
+                'message': result.message or 'Payment failed',
+                'errors': {},
+                'transaction_id': payment.transaction_id,
+                'redirect_url': None,
+            }, status=400)
 
     return JsonResponse({
         'success': False,
@@ -229,3 +300,30 @@ def payment_success(request, transaction_id):
         'first_lesson_url': first_lesson_url,
     }
     return render(request, 'payments/payment_success.html', context)
+
+
+@csrf_exempt
+def payment_webhook(request, provider: str):
+    """Generic webhook endpoint for payment providers."""
+    service = get_payment_service(provider)
+    event = service.verify_webhook(request)
+    if not event.valid:
+        return JsonResponse({"received": False, "message": event.message}, status=400)
+
+    # Update payment by processor_transaction_id if possible
+    if event.processor_transaction_id:
+        try:
+            payment = Payment.objects.get(processor_transaction_id=event.processor_transaction_id)
+            previous = payment.status
+            if event.status in {PaymentStatus.COMPLETED, PaymentStatus.FAILED, PaymentStatus.REFUNDED, PaymentStatus.PENDING}:
+                payment.status = event.status
+                payment.save()
+                # On completion for course, ensure enrollment exists
+                if payment.status == PaymentStatus.COMPLETED and payment.purchase_type == 'course' and not payment.enrollment:
+                    enrollment, _ = Enrollment.objects.get_or_create(user=payment.user, course=payment.course)
+                    payment.enrollment = enrollment
+                    payment.save(update_fields=["enrollment", "updated_at"])
+        except Payment.DoesNotExist:
+            pass
+
+    return JsonResponse({"received": True})

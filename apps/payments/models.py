@@ -31,8 +31,15 @@ class Payment(models.Model):
     payment_method = models.CharField(max_length=20, choices=PAYMENT_METHOD_CHOICES)
     purchase_type = models.CharField(max_length=15, choices=PAYMENT_TYPE_CHOICES, default='course')
     transaction_id = models.CharField(max_length=100, unique=True)
+    processor_transaction_id = models.CharField(max_length=150, null=True, blank=True, db_index=True)
+    idempotency_key = models.CharField(max_length=100, null=True, blank=True, db_index=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+
     def __str__(self):
         return f"Payment {self.transaction_id} - {self.user.username} - {self.amount} {self.currency}"
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["user", "course", "purchase_type"]),
+        ]
