@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const payButton = document.getElementById('pay-button');
     const overlay = document.getElementById('form-overlay');
     const errorSummary = document.getElementById('error-summary');
+    const clientTokenInput = document.getElementById('client_token');
 
     // body attribute for styling
     try {
@@ -15,6 +16,21 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!overlay) return;
         overlay.classList.toggle('d-none', !show);
     }
+
+    function uuidv4() {
+        // RFC4122-ish UUID v4 generator for client token
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        });
+    }
+
+    // Ensure there is an idempotency token per form open
+    try {
+        if (clientTokenInput && !clientTokenInput.value) {
+            clientTokenInput.value = uuidv4();
+        }
+    } catch(_) {}
     function setFieldError(id, message) {
         const input = document.getElementById(id);
         const feedback = document.getElementById(id + '_error');
