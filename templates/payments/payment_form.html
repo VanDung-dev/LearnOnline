@@ -78,6 +78,7 @@
                         {% csrf_token %}
                         <input type="hidden" name="course_slug" value="{{ course.slug }}">
                         <input type="hidden" name="purchase_type" value="{{ purchase_type }}">
+                        <input type="hidden" name="client_token" id="client_token" value="">
                         
                         <div class="mb-4">
                             <h5 class="mb-3">Payment Method</h5>
