@@ -15,6 +15,9 @@ class Payment(models.Model):
         ('visa', 'Visa'),
         ('mastercard', 'Mastercard'),
         ('paypal', 'PayPal'),
+        ('momo', 'MoMo'),
+        ('zalopay', 'ZaloPay'),
+        ('local_bank', 'Local Bank (QR)'),
     ]
     
     PAYMENT_TYPE_CHOICES = [

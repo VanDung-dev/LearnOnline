@@ -80,23 +80,31 @@ def process_payment(request, course_slug, purchase_type='course'):
         }, status=400)
 
     # Get payment details from form
+    payment_method = request.POST.get('payment_method')
+    # fallback for backward compatibility if payment_method not explicitly sent but card_type is
+    if not payment_method:
+        payment_method = request.POST.get('card_type')
+        
     card_number = request.POST.get('card_number')
     expiry_date = request.POST.get('expiry_date')
     cvv = request.POST.get('cvv')
-    card_type = request.POST.get('card_type')
+    
     purchase_type = request.POST.get('purchase_type', purchase_type)  # Get from form if available
     client_token = request.POST.get('client_token')  # idempotency key from client
     
-    # Validate card details (in a real app, this would be done by a payment processor)
+    # Validate details
     missing_fields = {}
-    if not card_number:
-        missing_fields['card_number'] = ['This field is required.']
-    if not expiry_date:
-        missing_fields['expiry_date'] = ['This field is required.']
-    if not cvv:
-        missing_fields['cvv'] = ['This field is required.']
-    if not card_type:
-        missing_fields['card_type'] = ['This field is required.']
+    if not payment_method:
+        missing_fields['payment_method'] = ['Please select a payment method.']
+        
+    if payment_method in ['visa', 'mastercard']:
+        if not card_number:
+            missing_fields['card_number'] = ['This field is required.']
+        if not expiry_date:
+            missing_fields['expiry_date'] = ['This field is required.']
+        if not cvv:
+            missing_fields['cvv'] = ['This field is required.']
+            
     if missing_fields:
         return JsonResponse({
             'success': False,
@@ -163,7 +171,7 @@ def process_payment(request, course_slug, purchase_type='course'):
             amount=course.price,
             currency='USD',
             status='pending',
-            payment_method=card_type,
+            payment_method=payment_method,
             purchase_type='course',
             transaction_id=str(uuid.uuid4()).replace('-', '')[:20].upper(),
             idempotency_key=client_token,
@@ -174,6 +182,7 @@ def process_payment(request, course_slug, purchase_type='course'):
             user_id=request.user.id,
             course_id=course.id,
             purchase_type='course',
+            payment_method=payment_method,
             amount=str(course.price),
             currency=payment.currency,
             idempotency_key=client_token,
@@ -233,7 +242,7 @@ def process_payment(request, course_slug, purchase_type='course'):
             amount=course.certificate_price,
             currency='USD',
             status='pending',
-            payment_method=card_type,
+            payment_method=payment_method,
             purchase_type='certificate',
             transaction_id=str(uuid.uuid4()).replace('-', '')[:20].upper(),
             idempotency_key=client_token,
@@ -243,6 +252,7 @@ def process_payment(request, course_slug, purchase_type='course'):
             user_id=request.user.id,
             course_id=course.id,
             purchase_type='certificate',
+            payment_method=payment_method,
             amount=str(course.certificate_price),
             currency=payment.currency,
             idempotency_key=client_token,
