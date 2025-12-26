@@ -81,61 +81,112 @@
                         <input type="hidden" name="client_token" id="client_token" value="">
                         
                         <div class="mb-4">
-                            <h5 class="mb-3">Payment Method</h5>
-                            <div class="card border shadow-sm">
-                                <div class="card-body">
-                                    <div class="mb-3">
-                                        <label class="form-label fw-medium">Card Type</label>
-                                        <div class="d-flex gap-3">
-                                            <div class="border rounded p-3 flex-fill text-center card-option" data-card-type="visa">
-                                                <div class="form-check-label d-flex flex-column align-items-center">
-                                                    <i class="bi bi-credit-card-fill fs-1 text-primary mb-2"></i>
-                                                    <span>Visa</span>
-                                                </div>
-                                            </div>
-                                            <div class="border rounded p-3 flex-fill text-center card-option" data-card-type="mastercard">
-                                                <div class="form-check-label d-flex flex-column align-items-center">
-                                                    <i class="bi bi-credit-card-fill fs-1 text-danger mb-2"></i>
-                                                    <span>Mastercard</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <input type="hidden" name="card_type" id="card_type" value="">
-                                        <div class="invalid-feedback d-block d-none" id="card_type_error">Please select a card type.</div>
+                            <h5 class="mb-3">Select Payment Method</h5>
+                            <div class="row g-2 mb-4" id="payment-method-selectors">
+                                <!-- Visa -->
+                                <div class="col-6 col-md-4 col-lg-2">
+                                    <div class="border rounded p-3 text-center cursor-pointer method-option selected" data-method="visa">
+                                        <img src="{% static 'payments/images/visa.webp' %}" class="payment-logo" alt="Visa">
+                                        <div class="mt-2 small fw-medium">Visa</div>
                                     </div>
-                                    
-                                    <div class="mb-3">
-                                        <label for="card_number" class="form-label fw-medium">Card Number</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text bg-white">
-                                                <i class="bi bi-credit-card"></i>
-                                            </span>
-                                            <input type="text" class="form-control form-control-lg" id="card_number" name="card_number" placeholder="1234 5678 9012 3456" required autocomplete="cc-number" inputmode="numeric" pattern="[0-9 ]{12,23}">
-                                            <div class="invalid-feedback" id="card_number_error"></div>
-                                        </div>
+                                </div>
+                                <!-- Mastercard -->
+                                <div class="col-6 col-md-4 col-lg-2">
+                                    <div class="border rounded p-3 text-center cursor-pointer method-option" data-method="mastercard">
+                                        <img src="{% static 'payments/images/mastercard.webp' %}" class="payment-logo" alt="Mastercard">
+                                        <div class="mt-2 small fw-medium">Mastercard</div>
                                     </div>
-                                    
-                                    <div class="row">
-                                        <div class="col-md-6 mb-3">
-                                            <label for="expiry_date" class="form-label fw-medium">Expiry Date</label>
+                                </div>
+                                <!-- MoMo -->
+                                <div class="col-6 col-md-4 col-lg-2">
+                                    <div class="border rounded p-3 text-center cursor-pointer method-option" data-method="momo">
+                                        <img src="{% static 'payments/images/momo.webp' %}" class="payment-logo" alt="MoMo">
+                                        <div class="mt-2 small fw-medium">MoMo</div>
+                                    </div>
+                                </div>
+                                <!-- ZaloPay -->
+                                <div class="col-6 col-md-4 col-lg-2">
+                                    <div class="border rounded p-3 text-center cursor-pointer method-option" data-method="zalopay">
+                                        <img src="{% static 'payments/images/zalopay.webp' %}" class="payment-logo" alt="ZaloPay">
+                                        <div class="mt-2 small fw-medium">ZaloPay</div>
+                                    </div>
+                                </div>
+                                <!-- Local Bank -->
+                                <div class="col-6 col-md-4 col-lg-2">
+                                    <div class="border rounded p-3 text-center cursor-pointer method-option" data-method="local_bank">
+                                        <img src="{% static 'payments/images/napas.webp' %}" class="payment-logo" alt="Napas">
+                                        <div class="mt-2 small fw-medium">Bank QR</div>
+                                    </div>
+                                </div>
+                                <!-- PayPal -->
+                                <div class="col-6 col-md-4 col-lg-2">
+                                    <div class="border rounded p-3 text-center cursor-pointer method-option" data-method="paypal">
+                                        <img src="{% static 'payments/images/paypal.webp' %}" class="payment-logo" alt="PayPal">
+                                        <div class="mt-2 small fw-medium">PayPal</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Removed card_type hidden input as payment_method now serves this purpose for cards too, but backend expects card_type for cards. We will handle this by syncing inputs. -->
+                            <input type="hidden" name="payment_method" id="payment_method" value="visa">
+                            <input type="hidden" name="card_type" id="card_type" value="visa">
+
+                            <!-- Credit Card Section -->
+                            <div id="credit-card-section">
+                                <div class="card border shadow-sm">
+                                    <div class="card-header bg-light py-3">
+                                        <h6 class="mb-0 text-muted"><i class="bi bi-credit-card me-2"></i>Enter Card Details</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <!-- Removed inner card selector -->
+                                        
+                                        <div class="mb-3">
+                                            <label for="card_number" class="form-label fw-medium">Card Number</label>
                                             <div class="input-group">
                                                 <span class="input-group-text bg-white">
-                                                    <i class="bi bi-calendar"></i>
+                                                    <i class="bi bi-credit-card"></i>
                                                 </span>
-                                                <input type="text" class="form-control form-control-lg" id="expiry_date" name="expiry_date" placeholder="MM/YY" required autocomplete="cc-exp" inputmode="numeric" pattern="[0-9/]{5}">
-                                                <div class="invalid-feedback" id="expiry_date_error"></div>
+                                                <input type="text" class="form-control form-control-lg" id="card_number" name="card_number" placeholder="1234 5678 9012 3456" required autocomplete="cc-number" inputmode="numeric" pattern="[0-9 ]{12,23}">
+                                                <div class="invalid-feedback" id="card_number_error"></div>
                                             </div>
                                         </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label for="cvv" class="form-label fw-medium">CVV</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text bg-white">
-                                                    <i class="bi bi-lock"></i>
-                                                </span>
-                                                <input type="text" class="form-control form-control-lg" id="cvv" name="cvv" placeholder="123" required autocomplete="cc-csc" inputmode="numeric" pattern="[0-9]{3,4}">
-                                                <div class="invalid-feedback" id="cvv_error"></div>
+                                        
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label for="expiry_date" class="form-label fw-medium">Expiry Date</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text bg-white">
+                                                        <i class="bi bi-calendar"></i>
+                                                    </span>
+                                                    <input type="text" class="form-control form-control-lg" id="expiry_date" name="expiry_date" placeholder="MM/YY" required autocomplete="cc-exp" inputmode="numeric" pattern="[0-9/]{5}">
+                                                    <div class="invalid-feedback" id="expiry_date_error"></div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label for="cvv" class="form-label fw-medium">CVV</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text bg-white">
+                                                        <i class="bi bi-lock"></i>
+                                                    </span>
+                                                    <input type="text" class="form-control form-control-lg" id="cvv" name="cvv" placeholder="123" required autocomplete="cc-csc" inputmode="numeric" pattern="[0-9]{3,4}">
+                                                    <div class="invalid-feedback" id="cvv_error"></div>
+                                                </div>
                                             </div>
                                         </div>
+                                    </div>
+                                </div>
+                            </div> <!-- End Credit Card Section -->
+
+                            <!-- Redirect Section -->
+                            <div id="redirect-section" class="d-none">
+                                <div class="card border shadow-sm bg-light">
+                                    <div class="card-body text-center py-5">
+                                        <div class="mb-3">
+                                            <i class="bi bi-arrow-right-circle-fill text-primary" style="font-size: 3rem;"></i>
+                                        </div>
+                                        <h5 class="card-title">Proceed to Payment</h5>
+                                        <p class="card-text text-muted mb-4">
+                                            You will be redirected to <span id="selected-method-name" class="fw-bold">MoMo</span> to complete your payment securely.
+                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -176,10 +227,9 @@
                         <div class="border-top flex-grow-1"></div>
                     </div>
                     <div class="d-flex justify-content-center gap-4 mt-3">
-                        <i class="bi bi-paypal text-muted" style="font-size: 2rem;"></i>
-                        <i class="bi bi-credit-card-2-front text-muted" style="font-size: 2rem;"></i>
-                        <i class="bi bi-google text-muted" style="font-size: 2rem;"></i>
-                        <i class="bi bi-apple text-muted" style="font-size: 2rem;"></i>
+                        <i class="nf nf-fa-paypal text-muted" style="font-size: 2rem;"></i>
+                        <i class="nf nf-fa-cc_visa text-muted" style="font-size: 2rem;"></i>
+                        <i class="nf nf-fa-cc_mastercard text-muted" style="font-size: 2rem;"></i>
                     </div>
                 </div>
             </div>
@@ -284,7 +334,23 @@
     </div>
 </div>
 
-<link rel="stylesheet" type="text/css" href="{% static 'payments/payment_form.css' %}">
+<link rel="stylesheet" href="https://www.nerdfonts.com/assets/css/webfont.css">
+<link rel="stylesheet" type="text/css" href="{% static 'payments/payment_form.css' %}?v=8">
+<style>
+    /* Inline backup for caching issues */
+    .method-option {
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+    }
+    .method-option:hover {
+        border-color: #0d6efd !important;
+        box-shadow: 0 0.125rem 0.25rem rgba(13, 110, 253, 0.25);
+    }
+    .method-option.selected {
+        border-color: #0d6efd !important;
+        background-color: rgba(13, 110, 253, 0.05);
+    }
+</style>
 
 <script>
 {% if purchase_type == 'certificate' %}
@@ -293,5 +359,5 @@ const processPaymentUrl = '{% url "payments:process_payment_type" course.slug "c
 const processPaymentUrl = '{% url "payments:process_payment" course.slug %}';
 {% endif %}
 </script>
-<script src="{% static 'payments/payment_form.js' %}"></script>
+<script src="{% static 'payments/payment_form.js' %}?v=3"></script>
 {% endblock %}
