@@ -42,6 +42,7 @@ class PaymentService:
         user_id: int,
         course_id: Optional[int],
         purchase_type: str,
+        payment_method: str,
         amount: str,
         currency: str,
         idempotency_key: Optional[str] = None,
@@ -62,13 +63,24 @@ class MockPaymentService(PaymentService):
         user_id: int,
         course_id: Optional[int],
         purchase_type: str,
+        payment_method: str,
         amount: str,
         currency: str,
         idempotency_key: Optional[str] = None,
         metadata: Optional[Dict[str, Any]] = None,
     ) -> PaymentResult:
         # In mock, we simply return a completed result with a fake processor id.
-        proc_id = f"MOCK-{str(uuid.uuid4()).replace('-', '')[:24].upper()}"
+        prefix = "MOCK"
+        if payment_method == "momo":
+            prefix = "MOMO"
+        elif payment_method == "zalopay":
+            prefix = "ZALO"
+        elif payment_method == "local_bank":
+            prefix = "BANK"
+        elif payment_method == "paypal":
+            prefix = "PAYPAL"
+            
+        proc_id = f"{prefix}-{str(uuid.uuid4()).replace('-', '')[:24].upper()}"
         return PaymentResult(
             success=True,
             status=PaymentStatus.COMPLETED,
