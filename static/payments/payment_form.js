@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const form = document.getElementById('payment-form');
     const payButton = document.getElementById('pay-button');
     const overlay = document.getElementById('form-overlay');
@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function() {
     try {
         const purchaseType = document.querySelector('input[name="purchase_type"]').value;
         if (purchaseType) document.body.setAttribute('data-purchase-type', purchaseType);
-    } catch (_) {}
+    } catch (_) { }
 
     // Helpers
     function showOverlay(show) {
@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function uuidv4() {
         // RFC4122-ish UUID v4 generator for client token
-        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
             const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
             return v.toString(16);
         });
@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (clientTokenInput && !clientTokenInput.value) {
             clientTokenInput.value = uuidv4();
         }
-    } catch(_) {}
+    } catch (_) { }
     function setFieldError(id, message) {
         const input = document.getElementById(id);
         const feedback = document.getElementById(id + '_error');
@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     function clearErrors() {
-        ['card_number','expiry_date','cvv'].forEach(id => setFieldError(id, ''));
+        ['card_number', 'expiry_date', 'cvv'].forEach(id => setFieldError(id, ''));
         setCardTypeError('');
         if (errorSummary) {
             errorSummary.classList.add('d-none');
@@ -60,18 +60,45 @@ document.addEventListener('DOMContentLoaded', function() {
         errorSummary.classList.remove('d-none');
     }
 
-    // Card type selection visual feedback
-    document.querySelectorAll('.card-option').forEach(option => {
-        option.addEventListener('click', function() {
-            document.querySelectorAll('.card-option').forEach(opt => {
-                opt.classList.remove('selected');
-            });
-            this.classList.add('selected');
-            document.getElementById('card_type').value = this.getAttribute('data-card-type');
-            setCardTypeError('');
+    // Payment Method Selection
+    const methodInput = document.getElementById('payment_method');
+    const creditCardSection = document.getElementById('credit-card-section');
+    const redirectSection = document.getElementById('redirect-section');
+    const selectedMethodName = document.getElementById('selected-method-name');
+
+    document.querySelectorAll('.method-option').forEach(option => {
+        option.addEventListener('click', function () {
+            // UI Update
+            document.querySelectorAll('.method-option').forEach(opt => opt.classList.remove('selected', 'border-primary', 'bg-light'));
+            this.classList.add('selected', 'border-primary', 'bg-light');
+
+            const method = this.getAttribute('data-method');
+            methodInput.value = method;
+
+            if (method === 'visa' || method === 'mastercard') {
+                // Set card type for backend validation
+                document.getElementById('card_type').value = method;
+                creditCardSection.classList.remove('d-none');
+                redirectSection.classList.add('d-none');
+            } else {
+                creditCardSection.classList.add('d-none');
+                redirectSection.classList.remove('d-none');
+
+                // Update redirect message name
+                const methodNameMap = {
+                    'momo': 'MoMo Wallet',
+                    'zalopay': 'ZaloPay',
+                    'local_bank': 'Local Bank App',
+                    'paypal': 'PayPal'
+                };
+                if (selectedMethodName) selectedMethodName.textContent = methodNameMap[method] || method;
+            }
+            clearErrors();
             validateForm();
         });
     });
+
+    // Removed old card-option click handlers as they are no longer in the DOM
 
     // Masking and validation
     const cardNumber = document.getElementById('card_number');
@@ -91,7 +118,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function formatExpiry(value) {
         const digits = onlyDigits(value).slice(0, 4);
         if (digits.length <= 2) return digits;
-        return digits.slice(0,2) + '/' + digits.slice(2);
+        return digits.slice(0, 2) + '/' + digits.slice(2);
     }
     function validateExpiry(value) {
         const match = /^(\d{2})\/(\d{2})$/.exec(value || '');
@@ -115,21 +142,23 @@ document.addEventListener('DOMContentLoaded', function() {
     function validateForm() {
         let valid = true;
         clearErrors();
-        if (!document.getElementById('card_type').value) {
-            setCardTypeError('Please select a card type.');
-            valid = false;
-        }
-        if (!validateCardNumber(cardNumber.value)) {
-            setFieldError('card_number', 'Enter a valid card number.');
-            valid = false;
-        }
-        if (!validateExpiry(expiry.value)) {
-            setFieldError('expiry_date', 'Enter a valid expiry in MM/YY.');
-            valid = false;
-        }
-        if (!validateCVV(cvv.value)) {
-            setFieldError('cvv', 'Enter a valid CVV (3–4 digits).');
-            valid = false;
+        if (creditCardSection && !creditCardSection.classList.contains('d-none')) {
+            if (!document.getElementById('card_type').value) {
+                setCardTypeError('Please select a card type.');
+                valid = false;
+            }
+            if (!validateCardNumber(cardNumber.value)) {
+                setFieldError('card_number', 'Enter a valid card number.');
+                valid = false;
+            }
+            if (!validateExpiry(expiry.value)) {
+                setFieldError('expiry_date', 'Enter a valid expiry in MM/YY.');
+                valid = false;
+            }
+            if (!validateCVV(cvv.value)) {
+                setFieldError('cvv', 'Enter a valid CVV (3–4 digits).');
+                valid = false;
+            }
         }
         payButton.disabled = !valid;
         return valid;
@@ -150,12 +179,12 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     if (cvv) {
         cvv.addEventListener('input', (e) => {
-            e.target.value = onlyDigits(e.target.value).slice(0,4);
+            e.target.value = onlyDigits(e.target.value).slice(0, 4);
             validateForm();
         });
     }
 
-    form.addEventListener('submit', function(e) {
+    form.addEventListener('submit', function (e) {
         e.preventDefault();
         if (!validateForm()) {
             showErrorSummary('Please correct the highlighted errors and try again.');
@@ -175,32 +204,32 @@ document.addEventListener('DOMContentLoaded', function() {
                 'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
             }
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                window.location.href = data.redirect_url;
-            } else {
-                const messages = [];
-                if (data.message) messages.push(data.message);
-                if (data.errors) {
-                    Object.entries(data.errors).forEach(([field, msgs]) => {
-                        if (field === 'card_type') setCardTypeError((msgs || []).join(' '));
-                        else setFieldError(field, (msgs || []).join(' '));
-                    });
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = data.redirect_url;
+                } else {
+                    const messages = [];
+                    if (data.message) messages.push(data.message);
+                    if (data.errors) {
+                        Object.entries(data.errors).forEach(([field, msgs]) => {
+                            if (field === 'card_type') setCardTypeError((msgs || []).join(' '));
+                            else setFieldError(field, (msgs || []).join(' '));
+                        });
+                    }
+                    showErrorSummary(messages.length ? messages : ['Payment failed.']);
+                    payButton.disabled = false;
+                    payButton.innerHTML = originalText;
+                    showOverlay(false);
                 }
-                showErrorSummary(messages.length ? messages : ['Payment failed.']);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showErrorSummary('An error occurred during payment processing. Please try again.');
                 payButton.disabled = false;
                 payButton.innerHTML = originalText;
                 showOverlay(false);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showErrorSummary('An error occurred during payment processing. Please try again.');
-            payButton.disabled = false;
-            payButton.innerHTML = originalText;
-            showOverlay(false);
-        });
+            });
     });
 
     // Initial state
