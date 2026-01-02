@@ -4,27 +4,29 @@
 
 ```mermaid
 erDiagram
-    %% User Management
+    %% User & Profile
     User ||--o| Profile : "has info"
-    User ||--o{ Course : "creates (instructor)"
-    User ||--o{ Enrollment : "enrolls in"
-    User ||--o{ Payment : "pays"
 
-    %% Course Structure
+    %% Content Hierarchy (Straight Line)
     Category ||--o{ Course : "categorizes"
     Course ||--o{ Module : "consists of"
     Module ||--o{ Lesson : "consists of"
-    
-    %% Quiz Structure
     Lesson ||--o| Quiz : "contains"
     Quiz ||--o{ Question : "has"
     Question ||--o{ Answer : "has options"
 
-    %% Business Logic
+    %% User Actions
+    User ||--o{ Course : "creates (instructor)"
+    User ||--o{ Enrollment : "enrolls in"
+    User ||--o{ Payment : "pays"
+
+    %% Course & Business Relationships
     Course ||--o{ Enrollment : "has students"
-    Enrollment ||--o{ Payment : "is paid by"
     Course ||--o{ Payment : "is paid for"
+    
+    %% Dependent Objects
     Enrollment ||--o{ Certificate : "awards"
+    Enrollment ||--o{ Payment : "is paid by"
 
     User {
         int id PK
