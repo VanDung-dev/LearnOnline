@@ -1,5 +1,10 @@
+# Class Diagram (CD)
+
+> **Note:** This is a simple CD template, not the original structure
+
 ```mermaid
 classDiagram
+    direction LR
     class User {
         +username: string
         +email: string
@@ -88,11 +93,6 @@ classDiagram
         +get_enrollment_date()
     }
 
-    class Progress {
-        +completed: bool
-        +completed_at: datetime
-    }
-
     class Certificate {
         +issued_at: datetime
         +certificate_number: string
@@ -107,20 +107,13 @@ classDiagram
         +transaction_id: string
     }
     
-    class QuizAttempt {
-        +attempt_number: int
-        +score: Decimal
-        +started_at: datetime
-        +completed_at: datetime
-    }
 
     User "1" -- "1" Profile : has
     User "1" -- "0..*" Course : created
     User "1" -- "0..*" Enrollment : has
-    User "1" -- "0..*" Progress : has
+
     User "1" -- "0..*" Certificate : has
     User "1" -- "0..*" Payment : has
-    User "1" -- "0..*" QuizAttempt : performs
 
     Category "1" -- "0..*" Course : contains
     
@@ -132,8 +125,6 @@ classDiagram
     Module "1" -- "0..*" Lesson : has
 
     Lesson "1" -- "0..1" Quiz : has
-    Lesson "1" -- "0..*" Progress : tracks
-    Lesson "1" -- "0..*" QuizAttempt : has_attempts_for
 
     Quiz "1" -- "0..*" Question : has
 
