@@ -62,7 +62,11 @@ def enroll_course(request, slug):
 
 @login_required
 def instructor_courses(request):
-    if not hasattr(request.user, 'profile') or not request.user.profile.is_instructor():
+    if (not request.user.is_superuser
+        and (not hasattr(request.user, 'profile')
+        or not (request.user.profile.is_instructor()
+        or request.user.profile.is_admin()))
+    ):
         return HttpResponseForbidden("You must be an instructor to view this page.")
 
     courses = Course.objects.filter(instructor=request.user)
