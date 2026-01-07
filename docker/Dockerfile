@@ -12,10 +12,10 @@ WORKDIR /app
 # Install system dependencies
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-        build-essential \
-        libpq-dev \
-        libjpeg-dev \
-        zlib1g-dev \
+    build-essential \
+    libpq-dev \
+    libjpeg-dev \
+    zlib1g-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Python dependencies
@@ -30,6 +30,7 @@ COPY . /app/
 
 # Copy entrypoint script
 COPY docker/entrypoint.sh /entrypoint.sh
+RUN sed -i 's/\r$//g' /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 # Expose port
