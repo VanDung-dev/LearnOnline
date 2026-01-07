@@ -9,6 +9,7 @@ django-ratelimit>=4.1.0
 # Async Task Processing (Celery + Redis)
 celery>=5.3.6
 redis>=5.0.1
+django-redis==5.2.0
 django-celery-results>=2.5.1
 django-celery-beat>=2.6.0
 eventlet>=0.33.3  # Required for Celery on Windows
@@ -26,6 +27,7 @@ pytest>=7.0
 pytest-django>=4.5
 pytest-cov>=4.0
 coverage>=7.0
+locust>=2.43.0
 
 # Code Quality & Tooling
 flake8>=6.0
@@ -34,3 +36,4 @@ isort>=5.12
 mypy>=1.0
 django-stubs>=4.0
 pre-commit>=3.5.0
+gunicorn>=23.0.0
