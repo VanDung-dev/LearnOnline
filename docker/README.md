@@ -1,108 +1,109 @@
 # Docker Setup for LearnOnline
 
 This directory contains the Docker configuration for the LearnOnline Django project.
+It supports two environments:
 
-## Prerequisites
+1. **Development (`docker-compose.yml`)**: For local development.
+2. **Production Simulation (`docker-compose.prod.yml`)**: For testing real-world performance (Nginx, Gunicorn, HTTPS).
 
-- Docker
-- Docker Compose
+---
 
-## Installation
+## 🏗 1. Build & Run
 
-Follow these steps to get the application running completely.
+### A. Development (Dev)
 
-1. **Build and Start the containers:**
-    This command builds the images and starts the services in detached mode (background).
-
-    ```bash
-    docker-compose up --build -d
-    ```
-
-2. **Apply Database Migrations:**  
-    This ensures your database tables are created according to the latest code.
-
-    ```bash
-    docker-compose exec web python manage.py migrate
-    ```
-
-3. **Create a Superuser (Admin):**  
-    You need an admin account to manage the application and access the admin panel.
-
-    ```bash
-    docker-compose exec web python manage.py createsuperuser
-    ```
-
-    *Follow the prompts in the terminal to set your username, email, and password.*
-
-4. **Access the Application:**
-    - **Main Site:** [http://localhost:8000](http://localhost:8000)
-    - **Admin Panel:** [http://localhost:8000/admin](http://localhost:8000/admin)
-
-## Common Commands
-
-- **Stop containers:**
-
-  ```bash
-  docker-compose down
-  ```
-
-- **View logs (follow mode):**
-
-  ```bash
-  docker-compose logs -f
-  ```
-
-- **Open a shell inside the container:**
-
-  ```bash
-  docker-compose exec web /bin/bash
-  ```
-
-## Troubleshooting
-
-### Database Adaptation (After Updates)
-
-When you pull new code or switch branches, the database schema might be out of sync.
-
-**1. Apply Standard Updates:**
-If the update contains new migration files, simply run:
+For coding and debugging with hot-reload.
 
 ```bash
-docker-compose exec web python manage.py migrate
+cd docker
+docker-compose up --build -d
 ```
 
-**2. Handling Migration Conflicts or Resets:**
-If the migration history was reset (e.g., all migrations squashed to `0001_initial.py`) but your database still contains the old tables, you must "fake" the migration to sync the history without touching the tables:
+### B. Production Simulation (Prod)
+
+For load testing and verifying deployment architecture.
+**Features:**
+
+- **Nginx** (Reverse Proxy & Static Files)
+- **Gunicorn** (Production WSGI Server, multi-worker)
+- **HTTPS** (Self-signed certificate)
+- **PostgreSQL 15**
+
+**Start Command:**
+
+```powershell
+# From project root
+docker compose -f docker/docker-compose.prod.yml up --build -d
+```
+
+**Initialize Data (First Run Only):**
+Since Production uses a separate database volume (`postgres_data_prod`), you must load data:
+
+```powershell
+# 1. Migrate DB
+docker compose -f docker/docker-compose.prod.yml exec web python manage.py migrate
+
+# 2. Load Sample Data (Optional)
+docker compose -f docker/docker-compose.prod.yml exec web python manage.py loaddata sample_data.json
+
+# 3. Create Admin Account
+docker compose -f docker/docker-compose.prod.yml exec web python manage.py createsuperuser
+```
+
+---
+
+## ⚙️ 2. Configuration & Access
+
+- **Development URL**: `http://localhost:8000`
+- **Production URL**: `https://localhost` (Accept the self-signed certificate warning)
+- **Admin Panel**: `/admin/`
+
+**Key Configuration Files:**
+
+- `docker/Dockerfile`: Builds the Python/Django image.
+- `docker/nginx/default.conf`: Nginx configuration (HTTPS, Static files).
+- `docker/docker-compose.prod.yml`: Define Prod services (Web, Nginx, DB, Redis).
+
+---
+
+## 🧪 3. Load Testing (Chịu tải) with Locust
+
+We use **Locust** to simulate thousands of users accessing the site.
+
+**Prerequisite:**
+
+- Install Locust: `pip install locust` (in a separate venv is recommended)
+- **Note:** Ensure `locustfile.py` has `urllib3.disable_warnings` if testing HTTPS self-signed.
+
+**Running Load Test:**
+
+```powershell
+# Run Locust in Headless mode (CLI only)
+# --users: Total concurrent users
+# --spawn-rate: Users added per second
+# --host: Target URL (Use https://localhost for Prod)
+
+.venv\Scripts\locust --headless --users 2000 --spawn-rate 50 --run-time 60s --host https://localhost
+```
+
+**Cause:** Django 5.x requires modern Postgres.
+**Fix:** Ensure `docker-compose.yml` uses `image: postgres:15`.
+If you upgraded from version 13, you MUST delete the old volume:
 
 ```bash
-# Step 1: Ensure migration files are generated (if missing)
-docker-compose exec web python manage.py makemigrations
-
-# Step 2: Mark migrations as applied without running SQL
-docker-compose exec web python manage.py migrate --fake
+docker compose -f docker/docker-compose.prod.yml down -v
 ```
 
-### Windows Issues
+### 3. `ConnectionRefusedError` (Locust)
 
-1. **PowerShell Syntax:**
-    Use `;` instead of `&&` to chain commands.
+**Cause:** Server is overwhelmed or not running.
+**Fix:**
 
-    ```powershell
-    cd docker; docker-compose up -d
-    ```
+- Check logs: `docker compose -f docker/docker-compose.prod.yml logs web`
+- Reduce user count if testing Dev server.
+- Ensure containers are up: `docker ps`
 
-2. **Volume Permissions:**
-    If you see "Permission denied" errors, ensure Docker Desktop is running and try running your terminal as Administrator.
+### 4. `SSL: WRONG_VERSION_NUMBER`
 
-### General Issues
-
-1. **Port 8000 already in use:**
-    - Stop other services using port 8000.
-    - Or change the port mapping in `docker-compose.yml` (e.g., `"8080:8000"`).
-
-2. **Container exits immediately:**
-    Check the logs to find the error:
-
-    ```bash
-    docker-compose logs web
-    ```
+**Cause:** Testing HTTP target with HTTPS client or vice versa.
+**Fix:** Check `--host` parameter. Use `http://` for Dev and `https://` for Prod.
