@@ -64,7 +64,7 @@ class CustomLoginView(LoginView):
         else:
             return reverse_lazy('courses:home')
 
-    @method_decorator(ratelimit(key='ip', rate='5/5m', method='POST', block=False))
+    # @method_decorator(ratelimit(key='ip', rate='5/5m', method='POST', block=False))
     def post(self, request, *args, **kwargs):
         # Check if rate limited
         if getattr(request, 'limited', False):
