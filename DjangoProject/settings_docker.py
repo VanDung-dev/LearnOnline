@@ -34,6 +34,13 @@ STATIC_ROOT = '/app/staticfiles/'
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://redis_cache:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    },
+    "session_storage": {
+        "BACKEND": "django_redis.cache.RedisCache",
         "LOCATION": "redis://redis:6379/1",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
@@ -43,7 +50,7 @@ CACHES = {
 
 # Session configuration (Redis)
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
-SESSION_CACHE_ALIAS = "default"
+SESSION_CACHE_ALIAS = "session_storage"
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = '/app/media/'
