@@ -94,27 +94,43 @@ class InstructorBehavior(BaseUserBehavior):
         self.client.get("/instructor/courses/create/")
 
 
-class CertificateHunterBehavior(BaseUserBehavior):
-    """Behavior of students looking for certificates (CPU-intensive)"""
-
-    @task
-    def view_certificate(self):
-        # Real Certificate (Render PDF)
-        self.client.get("/certificate/public/CERT-12345/")
-
-
 class WebsiteUser(HttpUser):
     """User total (Visitor + Student + Instructor)"""
     # 5 seconds break between actions
     wait_time = between(2, 5)
 
-    def on_start(self):
-        self.client.verify = False 
-
-    # User Rate Distribution
     tasks = {
-        NewStudentEnrollmentBehavior: 6, # 60% Guests/New Students
-        StudentLearningBehavior: 3,      # 30% Current Students
-        InstructorBehavior: 1,           # 10% Teachers
-        CertificateHunterBehavior: 0     # (Temporarily turned off because real data is needed to generate PDF)
+        NewStudentEnrollmentBehavior: 6,
+        StudentLearningBehavior: 3,
+        InstructorBehavior: 1,
     }
+    
+    users = [
+        ("instructor_john", "password123"),
+        ("instructor_jane", "password123"),
+        ("student_alice", "password123"),
+        ("student_bob", "password123"),
+    ]
+
+    def on_start(self):
+        self.client.verify = False
+        self.login()
+
+    def login(self):
+        import random
+        # Pick a random user to avoid locking on a single account
+        username, password = random.choice(self.users)
+        
+        response = self.client.get("/accounts/login/")
+        csrftoken = response.cookies.get('csrftoken')
+        
+        if csrftoken:
+            self.client.post(
+                "/accounts/login/",
+                {
+                    "username": username,
+                    "password": password,
+                    "csrfmiddlewaretoken": csrftoken
+                },
+                headers={"X-CSRFToken": csrftoken}
+            )
