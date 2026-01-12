@@ -340,3 +340,5 @@ cython_debug/
 tinymce/
 tinymce.zip
 staticfiles/
+
+docker/nginx/certs/
