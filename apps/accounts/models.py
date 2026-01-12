@@ -43,7 +43,7 @@ class Profile(models.Model):
                 raise ValidationError(_('Profile picture size must be less than 5MB.'))
             
             # Check file extension
-            valid_extensions = ['.jpg', '.jpeg', '.png', '.gif']
+            valid_extensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp']
             ext = os.path.splitext(self.profile_picture.name)[1].lower()
             if ext not in valid_extensions:
                 raise ValidationError(_('Unsupported file extension for profile picture. Allowed extensions are: %s' % ', '.join(valid_extensions)))
@@ -51,6 +51,15 @@ class Profile(models.Model):
     def save(self, *args, **kwargs):
         # Clean the instance before saving
         self.clean()
+
+        # Convert profile picture to WebP if it's a new upload
+        if self.profile_picture and hasattr(self.profile_picture, 'file'):
+            from apps.courses.utils import convert_to_webp
+            result = convert_to_webp(self.profile_picture)
+            if result:
+                _, content_file = result
+                self.profile_picture = content_file
+
         super().save(*args, **kwargs)
     
     def __str__(self):
