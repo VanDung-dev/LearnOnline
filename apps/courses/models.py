@@ -76,7 +76,7 @@ class Course(models.Model):
                 raise ValidationError(_("Thumbnail size must be less than 5MB."))
 
             # Check file extension
-            valid_extensions = [".jpg", ".jpeg", ".png", ".gif"]
+            valid_extensions = [".jpg", ".jpeg", ".png", ".gif", ".webp"]
             ext = os.path.splitext(self.thumbnail.name)[1].lower()
             if ext not in valid_extensions:
                 raise ValidationError(
@@ -94,6 +94,14 @@ class Course(models.Model):
         # This ensures students don't have to pay twice for the course and certificate
         if self.price > 0:
             self.certificate_price = 0
+
+        # Convert thumbnail to WebP if it's a new upload
+        if self.thumbnail and hasattr(self.thumbnail, 'file'):
+            from .utils import convert_to_webp
+            result = convert_to_webp(self.thumbnail)
+            if result:
+                _, content_file = result
+                self.thumbnail = content_file
 
         if not self.slug:
             self.slug = slugify(self.title)
