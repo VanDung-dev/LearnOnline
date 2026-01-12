@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Payment Policy{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-4">
+                    <h1 class="text-center mb-0">
+                        <i class="bi bi-shield-check text-primary me-2"></i>Payment Policy
+                    </h1>
+                </div>
+                <div class="card-body p-4 p-md-5">
+                    
+                    <!-- Payment Methods -->
+                    <section class="mb-5">
+                        <h2 class="h4 mb-3">
+                            <i class="bi bi-credit-card me-2 text-primary"></i>Accepted Payment Methods
+                        </h2>
+                        <p>We accept a variety of payment methods to ensure convenient transactions:</p>
+                        <div class="row g-3">
+                            <div class="col-6 col-md-4">
+                                <div class="border rounded p-3 text-center h-100">
+                                    <i class="bi bi-credit-card-2-front fs-2 text-primary"></i>
+                                    <div class="mt-2 fw-medium">Visa / Mastercard</div>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-4">
+                                <div class="border rounded p-3 text-center h-100">
+                                    <i class="bi bi-paypal fs-2 text-primary"></i>
+                                    <div class="mt-2 fw-medium">PayPal</div>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-4">
+                                <div class="border rounded p-3 text-center h-100">
+                                    <i class="bi bi-phone fs-2 text-primary"></i>
+                                    <div class="mt-2 fw-medium">MoMo / ZaloPay</div>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-4">
+                                <div class="border rounded p-3 text-center h-100">
+                                    <i class="bi bi-qr-code fs-2 text-primary"></i>
+                                    <div class="mt-2 fw-medium">Bank QR (Napas)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Security -->
+                    <section class="mb-5">
+                        <h2 class="h4 mb-3">
+                            <i class="bi bi-lock me-2 text-success"></i>Payment Security
+                        </h2>
+                        <div class="alert alert-success d-flex align-items-start">
+                            <i class="bi bi-shield-lock-fill me-3 fs-4"></i>
+                            <div>
+                                <h5 class="alert-heading">Your Data is Safe</h5>
+                                <p class="mb-0">We do <strong>NOT</strong> store your card number (PAN) on our servers. All payment information is processed securely through industry-standard encryption and tokenization via our trusted payment partners.</p>
+                            </div>
+                        </div>
+                        <ul class="list-unstyled">
+                            <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>256-bit SSL encryption for all transactions</li>
+                            <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>PCI DSS compliant payment processing</li>
+                            <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Tokenized card data — we never see your full card number</li>
+                            <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Secure authentication with 3D Secure where supported</li>
+                        </ul>
+                    </section>
+
+                    <!-- Refund Policy -->
+                    <section class="mb-5">
+                        <h2 class="h4 mb-3">
+                            <i class="bi bi-arrow-return-left me-2 text-warning"></i>Refund Policy
+                        </h2>
+                        <div class="card bg-light border-0">
+                            <div class="card-body">
+                                <h5>Course Purchases</h5>
+                                <p>We offer a <strong>7-day money-back guarantee</strong> for course purchases. If you're not satisfied with your learning experience, you can request a full refund within 7 days of purchase, provided you haven't completed more than 30% of the course content.</p>
+                                
+                                <h5 class="mt-4">Certificate Purchases</h5>
+                                <p class="mb-0">Certificate purchases are <strong>non-refundable</strong> once the certificate has been generated. Please ensure you have completed the course requirements before purchasing a certificate.</p>
+                            </div>
+                        </div>
+                        
+                        <h5 class="mt-4">How to Request a Refund</h5>
+                        <ol>
+                            <li>Contact our support team via email or phone</li>
+                            <li>Provide your order/transaction ID</li>
+                            <li>Explain the reason for your refund request</li>
+                            <li>Refunds are processed within 5-7 business days</li>
+                        </ol>
+                    </section>
+
+                    <!-- Billing -->
+                    <section class="mb-5">
+                        <h2 class="h4 mb-3">
+                            <i class="bi bi-receipt me-2 text-info"></i>Billing Information
+                        </h2>
+                        <ul>
+                            <li>All prices are displayed in <strong>USD</strong></li>
+                            <li>You will receive an email confirmation after each successful payment</li>
+                            <li>Transaction history is available in your account dashboard</li>
+                            <li>Invoices can be downloaded from your payment history</li>
+                        </ul>
+                    </section>
+
+                    <!-- Contact -->
+                    <section>
+                        <h2 class="h4 mb-3">
+                            <i class="bi bi-headset me-2 text-primary"></i>Payment Support
+                        </h2>
+                        <p>If you have any questions about payments, billing, or refunds, please don't hesitate to contact us:</p>
+                        <div class="d-grid gap-2 d-md-flex">
+                            <a href="{% url 'courses:support' %}" class="btn btn-primary">
+                                <i class="bi bi-life-preserver me-2"></i>Contact Support
+                            </a>
+                            <a href="mailto:billing@learnonline.com" class="btn btn-outline-primary">
+                                <i class="bi bi-envelope me-2"></i>billing@learnonline.com
+                            </a>
+                        </div>
+                    </section>
+
+                </div>
+                <div class="card-footer bg-white py-3 text-center text-muted">
+                    <small>Last updated: January 2026</small>
+                </div>
+            </div>
+            
+            <div class="text-center mt-4">
+                <a href="javascript:history.back()" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-2"></i>Go Back
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
