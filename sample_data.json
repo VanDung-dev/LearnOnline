@@ -216,6 +216,7 @@
       "description": "Master Python by building 100 projects in 100 days. This is the only course you need.",
       "price": "99.99",
       "certificate_price": "0.00",
+      "thumbnail": "course_thumbnails/python.webp",
       "is_active": true,
       "created_at": "2025-01-10T08:00:00Z",
       "updated_at": "2025-01-10T08:00:00Z"
@@ -233,6 +234,7 @@
       "description": "Hooks, Context, Redux, and more. Learn the modern way to build React apps.",
       "price": "0.00",
       "certificate_price": "0.00",
+      "thumbnail": "course_thumbnails/react.webp",
       "is_active": true,
       "created_at": "2025-01-12T09:30:00Z",
       "updated_at": "2025-01-12T09:30:00Z"
@@ -250,6 +252,7 @@
       "description": "Learn to create Machine Learning Algorithms in Python and R from two Data Science experts.",
       "price": "149.99",
       "certificate_price": "0.00",
+      "thumbnail": "course_thumbnails/machine_learning.webp",
       "is_active": true,
       "created_at": "2025-01-15T14:45:00Z",
       "updated_at": "2025-01-15T14:45:00Z"
