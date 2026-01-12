@@ -18,13 +18,19 @@
     python manage.py migrate
     ```
 
-4. Create a Superuser (Admin):
+4. Create cache table (required for session/cache):
+
+    ```bash
+    python manage.py createcachetable
+    ```
+
+5. Create a Superuser (Admin):
 
     ```bash
     python manage.py createsuperuser
     ```
 
-5. Start the development server:
+6. Start the development server:
 
     ```bash
     python manage.py runserver
@@ -65,19 +71,25 @@ If you encounter other errors, try these:
     python manage.py showmigrations
     ```
 
-2. Reset database (WARNING: DELETES ALL DATA):
+2. **"no such table: django_cache_table" error:**
+
+    ```bash
+    python manage.py createcachetable
+    ```
+
+3. Reset database (WARNING: DELETES ALL DATA):
 
     ```bash
     python manage.py flush
     ```
 
-3. Collect static files:
+4. Collect static files:
 
     ```bash
     python manage.py collectstatic
     ```
 
-4. Re-setup TinyMCE (if needed):
+5. Re-setup TinyMCE (if needed):
 
     ```bash
     python setup_tinymce.py
