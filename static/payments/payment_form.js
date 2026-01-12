@@ -5,6 +5,20 @@ document.addEventListener('DOMContentLoaded', function () {
     const errorSummary = document.getElementById('error-summary');
     const clientTokenInput = document.getElementById('client_token');
 
+    // Fade-in payment logos when loaded (prevent flash)
+    document.querySelectorAll('.payment-logo').forEach(img => {
+        const showLogo = () => {
+            img.style.opacity = '1';
+            img.classList.add('loaded');
+        };
+        if (img.complete) {
+            showLogo();
+        } else {
+            img.addEventListener('load', showLogo);
+            img.addEventListener('error', showLogo);
+        }
+    });
+
     // body attribute for styling
     try {
         const purchaseType = document.querySelector('input[name="purchase_type"]').value;

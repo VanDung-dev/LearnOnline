@@ -53,6 +53,13 @@ body[data-purchase-type="certificate"] .method-option.selected {
     margin-bottom: 0.5rem;
     border-radius: 8px;
     border: 2px solid #bcbcbc;
+    /* Prevent flash: start hidden, fade in when loaded */
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.payment-logo.loaded {
+    opacity: 1;
 }
 
 .payment-logo-sm {
