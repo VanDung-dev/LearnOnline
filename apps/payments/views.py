@@ -7,8 +7,37 @@ from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 
 from apps.courses.models import Course, Enrollment, Certificate
-from .models import Payment
+from .models import Payment, PaymentLog
 from .services.payment_service import get_payment_service, PaymentStatus
+
+
+def payment_policy(request):
+    """Display payment policy page."""
+    return render(request, 'payments/payment_policy.html')
+
+
+def log_payment_event(payment, event_type, previous_status=None, new_status=None,
+                      message='', request=None):
+    """Create an audit log entry for a payment event."""
+    ip_address = None
+    user_agent = ''
+    if request:
+        x_forwarded = request.META.get('HTTP_X_FORWARDED_FOR')
+        if x_forwarded:
+            ip_address = x_forwarded.split(',')[0].strip()
+        else:
+            ip_address = request.META.get('REMOTE_ADDR')
+        user_agent = request.META.get('HTTP_USER_AGENT', '')[:500]
+
+    PaymentLog.objects.create(
+        payment=payment,
+        event_type=event_type,
+        previous_status=previous_status,
+        new_status=new_status,
+        message=message,
+        ip_address=ip_address,
+        user_agent=user_agent,
+    )
 
 
 @login_required
@@ -176,6 +205,11 @@ def process_payment(request, course_slug, purchase_type='course'):
             transaction_id=str(uuid.uuid4()).replace('-', '')[:20].upper(),
             idempotency_key=client_token,
         )
+        # Log payment creation
+        log_payment_event(
+            payment, 'created', new_status='pending',
+            message=f'Course purchase: {course.title}', request=request
+        )
 
         # Call gateway (mock completes immediately)
         result = service.create_payment(
@@ -190,7 +224,13 @@ def process_payment(request, course_slug, purchase_type='course'):
         )
 
         payment.processor_transaction_id = result.processor_transaction_id
-        payment.status = result.status if result.success else 'failed'
+        new_status = result.status if result.success else 'failed'
+        if payment.status != new_status:
+            log_payment_event(
+                payment, 'status_change', previous_status='pending',
+                new_status=new_status, request=request
+            )
+        payment.status = new_status
         payment.save()
 
         if payment.status == 'completed':
@@ -247,6 +287,11 @@ def process_payment(request, course_slug, purchase_type='course'):
             transaction_id=str(uuid.uuid4()).replace('-', '')[:20].upper(),
             idempotency_key=client_token,
         )
+        # Log certificate payment creation
+        log_payment_event(
+            payment, 'created', new_status='pending',
+            message=f'Certificate purchase: {course.title}', request=request
+        )
 
         result = service.create_payment(
             user_id=request.user.id,
@@ -260,7 +305,13 @@ def process_payment(request, course_slug, purchase_type='course'):
         )
 
         payment.processor_transaction_id = result.processor_transaction_id
-        payment.status = result.status if result.success else 'failed'
+        new_status = result.status if result.success else 'failed'
+        if payment.status != new_status:
+            log_payment_event(
+                payment, 'status_change', previous_status='pending',
+                new_status=new_status, request=request
+            )
+        payment.status = new_status
         payment.save()
 
         if payment.status == 'completed':
@@ -323,14 +374,31 @@ def payment_webhook(request, provider: str):
     # Update payment by processor_transaction_id if possible
     if event.processor_transaction_id:
         try:
-            payment = Payment.objects.get(processor_transaction_id=event.processor_transaction_id)
-            previous = payment.status
-            if event.status in {PaymentStatus.COMPLETED, PaymentStatus.FAILED, PaymentStatus.REFUNDED, PaymentStatus.PENDING}:
+            payment = Payment.objects.get(
+                processor_transaction_id=event.processor_transaction_id
+            )
+            previous_status = payment.status
+            valid_statuses = {
+                PaymentStatus.COMPLETED, PaymentStatus.FAILED,
+                PaymentStatus.REFUNDED, PaymentStatus.PENDING
+            }
+            if event.status in valid_statuses:
                 payment.status = event.status
                 payment.save()
+                # Log webhook status change
+                log_payment_event(
+                    payment, 'webhook_received',
+                    previous_status=previous_status,
+                    new_status=event.status,
+                    message=f'Webhook from {provider}'
+                )
                 # On completion for course, ensure enrollment exists
-                if payment.status == PaymentStatus.COMPLETED and payment.purchase_type == 'course' and not payment.enrollment:
-                    enrollment, _ = Enrollment.objects.get_or_create(user=payment.user, course=payment.course)
+                if (payment.status == PaymentStatus.COMPLETED
+                        and payment.purchase_type == 'course'
+                        and not payment.enrollment):
+                    enrollment, _ = Enrollment.objects.get_or_create(
+                        user=payment.user, course=payment.course
+                    )
                     payment.enrollment = enrollment
                     payment.save(update_fields=["enrollment", "updated_at"])
         except Payment.DoesNotExist:

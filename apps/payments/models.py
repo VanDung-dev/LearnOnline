@@ -46,3 +46,33 @@ class Payment(models.Model):
         indexes = [
             models.Index(fields=["user", "course", "purchase_type"]),
         ]
+
+
+class PaymentLog(models.Model):
+    """Audit trail for payment events."""
+    EVENT_TYPES = [
+        ('created', 'Payment Created'),
+        ('status_change', 'Status Changed'),
+        ('webhook_received', 'Webhook Received'),
+        ('refund_initiated', 'Refund Initiated'),
+    ]
+
+    payment = models.ForeignKey(
+        Payment, on_delete=models.CASCADE, related_name='logs'
+    )
+    event_type = models.CharField(max_length=30, choices=EVENT_TYPES)
+    previous_status = models.CharField(max_length=20, null=True, blank=True)
+    new_status = models.CharField(max_length=20, null=True, blank=True)
+    message = models.TextField(blank=True)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    user_agent = models.CharField(max_length=500, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['payment', 'event_type']),
+        ]
+
+    def __str__(self):
+        return f"{self.event_type} - {self.payment.transaction_id}"

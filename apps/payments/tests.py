@@ -31,20 +31,20 @@ class PaymentFlowTests(TestCase):
 
     def test_process_payment_returns_field_errors_when_missing_params(self):
         url = reverse("payments:process_payment", kwargs={"course_slug": self.course.slug})
-        # Missing card_type
+        # Missing payment_method
         resp = self.client.post(url, {
             "card_number": "4242424242424242",
             "expiry_date": "12/30",
             "cvv": "123",
-            # "card_type": "visa"  # intentionally missing
+            # "payment_method": "visa"  # intentionally missing
         })
         self.assertEqual(resp.status_code, 400)
         data = resp.json()
         self.assertIn("success", data)
         self.assertFalse(data["success"])  # standardized schema
         self.assertIn("errors", data)
-        # Expect card_type error present
-        self.assertIn("card_type", data["errors"]) 
+        # Expect payment_method error present
+        self.assertIn("payment_method", data["errors"]) 
 
     def test_process_payment_success_returns_transaction_and_redirect(self):
         url = reverse("payments:process_payment", kwargs={"course_slug": self.course.slug})
