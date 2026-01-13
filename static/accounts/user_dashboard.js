@@ -1,4 +1,8 @@
 document.addEventListener('DOMContentLoaded', function () {
+    // Universal Filter/Sort Logic for Dashboard
+    initDashboardFilters();
+
+    // Analytics Initialization
     initStudentAnalytics();
     initInstructorAnalytics();
 
@@ -11,6 +15,100 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 });
+
+function initDashboardFilters() {
+    const searchInput = document.getElementById('search-input');
+    const sortSelect = document.getElementById('sort-select');
+    const statusFilters = document.querySelectorAll('input[name="status-filter"]'); // Student
+    const priceFilters = document.querySelectorAll('input[name="price-filter"]'); // Instructor
+    const coursesContainer = document.getElementById('courses-container');
+    const noResultsMsg = document.getElementById('no-results');
+
+    if (!coursesContainer) return; // Exit if no course container (e.g. empty state)
+
+    // Helper to get all course items
+    const getItems = () => Array.from(document.querySelectorAll('.course-item'));
+
+    function filterAndSort() {
+        const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
+        const sortValue = sortSelect ? sortSelect.value : 'newest';
+
+        // Get active filter value (handle optional filters)
+        let statusValue = 'all';
+        let priceValue = 'all';
+
+        const activeStatus = document.querySelector('input[name="status-filter"]:checked');
+        if (activeStatus) statusValue = activeStatus.value;
+
+        const activePrice = document.querySelector('input[name="price-filter"]:checked');
+        if (activePrice) priceValue = activePrice.value;
+
+        let visibleCount = 0;
+
+        getItems().forEach(item => {
+            const title = item.dataset.title;
+            const status = item.dataset.status; // might be undefined for instructor
+            const price = parseFloat(item.dataset.price); // might be NaN for student
+
+            let matchesSearch = !searchTerm || title.includes(searchTerm);
+            let matchesStatus = (statusValue === 'all') || (status === statusValue);
+
+            let matchesPrice = true;
+            if (priceValue === 'free') matchesPrice = (price === 0);
+            if (priceValue === 'paid') matchesPrice = (price > 0);
+
+            if (matchesSearch && matchesStatus && matchesPrice) {
+                item.classList.remove('d-none');
+                visibleCount++;
+            } else {
+                item.classList.add('d-none');
+            }
+        });
+
+        if (visibleCount === 0 && getItems().length > 0) {
+            if (noResultsMsg) noResultsMsg.classList.remove('d-none');
+        } else {
+            if (noResultsMsg) noResultsMsg.classList.add('d-none');
+        }
+
+        sortItems(sortValue);
+    }
+
+    function sortItems(sortValue) {
+        const items = getItems();
+
+        items.sort((a, b) => {
+            const titleA = a.dataset.title;
+            const titleB = b.dataset.title;
+            const dateA = parseInt(a.dataset.created || a.dataset.enrolled || 0);
+            const dateB = parseInt(b.dataset.created || b.dataset.enrolled || 0);
+            const priceA = parseFloat(a.dataset.price || 0);
+            const priceB = parseFloat(b.dataset.price || 0);
+
+            switch (sortValue) {
+                case 'title-asc': return titleA.localeCompare(titleB);
+                case 'title-desc': return titleB.localeCompare(titleA);
+                case 'newest': return dateB - dateA;
+                case 'oldest': return dateA - dateB;
+                case 'price-low': return priceA - priceB;
+                case 'price-high': return priceB - priceA;
+                default: return 0;
+            }
+        });
+
+        // Re-append items in new order
+        items.forEach(item => coursesContainer.appendChild(item));
+    }
+
+    // Event Listeners
+    if (searchInput) searchInput.addEventListener('input', filterAndSort);
+    if (sortSelect) sortSelect.addEventListener('change', filterAndSort);
+    statusFilters.forEach(radio => radio.addEventListener('change', filterAndSort));
+    priceFilters.forEach(radio => radio.addEventListener('change', filterAndSort));
+
+    // Initial sort
+    filterAndSort();
+}
 
 function initStudentAnalytics() {
     const ctx = document.getElementById('studentProgressChart');
