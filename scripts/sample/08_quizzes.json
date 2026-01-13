@@ -1,0 +1,200 @@
+[
+  {
+    "model": "courses.quiz",
+    "pk": 1,
+    "fields": {
+      "lesson": 4,
+      "title": "Basics Checkup",
+      "description": "A quick quiz to check your understanding of variables and types.",
+      "created_at": "2025-01-11T10:00:00Z",
+      "updated_at": "2025-01-11T10:00:00Z"
+    }
+  },
+  {
+    "model": "courses.quiz",
+    "pk": 2,
+    "fields": {
+      "lesson": 6,
+      "title": "Control Flow Test",
+      "description": "Test your knowledge of conditionals and loops.",
+      "created_at": "2025-01-12T10:00:00Z",
+      "updated_at": "2025-01-12T10:00:00Z"
+    }
+  },
+  {
+    "model": "courses.quiz",
+    "pk": 3,
+    "fields": {
+      "lesson": 10,
+      "title": "Hooks Knowledge Check",
+      "description": "Test your understanding of React hooks.",
+      "created_at": "2025-01-13T10:00:00Z",
+      "updated_at": "2025-01-13T10:00:00Z"
+    }
+  },
+  {
+    "model": "courses.quiz",
+    "pk": 4,
+    "fields": {
+      "lesson": 12,
+      "title": "State Management Test",
+      "description": "Quiz on Context API and Redux.",
+      "created_at": "2025-01-14T10:00:00Z",
+      "updated_at": "2025-01-14T10:00:00Z"
+    }
+  },
+  {
+    "model": "courses.quiz",
+    "pk": 5,
+    "fields": {
+      "lesson": 16,
+      "title": "Regression Test",
+      "description": "Quiz on regression techniques.",
+      "created_at": "2025-01-16T10:00:00Z",
+      "updated_at": "2025-01-16T10:00:00Z"
+    }
+  },
+  {
+    "model": "courses.quiz",
+    "pk": 6,
+    "fields": {
+      "lesson": 18,
+      "title": "Classification Test",
+      "description": "Quiz on classification algorithms.",
+      "created_at": "2025-01-17T10:00:00Z",
+      "updated_at": "2025-01-17T10:00:00Z"
+    }
+  },
+  {
+    "model": "courses.quiz",
+    "pk": 7,
+    "fields": {
+      "lesson": 22,
+      "title": "Models Knowledge Check",
+      "description": "Quiz on Django ORM and models.",
+      "created_at": "2025-01-21T10:00:00Z",
+      "updated_at": "2025-01-21T10:00:00Z"
+    }
+  },
+  {
+    "model": "courses.quiz",
+    "pk": 8,
+    "fields": {
+      "lesson": 24,
+      "title": "Views Test",
+      "description": "Quiz on Django views.",
+      "created_at": "2025-01-22T10:00:00Z",
+      "updated_at": "2025-01-22T10:00:00Z"
+    }
+  },
+  {
+    "model": "courses.quiz",
+    "pk": 9,
+    "fields": {
+      "lesson": 28,
+      "title": "Docker Compose Test",
+      "description": "Quiz on Docker Compose.",
+      "created_at": "2025-01-26T10:00:00Z",
+      "updated_at": "2025-01-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "courses.quiz",
+    "pk": 10,
+    "fields": {
+      "lesson": 30,
+      "title": "K8s Fundamentals Test",
+      "description": "Quiz on Kubernetes basics.",
+      "created_at": "2025-01-27T10:00:00Z",
+      "updated_at": "2025-01-27T10:00:00Z"
+    }
+  },
+  {
+    "model": "courses.quiz",
+    "pk": 11,
+    "fields": {
+      "lesson": 34,
+      "title": "JOINs Test",
+      "description": "Quiz on SQL JOINs.",
+      "created_at": "2025-01-29T10:00:00Z",
+      "updated_at": "2025-01-29T10:00:00Z"
+    }
+  },
+  {
+    "model": "courses.quiz",
+    "pk": 12,
+    "fields": {
+      "lesson": 36,
+      "title": "Design Principles Test",
+      "description": "Quiz on database design.",
+      "created_at": "2025-01-30T10:00:00Z",
+      "updated_at": "2025-01-30T10:00:00Z"
+    }
+  },
+  {
+    "model": "courses.quiz",
+    "pk": 13,
+    "fields": {
+      "lesson": 40,
+      "title": "Composition API Test",
+      "description": "Quiz on Vue 3 Composition API.",
+      "created_at": "2025-02-02T10:00:00Z",
+      "updated_at": "2025-02-02T10:00:00Z"
+    }
+  },
+  {
+    "model": "courses.quiz",
+    "pk": 14,
+    "fields": {
+      "lesson": 42,
+      "title": "Pinia Test",
+      "description": "Quiz on Pinia state management.",
+      "created_at": "2025-02-03T10:00:00Z",
+      "updated_at": "2025-02-03T10:00:00Z"
+    }
+  },
+  {
+    "model": "courses.quiz",
+    "pk": 15,
+    "fields": {
+      "lesson": 46,
+      "title": "Generics Test",
+      "description": "Quiz on TypeScript generics.",
+      "created_at": "2025-02-06T10:00:00Z",
+      "updated_at": "2025-02-06T10:00:00Z"
+    }
+  },
+  {
+    "model": "courses.quiz",
+    "pk": 16,
+    "fields": {
+      "lesson": 48,
+      "title": "TS Frameworks Test",
+      "description": "Quiz on TypeScript with frameworks.",
+      "created_at": "2025-02-07T10:00:00Z",
+      "updated_at": "2025-02-07T10:00:00Z"
+    }
+  },
+  {
+    "model": "courses.quiz",
+    "pk": 17,
+    "fields": {
+      "lesson": 52,
+      "title": "Navigation Test",
+      "description": "Quiz on React Navigation.",
+      "created_at": "2025-02-11T10:00:00Z",
+      "updated_at": "2025-02-11T10:00:00Z"
+    }
+  },
+  {
+    "model": "courses.quiz",
+    "pk": 18,
+    "fields": {
+      "lesson": 54,
+      "title": "Native APIs Test",
+      "description": "Quiz on native device features.",
+      "created_at": "2025-02-12T10:00:00Z",
+      "updated_at": "2025-02-12T10:00:00Z"
+    }
+  }
+]

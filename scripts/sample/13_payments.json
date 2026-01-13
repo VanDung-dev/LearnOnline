@@ -1,0 +1,66 @@
+[
+  {
+    "model": "payments.payment",
+    "pk": 1,
+    "fields": {
+      "user": 4,
+      "course": 1,
+      "amount": "99.99",
+      "currency": "USD",
+      "status": "completed",
+      "payment_method": "visa",
+      "purchase_type": "course",
+      "transaction_id": "txn_001",
+      "created_at": "2025-02-01T09:55:00Z",
+      "updated_at": "2025-02-01T09:55:00Z"
+    }
+  },
+  {
+    "model": "payments.payment",
+    "pk": 2,
+    "fields": {
+      "user": 4,
+      "course": 3,
+      "amount": "149.99",
+      "currency": "USD",
+      "status": "completed",
+      "payment_method": "mastercard",
+      "purchase_type": "course",
+      "transaction_id": "txn_002",
+      "created_at": "2025-02-10T09:00:00Z",
+      "updated_at": "2025-02-10T09:00:00Z"
+    }
+  },
+  {
+    "model": "payments.payment",
+    "pk": 3,
+    "fields": {
+      "user": 4,
+      "course": 4,
+      "amount": "79.99",
+      "currency": "USD",
+      "status": "completed",
+      "payment_method": "paypal",
+      "purchase_type": "course",
+      "transaction_id": "txn_003",
+      "created_at": "2025-03-01T09:00:00Z",
+      "updated_at": "2025-03-01T09:00:00Z"
+    }
+  },
+  {
+    "model": "payments.payment",
+    "pk": 4,
+    "fields": {
+      "user": 4,
+      "course": 5,
+      "amount": "129.99",
+      "currency": "USD",
+      "status": "completed",
+      "payment_method": "visa",
+      "purchase_type": "course",
+      "transaction_id": "txn_004",
+      "created_at": "2025-03-15T09:00:00Z",
+      "updated_at": "2025-03-15T09:00:00Z"
+    }
+  }
+]

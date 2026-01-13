@@ -1,0 +1,27 @@
+[
+  {
+    "_comment": "=== SCHOOLS ===",
+    "model": "organization.school",
+    "pk": 1,
+    "fields": {
+      "name": "Đại học A",
+      "code": "uni_a",
+      "domain": "unia.edu.vn",
+      "status": "active",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "organization.school",
+    "pk": 2,
+    "fields": {
+      "name": "Cao đẳng B",
+      "code": "col_b",
+      "domain": "colb.edu.vn",
+      "status": "active",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  }
+]

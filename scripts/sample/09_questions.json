@@ -1,0 +1,211 @@
+[
+  {
+    "model": "courses.question",
+    "pk": 1,
+    "fields": {
+      "quiz": 1,
+      "text": "What is the correct file extension for Python files?",
+      "question_type": "single",
+      "order": 1,
+      "points": 5
+    }
+  },
+  {
+    "model": "courses.question",
+    "pk": 2,
+    "fields": {
+      "quiz": 1,
+      "text": "Which of the following are valid variable names?",
+      "question_type": "multiple",
+      "order": 2,
+      "points": 5
+    }
+  },
+  {
+    "model": "courses.question",
+    "pk": 3,
+    "fields": {
+      "quiz": 2,
+      "text": "What keyword is used to start a conditional in Python?",
+      "question_type": "single",
+      "order": 1,
+      "points": 5
+    }
+  },
+  {
+    "model": "courses.question",
+    "pk": 4,
+    "fields": {
+      "quiz": 3,
+      "text": "Which hook is used for side effects?",
+      "question_type": "single",
+      "order": 1,
+      "points": 5
+    }
+  },
+  {
+    "model": "courses.question",
+    "pk": 5,
+    "fields": {
+      "quiz": 4,
+      "text": "What is the purpose of Context API?",
+      "question_type": "single",
+      "order": 1,
+      "points": 5
+    }
+  },
+  {
+    "model": "courses.question",
+    "pk": 6,
+    "fields": {
+      "quiz": 5,
+      "text": "What type of problem does linear regression solve?",
+      "question_type": "single",
+      "order": 1,
+      "points": 5
+    }
+  },
+  {
+    "model": "courses.question",
+    "pk": 7,
+    "fields": {
+      "quiz": 6,
+      "text": "Which algorithm uses sigmoid function?",
+      "question_type": "single",
+      "order": 1,
+      "points": 5
+    }
+  },
+  {
+    "model": "courses.question",
+    "pk": 8,
+    "fields": {
+      "quiz": 7,
+      "text": "What command creates database tables from models?",
+      "question_type": "single",
+      "order": 1,
+      "points": 5
+    }
+  },
+  {
+    "model": "courses.question",
+    "pk": 9,
+    "fields": {
+      "quiz": 8,
+      "text": "Which CBV is used to display a list of objects?",
+      "question_type": "single",
+      "order": 1,
+      "points": 5
+    }
+  },
+  {
+    "model": "courses.question",
+    "pk": 10,
+    "fields": {
+      "quiz": 9,
+      "text": "What file defines Docker Compose services?",
+      "question_type": "single",
+      "order": 1,
+      "points": 5
+    }
+  },
+  {
+    "model": "courses.question",
+    "pk": 11,
+    "fields": {
+      "quiz": 10,
+      "text": "What is the smallest deployable unit in Kubernetes?",
+      "question_type": "single",
+      "order": 1,
+      "points": 5
+    }
+  },
+  {
+    "model": "courses.question",
+    "pk": 12,
+    "fields": {
+      "quiz": 11,
+      "text": "Which JOIN returns all rows from the left table?",
+      "question_type": "single",
+      "order": 1,
+      "points": 5
+    }
+  },
+  {
+    "model": "courses.question",
+    "pk": 13,
+    "fields": {
+      "quiz": 12,
+      "text": "What is the purpose of normalization?",
+      "question_type": "single",
+      "order": 1,
+      "points": 5
+    }
+  },
+  {
+    "model": "courses.question",
+    "pk": 14,
+    "fields": {
+      "quiz": 13,
+      "text": "Which function creates a reactive reference in Vue 3?",
+      "question_type": "single",
+      "order": 1,
+      "points": 5
+    }
+  },
+  {
+    "model": "courses.question",
+    "pk": 15,
+    "fields": {
+      "quiz": 14,
+      "text": "What is Pinia?",
+      "question_type": "single",
+      "order": 1,
+      "points": 5
+    }
+  },
+  {
+    "model": "courses.question",
+    "pk": 16,
+    "fields": {
+      "quiz": 15,
+      "text": "What symbol is used to define a generic type?",
+      "question_type": "single",
+      "order": 1,
+      "points": 5
+    }
+  },
+  {
+    "model": "courses.question",
+    "pk": 17,
+    "fields": {
+      "quiz": 16,
+      "text": "How do you type React component props?",
+      "question_type": "single",
+      "order": 1,
+      "points": 5
+    }
+  },
+  {
+    "model": "courses.question",
+    "pk": 18,
+    "fields": {
+      "quiz": 17,
+      "text": "Which navigator creates a tab bar?",
+      "question_type": "single",
+      "order": 1,
+      "points": 5
+    }
+  },
+  {
+    "model": "courses.question",
+    "pk": 19,
+    "fields": {
+      "quiz": 18,
+      "text": "What library is commonly used for camera in Expo?",
+      "question_type": "single",
+      "order": 1,
+      "points": 5
+    }
+  }
+]

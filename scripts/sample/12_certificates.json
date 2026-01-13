@@ -1,0 +1,35 @@
+[
+  {
+    "model": "courses.certificate",
+    "pk": 1,
+    "fields": {
+      "user": 4,
+      "course": 1,
+      "enrollment": 1,
+      "certificate_number": "CERT001PYTHON",
+      "issued_at": "2025-03-01T10:00:00Z"
+    }
+  },
+  {
+    "model": "courses.certificate",
+    "pk": 2,
+    "fields": {
+      "user": 4,
+      "course": 2,
+      "enrollment": 2,
+      "certificate_number": "CERT002REACT",
+      "issued_at": "2025-03-15T10:00:00Z"
+    }
+  },
+  {
+    "model": "courses.certificate",
+    "pk": 3,
+    "fields": {
+      "user": 4,
+      "course": 3,
+      "enrollment": 3,
+      "certificate_number": "CERT003ML",
+      "issued_at": "2025-04-01T10:00:00Z"
+    }
+  }
+]

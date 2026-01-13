@@ -1,0 +1,767 @@
+[
+  {
+    "model": "courses.lesson",
+    "pk": 1,
+    "fields": {
+      "module": 1,
+      "title": "Installing Python",
+      "slug": "installing-python",
+      "lesson_type": "text",
+      "content": "<h2>Installing Python on Windows</h2><p>Download the latest version from python.org. Run the installer and make sure to check 'Add Python to PATH'.</p><h2>Installing on Mac</h2><p>Use Homebrew: <code>brew install python</code></p><h2>Installing on Linux</h2><p>Use apt: <code>sudo apt install python3</code></p>",
+      "order": 1,
+      "is_published": true,
+      "created_at": "2025-01-10T10:00:00Z"
+    }
+  },
+  {
+    "model": "courses.lesson",
+    "pk": 2,
+    "fields": {
+      "module": 1,
+      "title": "Your First Python Script",
+      "slug": "first-python-script",
+      "lesson_type": "video",
+      "video_url": "https://www.youtube.com/watch?v=kqtD5dpn9C8",
+      "content": "Learn to write your first Hello World program and understand Python syntax.",
+      "order": 2,
+      "is_published": true,
+      "created_at": "2025-01-10T11:00:00Z"
+    }
+  },
+  {
+    "model": "courses.lesson",
+    "pk": 3,
+    "fields": {
+      "module": 2,
+      "title": "Variables and Data Types",
+      "slug": "variables-data-types",
+      "lesson_type": "text",
+      "content": "<h2>What are Variables?</h2><p>Variables are containers for storing data values. Python has no command for declaring a variable.</p><h3>Data Types</h3><ul><li>int - Integer numbers</li><li>float - Decimal numbers</li><li>str - Text strings</li><li>bool - True/False</li></ul>",
+      "order": 1,
+      "is_published": true,
+      "created_at": "2025-01-11T09:00:00Z"
+    }
+  },
+  {
+    "model": "courses.lesson",
+    "pk": 4,
+    "fields": {
+      "module": 2,
+      "title": "Python Basics Quiz",
+      "slug": "python-basics-quiz",
+      "lesson_type": "quiz",
+      "content": "Test your knowledge of Python basics.",
+      "order": 2,
+      "is_published": true,
+      "created_at": "2025-01-11T10:00:00Z"
+    }
+  },
+  {
+    "model": "courses.lesson",
+    "pk": 5,
+    "fields": {
+      "module": 3,
+      "title": "If Statements",
+      "slug": "if-statements",
+      "lesson_type": "text",
+      "content": "<h2>Conditional Statements</h2><p>Python uses if, elif, and else for decision making.</p><pre><code>if x > 0:\n    print('Positive')\nelif x < 0:\n    print('Negative')\nelse:\n    print('Zero')</code></pre>",
+      "order": 1,
+      "is_published": true,
+      "created_at": "2025-01-12T09:00:00Z"
+    }
+  },
+  {
+    "model": "courses.lesson",
+    "pk": 6,
+    "fields": {
+      "module": 3,
+      "title": "Control Flow Quiz",
+      "slug": "control-flow-quiz",
+      "lesson_type": "quiz",
+      "content": "Test your understanding of control flow.",
+      "order": 2,
+      "is_published": true,
+      "created_at": "2025-01-12T10:00:00Z"
+    }
+  },
+  {
+    "model": "courses.lesson",
+    "pk": 7,
+    "fields": {
+      "module": 4,
+      "title": "What is React?",
+      "slug": "what-is-react",
+      "lesson_type": "text",
+      "content": "<h2>Introduction to React</h2><p>React is a JavaScript library for building user interfaces. It was developed by Facebook and is now maintained by Meta.</p><h3>Key Features</h3><ul><li>Component-based architecture</li><li>Virtual DOM for performance</li><li>Declarative programming</li><li>Large ecosystem</li></ul>",
+      "order": 1,
+      "is_published": true,
+      "created_at": "2025-01-12T10:00:00Z"
+    }
+  },
+  {
+    "model": "courses.lesson",
+    "pk": 8,
+    "fields": {
+      "module": 4,
+      "title": "Creating Components",
+      "slug": "creating-components",
+      "lesson_type": "video",
+      "video_url": "https://www.youtube.com/watch?v=example2",
+      "content": "Learn how to create functional and class components in React.",
+      "order": 2,
+      "is_published": true,
+      "created_at": "2025-01-12T11:00:00Z"
+    }
+  },
+  {
+    "model": "courses.lesson",
+    "pk": 9,
+    "fields": {
+      "module": 5,
+      "title": "useState Hook",
+      "slug": "usestate-hook",
+      "lesson_type": "text",
+      "content": "<h2>Managing State with useState</h2><p>The useState hook allows you to add state to functional components.</p><pre><code>const [count, setCount] = useState(0);</code></pre>",
+      "order": 1,
+      "is_published": true,
+      "created_at": "2025-01-13T09:00:00Z"
+    }
+  },
+  {
+    "model": "courses.lesson",
+    "pk": 10,
+    "fields": {
+      "module": 5,
+      "title": "React Hooks Quiz",
+      "slug": "react-hooks-quiz",
+      "lesson_type": "quiz",
+      "content": "Test your knowledge of React hooks.",
+      "order": 2,
+      "is_published": true,
+      "created_at": "2025-01-13T10:00:00Z"
+    }
+  },
+  {
+    "model": "courses.lesson",
+    "pk": 11,
+    "fields": {
+      "module": 6,
+      "title": "Context API",
+      "slug": "context-api",
+      "lesson_type": "text",
+      "content": "<h2>Global State with Context</h2><p>Context provides a way to pass data through the component tree without manually passing props.</p>",
+      "order": 1,
+      "is_published": true,
+      "created_at": "2025-01-14T09:00:00Z"
+    }
+  },
+  {
+    "model": "courses.lesson",
+    "pk": 12,
+    "fields": {
+      "module": 6,
+      "title": "State Management Quiz",
+      "slug": "state-management-quiz",
+      "lesson_type": "quiz",
+      "content": "Test your understanding of state management.",
+      "order": 2,
+      "is_published": true,
+      "created_at": "2025-01-14T10:00:00Z"
+    }
+  },
+  {
+    "model": "courses.lesson",
+    "pk": 13,
+    "fields": {
+      "module": 7,
+      "title": "Importing Libraries",
+      "slug": "importing-libraries",
+      "lesson_type": "text",
+      "content": "<h2>Essential ML Libraries</h2><p>NumPy, Pandas, Matplotlib, Scikit-learn are the core libraries for machine learning in Python.</p><pre><code>import numpy as np\nimport pandas as pd\nfrom sklearn.model_selection import train_test_split</code></pre>",
+      "order": 1,
+      "is_published": true,
+      "created_at": "2025-01-15T15:00:00Z"
+    }
+  },
+  {
+    "model": "courses.lesson",
+    "pk": 14,
+    "fields": {
+      "module": 7,
+      "title": "Handling Missing Data",
+      "slug": "handling-missing-data",
+      "lesson_type": "video",
+      "video_url": "https://www.youtube.com/watch?v=example3",
+      "content": "Learn techniques to handle missing values in your dataset.",
+      "order": 2,
+      "is_published": true,
+      "created_at": "2025-01-15T16:00:00Z"
+    }
+  },
+  {
+    "model": "courses.lesson",
+    "pk": 15,
+    "fields": {
+      "module": 8,
+      "title": "Simple Linear Regression",
+      "slug": "simple-linear-regression",
+      "lesson_type": "text",
+      "content": "<h2>Linear Regression</h2><p>Linear regression is used to predict a continuous output variable based on one or more input features.</p><p>Formula: y = mx + b</p>",
+      "order": 1,
+      "is_published": true,
+      "created_at": "2025-01-16T09:00:00Z"
+    }
+  },
+  {
+    "model": "courses.lesson",
+    "pk": 16,
+    "fields": {
+      "module": 8,
+      "title": "Regression Quiz",
+      "slug": "regression-quiz",
+      "lesson_type": "quiz",
+      "content": "Test your knowledge of regression algorithms.",
+      "order": 2,
+      "is_published": true,
+      "created_at": "2025-01-16T10:00:00Z"
+    }
+  },
+  {
+    "model": "courses.lesson",
+    "pk": 17,
+    "fields": {
+      "module": 9,
+      "title": "Logistic Regression",
+      "slug": "logistic-regression",
+      "lesson_type": "text",
+      "content": "<h2>Classification with Logistic Regression</h2><p>Despite its name, logistic regression is used for classification problems. It predicts probabilities between 0 and 1.</p>",
+      "order": 1,
+      "is_published": true,
+      "created_at": "2025-01-17T09:00:00Z"
+    }
+  },
+  {
+    "model": "courses.lesson",
+    "pk": 18,
+    "fields": {
+      "module": 9,
+      "title": "Classification Quiz",
+      "slug": "classification-quiz",
+      "lesson_type": "quiz",
+      "content": "Test your understanding of classification algorithms.",
+      "order": 2,
+      "is_published": true,
+      "created_at": "2025-01-17T10:00:00Z"
+    }
+  },
+  {
+    "model": "courses.lesson",
+    "pk": 19,
+    "fields": {
+      "module": 10,
+      "title": "What is Django?",
+      "slug": "what-is-django",
+      "lesson_type": "text",
+      "content": "<h2>Django Overview</h2><p>Django is a high-level Python web framework that encourages rapid development. It follows the MVT (Model-View-Template) architecture pattern.</p><h3>Key Features</h3><ul><li>Built-in admin interface</li><li>ORM for database operations</li><li>Security features out of the box</li><li>Scalable and maintainable</li></ul>",
+      "order": 1,
+      "is_published": true,
+      "created_at": "2025-01-20T11:00:00Z"
+    }
+  },
+  {
+    "model": "courses.lesson",
+    "pk": 20,
+    "fields": {
+      "module": 10,
+      "title": "Creating Your First Project",
+      "slug": "first-django-project",
+      "lesson_type": "video",
+      "video_url": "https://youtube.com/watch?v=django1",
+      "content": "Learn to create and configure a Django project from scratch.",
+      "order": 2,
+      "is_published": true,
+      "created_at": "2025-01-20T12:00:00Z"
+    }
+  },
+  {
+    "model": "courses.lesson",
+    "pk": 21,
+    "fields": {
+      "module": 11,
+      "title": "Django Models",
+      "slug": "django-models",
+      "lesson_type": "text",
+      "content": "<h2>Creating Models</h2><p>Models are Python classes that define your database structure.</p><pre><code>class Article(models.Model):\n    title = models.CharField(max_length=200)\n    content = models.TextField()\n    created_at = models.DateTimeField(auto_now_add=True)</code></pre>",
+      "order": 1,
+      "is_published": true,
+      "created_at": "2025-01-21T09:00:00Z"
+    }
+  },
+  {
+    "model": "courses.lesson",
+    "pk": 22,
+    "fields": {
+      "module": 11,
+      "title": "Django Models Quiz",
+      "slug": "django-models-quiz",
+      "lesson_type": "quiz",
+      "content": "Test your knowledge of Django models.",
+      "order": 2,
+      "is_published": true,
+      "created_at": "2025-01-21T10:00:00Z"
+    }
+  },
+  {
+    "model": "courses.lesson",
+    "pk": 23,
+    "fields": {
+      "module": 12,
+      "title": "Class-Based Views",
+      "slug": "class-based-views",
+      "lesson_type": "text",
+      "content": "<h2>CBV in Django</h2><p>Class-based views provide reusable components for common patterns like ListView, DetailView, CreateView, etc.</p>",
+      "order": 1,
+      "is_published": true,
+      "created_at": "2025-01-22T09:00:00Z"
+    }
+  },
+  {
+    "model": "courses.lesson",
+    "pk": 24,
+    "fields": {
+      "module": 12,
+      "title": "Views Quiz",
+      "slug": "views-quiz",
+      "lesson_type": "quiz",
+      "content": "Test your understanding of Django views.",
+      "order": 2,
+      "is_published": true,
+      "created_at": "2025-01-22T10:00:00Z"
+    }
+  },
+  {
+    "model": "courses.lesson",
+    "pk": 25,
+    "fields": {
+      "module": 13,
+      "title": "Introduction to Containers",
+      "slug": "intro-containers",
+      "lesson_type": "text",
+      "content": "<h2>What are Containers?</h2><p>Containers are lightweight, standalone, executable packages that include everything needed to run an application. They share the OS kernel but run in isolation.</p>",
+      "order": 1,
+      "is_published": true,
+      "created_at": "2025-01-25T11:00:00Z"
+    }
+  },
+  {
+    "model": "courses.lesson",
+    "pk": 26,
+    "fields": {
+      "module": 13,
+      "title": "Building Docker Images",
+      "slug": "building-docker-images",
+      "lesson_type": "video",
+      "video_url": "https://youtube.com/watch?v=docker1",
+      "content": "Learn to create Dockerfiles and build custom images.",
+      "order": 2,
+      "is_published": true,
+      "created_at": "2025-01-25T12:00:00Z"
+    }
+  },
+  {
+    "model": "courses.lesson",
+    "pk": 27,
+    "fields": {
+      "module": 14,
+      "title": "Docker Compose Basics",
+      "slug": "docker-compose-basics",
+      "lesson_type": "text",
+      "content": "<h2>Multi-Container Apps</h2><p>Docker Compose allows you to define and run multi-container applications with a YAML file.</p><pre><code>version: '3'\nservices:\n  web:\n    build: .\n  db:\n    image: postgres</code></pre>",
+      "order": 1,
+      "is_published": true,
+      "created_at": "2025-01-26T09:00:00Z"
+    }
+  },
+  {
+    "model": "courses.lesson",
+    "pk": 28,
+    "fields": {
+      "module": 14,
+      "title": "Docker Compose Quiz",
+      "slug": "docker-compose-quiz",
+      "lesson_type": "quiz",
+      "content": "Test your Docker Compose knowledge.",
+      "order": 2,
+      "is_published": true,
+      "created_at": "2025-01-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "courses.lesson",
+    "pk": 29,
+    "fields": {
+      "module": 15,
+      "title": "Kubernetes Overview",
+      "slug": "kubernetes-overview",
+      "lesson_type": "text",
+      "content": "<h2>What is Kubernetes?</h2><p>Kubernetes (K8s) is an open-source container orchestration platform that automates deployment, scaling, and management of containerized applications.</p>",
+      "order": 1,
+      "is_published": true,
+      "created_at": "2025-01-27T09:00:00Z"
+    }
+  },
+  {
+    "model": "courses.lesson",
+    "pk": 30,
+    "fields": {
+      "module": 15,
+      "title": "Kubernetes Quiz",
+      "slug": "kubernetes-quiz",
+      "lesson_type": "quiz",
+      "content": "Test your Kubernetes knowledge.",
+      "order": 2,
+      "is_published": true,
+      "created_at": "2025-01-27T10:00:00Z"
+    }
+  },
+  {
+    "model": "courses.lesson",
+    "pk": 31,
+    "fields": {
+      "module": 16,
+      "title": "SELECT Statement",
+      "slug": "select-statement",
+      "lesson_type": "text",
+      "content": "<h2>Querying Data</h2><p>The SELECT statement is used to retrieve data from a database.</p><pre><code>SELECT column1, column2 FROM table_name WHERE condition;</code></pre>",
+      "order": 1,
+      "is_published": true,
+      "created_at": "2025-01-28T11:00:00Z"
+    }
+  },
+  {
+    "model": "courses.lesson",
+    "pk": 32,
+    "fields": {
+      "module": 16,
+      "title": "CRUD Operations",
+      "slug": "crud-operations",
+      "lesson_type": "video",
+      "video_url": "https://youtube.com/watch?v=sql1",
+      "content": "Learn INSERT, UPDATE, and DELETE operations.",
+      "order": 2,
+      "is_published": true,
+      "created_at": "2025-01-28T12:00:00Z"
+    }
+  },
+  {
+    "model": "courses.lesson",
+    "pk": 33,
+    "fields": {
+      "module": 17,
+      "title": "SQL JOINs",
+      "slug": "sql-joins",
+      "lesson_type": "text",
+      "content": "<h2>Combining Tables</h2><p>JOINs are used to combine rows from two or more tables based on a related column.</p><h3>Types of JOINs</h3><ul><li>INNER JOIN</li><li>LEFT JOIN</li><li>RIGHT JOIN</li><li>FULL OUTER JOIN</li></ul>",
+      "order": 1,
+      "is_published": true,
+      "created_at": "2025-01-29T09:00:00Z"
+    }
+  },
+  {
+    "model": "courses.lesson",
+    "pk": 34,
+    "fields": {
+      "module": 17,
+      "title": "JOINs Quiz",
+      "slug": "joins-quiz",
+      "lesson_type": "quiz",
+      "content": "Test your knowledge of SQL JOINs.",
+      "order": 2,
+      "is_published": true,
+      "created_at": "2025-01-29T10:00:00Z"
+    }
+  },
+  {
+    "model": "courses.lesson",
+    "pk": 35,
+    "fields": {
+      "module": 18,
+      "title": "Database Normalization",
+      "slug": "database-normalization",
+      "lesson_type": "text",
+      "content": "<h2>Normalization</h2><p>Database normalization is the process of organizing data to minimize redundancy. Common forms: 1NF, 2NF, 3NF.</p>",
+      "order": 1,
+      "is_published": true,
+      "created_at": "2025-01-30T09:00:00Z"
+    }
+  },
+  {
+    "model": "courses.lesson",
+    "pk": 36,
+    "fields": {
+      "module": 18,
+      "title": "Design Quiz",
+      "slug": "design-quiz",
+      "lesson_type": "quiz",
+      "content": "Test your database design knowledge.",
+      "order": 2,
+      "is_published": true,
+      "created_at": "2025-01-30T10:00:00Z"
+    }
+  },
+  {
+    "model": "courses.lesson",
+    "pk": 37,
+    "fields": {
+      "module": 19,
+      "title": "Introduction to Vue",
+      "slug": "intro-vue",
+      "lesson_type": "text",
+      "content": "<h2>What is Vue.js?</h2><p>Vue.js is a progressive JavaScript framework for building user interfaces. It's designed to be incrementally adoptable.</p><h3>Key Features</h3><ul><li>Reactive data binding</li><li>Component-based architecture</li><li>Virtual DOM</li><li>Easy to learn</li></ul>",
+      "order": 1,
+      "is_published": true,
+      "created_at": "2025-02-01T11:00:00Z"
+    }
+  },
+  {
+    "model": "courses.lesson",
+    "pk": 38,
+    "fields": {
+      "module": 19,
+      "title": "Vue Directives",
+      "slug": "vue-directives",
+      "lesson_type": "video",
+      "video_url": "https://youtube.com/watch?v=vue1",
+      "content": "Learn v-if, v-for, v-bind, and v-model directives.",
+      "order": 2,
+      "is_published": true,
+      "created_at": "2025-02-01T12:00:00Z"
+    }
+  },
+  {
+    "model": "courses.lesson",
+    "pk": 39,
+    "fields": {
+      "module": 20,
+      "title": "ref and reactive",
+      "slug": "ref-reactive",
+      "lesson_type": "text",
+      "content": "<h2>Reactivity Fundamentals</h2><p>Vue 3 introduces ref() and reactive() for creating reactive state in Composition API.</p><pre><code>const count = ref(0)\nconst state = reactive({ name: 'Vue' })</code></pre>",
+      "order": 1,
+      "is_published": true,
+      "created_at": "2025-02-02T09:00:00Z"
+    }
+  },
+  {
+    "model": "courses.lesson",
+    "pk": 40,
+    "fields": {
+      "module": 20,
+      "title": "Composition API Quiz",
+      "slug": "composition-api-quiz",
+      "lesson_type": "quiz",
+      "content": "Test your Composition API knowledge.",
+      "order": 2,
+      "is_published": true,
+      "created_at": "2025-02-02T10:00:00Z"
+    }
+  },
+  {
+    "model": "courses.lesson",
+    "pk": 41,
+    "fields": {
+      "module": 21,
+      "title": "Pinia Basics",
+      "slug": "pinia-basics",
+      "lesson_type": "text",
+      "content": "<h2>State Management with Pinia</h2><p>Pinia is the recommended state management library for Vue 3. It provides stores for global state.</p>",
+      "order": 1,
+      "is_published": true,
+      "created_at": "2025-02-03T09:00:00Z"
+    }
+  },
+  {
+    "model": "courses.lesson",
+    "pk": 42,
+    "fields": {
+      "module": 21,
+      "title": "State Management Quiz",
+      "slug": "vue-state-quiz",
+      "lesson_type": "quiz",
+      "content": "Test your state management knowledge.",
+      "order": 2,
+      "is_published": true,
+      "created_at": "2025-02-03T10:00:00Z"
+    }
+  },
+  {
+    "model": "courses.lesson",
+    "pk": 43,
+    "fields": {
+      "module": 22,
+      "title": "Why TypeScript?",
+      "slug": "why-typescript",
+      "lesson_type": "text",
+      "content": "<h2>TypeScript Overview</h2><p>TypeScript is a superset of JavaScript that adds static typing. It helps catch errors early and improves code quality.</p><h3>Benefits</h3><ul><li>Type safety</li><li>Better IDE support</li><li>Self-documenting code</li><li>Easier refactoring</li></ul>",
+      "order": 1,
+      "is_published": true,
+      "created_at": "2025-02-05T11:00:00Z"
+    }
+  },
+  {
+    "model": "courses.lesson",
+    "pk": 44,
+    "fields": {
+      "module": 22,
+      "title": "Basic Types",
+      "slug": "basic-types",
+      "lesson_type": "video",
+      "video_url": "https://youtube.com/watch?v=ts1",
+      "content": "Learn string, number, boolean, array, and object types.",
+      "order": 2,
+      "is_published": true,
+      "created_at": "2025-02-05T12:00:00Z"
+    }
+  },
+  {
+    "model": "courses.lesson",
+    "pk": 45,
+    "fields": {
+      "module": 23,
+      "title": "Generics",
+      "slug": "generics",
+      "lesson_type": "text",
+      "content": "<h2>Generic Types</h2><p>Generics allow you to create reusable components that work with multiple types.</p><pre><code>function identity<T>(arg: T): T {\n  return arg;\n}</code></pre>",
+      "order": 1,
+      "is_published": true,
+      "created_at": "2025-02-06T09:00:00Z"
+    }
+  },
+  {
+    "model": "courses.lesson",
+    "pk": 46,
+    "fields": {
+      "module": 23,
+      "title": "Generics Quiz",
+      "slug": "generics-quiz",
+      "lesson_type": "quiz",
+      "content": "Test your knowledge of TypeScript generics.",
+      "order": 2,
+      "is_published": true,
+      "created_at": "2025-02-06T10:00:00Z"
+    }
+  },
+  {
+    "model": "courses.lesson",
+    "pk": 47,
+    "fields": {
+      "module": 24,
+      "title": "TypeScript with React",
+      "slug": "ts-react",
+      "lesson_type": "text",
+      "content": "<h2>React + TypeScript</h2><p>TypeScript works great with React, providing type safety for props, state, and hooks.</p>",
+      "order": 1,
+      "is_published": true,
+      "created_at": "2025-02-07T09:00:00Z"
+    }
+  },
+  {
+    "model": "courses.lesson",
+    "pk": 48,
+    "fields": {
+      "module": 24,
+      "title": "Framework Integration Quiz",
+      "slug": "framework-quiz",
+      "lesson_type": "quiz",
+      "content": "Test your TypeScript framework integration knowledge.",
+      "order": 2,
+      "is_published": true,
+      "created_at": "2025-02-07T10:00:00Z"
+    }
+  },
+  {
+    "model": "courses.lesson",
+    "pk": 49,
+    "fields": {
+      "module": 25,
+      "title": "Getting Started with React Native",
+      "slug": "getting-started-rn",
+      "lesson_type": "text",
+      "content": "<h2>What is React Native?</h2><p>React Native is a framework for building native mobile apps using React and JavaScript. Write once, run on both iOS and Android.</p>",
+      "order": 1,
+      "is_published": true,
+      "created_at": "2025-02-10T11:00:00Z"
+    }
+  },
+  {
+    "model": "courses.lesson",
+    "pk": 50,
+    "fields": {
+      "module": 25,
+      "title": "Core Components",
+      "slug": "core-components-rn",
+      "lesson_type": "video",
+      "video_url": "https://youtube.com/watch?v=rn1",
+      "content": "Learn View, Text, Image, ScrollView, and other core components.",
+      "order": 2,
+      "is_published": true,
+      "created_at": "2025-02-10T12:00:00Z"
+    }
+  },
+  {
+    "model": "courses.lesson",
+    "pk": 51,
+    "fields": {
+      "module": 26,
+      "title": "React Navigation Setup",
+      "slug": "react-navigation-setup",
+      "lesson_type": "text",
+      "content": "<h2>Navigation in React Native</h2><p>React Navigation is the most popular navigation library for React Native. It supports stack, tab, and drawer navigation.</p>",
+      "order": 1,
+      "is_published": true,
+      "created_at": "2025-02-11T09:00:00Z"
+    }
+  },
+  {
+    "model": "courses.lesson",
+    "pk": 52,
+    "fields": {
+      "module": 26,
+      "title": "Navigation Quiz",
+      "slug": "navigation-quiz",
+      "lesson_type": "quiz",
+      "content": "Test your React Navigation knowledge.",
+      "order": 2,
+      "is_published": true,
+      "created_at": "2025-02-11T10:00:00Z"
+    }
+  },
+  {
+    "model": "courses.lesson",
+    "pk": 53,
+    "fields": {
+      "module": 27,
+      "title": "Using Camera API",
+      "slug": "camera-api",
+      "lesson_type": "text",
+      "content": "<h2>Accessing Device Camera</h2><p>React Native allows you to access native device features like the camera through native modules or libraries like expo-camera.</p>",
+      "order": 1,
+      "is_published": true,
+      "created_at": "2025-02-12T09:00:00Z"
+    }
+  },
+  {
+    "model": "courses.lesson",
+    "pk": 54,
+    "fields": {
+      "module": 27,
+      "title": "Native Features Quiz",
+      "slug": "native-features-quiz",
+      "lesson_type": "quiz",
+      "content": "Test your native features knowledge.",
+      "order": 2,
+      "is_published": true,
+      "created_at": "2025-02-12T10:00:00Z"
+    }
+  }
+]

@@ -1,0 +1,326 @@
+[
+  {
+    "model": "courses.module",
+    "pk": 1,
+    "fields": {
+      "course": 1,
+      "title": "Getting Started with Python",
+      "description": "Setting up your development environment and understanding Python basics.",
+      "order": 1,
+      "duration_days": 3,
+      "is_locked": false
+    }
+  },
+  {
+    "model": "courses.module",
+    "pk": 2,
+    "fields": {
+      "course": 1,
+      "title": "Python Data Types",
+      "description": "Variables, strings, numbers, lists, dictionaries and more.",
+      "order": 2,
+      "duration_days": 5,
+      "is_locked": false
+    }
+  },
+  {
+    "model": "courses.module",
+    "pk": 3,
+    "fields": {
+      "course": 1,
+      "title": "Control Flow & Functions",
+      "description": "Conditionals, loops, functions and error handling.",
+      "order": 3,
+      "duration_days": 7,
+      "is_locked": true
+    }
+  },
+  {
+    "model": "courses.module",
+    "pk": 4,
+    "fields": {
+      "course": 2,
+      "title": "React Fundamentals",
+      "description": "Understanding components, JSX and props.",
+      "order": 1,
+      "duration_days": 4,
+      "is_locked": false
+    }
+  },
+  {
+    "model": "courses.module",
+    "pk": 5,
+    "fields": {
+      "course": 2,
+      "title": "React Hooks",
+      "description": "useState, useEffect, useContext and custom hooks.",
+      "order": 2,
+      "duration_days": 5,
+      "is_locked": false
+    }
+  },
+  {
+    "model": "courses.module",
+    "pk": 6,
+    "fields": {
+      "course": 2,
+      "title": "State Management",
+      "description": "Context API and Redux basics.",
+      "order": 3,
+      "duration_days": 6,
+      "is_locked": false
+    }
+  },
+  {
+    "model": "courses.module",
+    "pk": 7,
+    "fields": {
+      "course": 3,
+      "title": "Data Preprocessing",
+      "description": "Cleaning and preparing data for ML models.",
+      "order": 1,
+      "duration_days": 5,
+      "is_locked": false
+    }
+  },
+  {
+    "model": "courses.module",
+    "pk": 8,
+    "fields": {
+      "course": 3,
+      "title": "Regression",
+      "description": "Linear, polynomial and multiple regression.",
+      "order": 2,
+      "duration_days": 7,
+      "is_locked": false
+    }
+  },
+  {
+    "model": "courses.module",
+    "pk": 9,
+    "fields": {
+      "course": 3,
+      "title": "Classification",
+      "description": "Logistic regression, K-NN, SVM, decision trees.",
+      "order": 3,
+      "duration_days": 8,
+      "is_locked": true
+    }
+  },
+  {
+    "model": "courses.module",
+    "pk": 10,
+    "fields": {
+      "course": 4,
+      "title": "Django Fundamentals",
+      "description": "Introduction to Django, MVT architecture, and project setup.",
+      "order": 1,
+      "duration_days": 4,
+      "is_locked": false
+    }
+  },
+  {
+    "model": "courses.module",
+    "pk": 11,
+    "fields": {
+      "course": 4,
+      "title": "Models & Database",
+      "description": "ORM, migrations, and database relationships.",
+      "order": 2,
+      "duration_days": 5,
+      "is_locked": false
+    }
+  },
+  {
+    "model": "courses.module",
+    "pk": 12,
+    "fields": {
+      "course": 4,
+      "title": "Views & Templates",
+      "description": "Class-based views, function views, and template system.",
+      "order": 3,
+      "duration_days": 6,
+      "is_locked": true
+    }
+  },
+  {
+    "model": "courses.module",
+    "pk": 13,
+    "fields": {
+      "course": 5,
+      "title": "Docker Basics",
+      "description": "Containers, images, and Dockerfile.",
+      "order": 1,
+      "duration_days": 5,
+      "is_locked": false
+    }
+  },
+  {
+    "model": "courses.module",
+    "pk": 14,
+    "fields": {
+      "course": 5,
+      "title": "Docker Compose",
+      "description": "Multi-container applications.",
+      "order": 2,
+      "duration_days": 4,
+      "is_locked": false
+    }
+  },
+  {
+    "model": "courses.module",
+    "pk": 15,
+    "fields": {
+      "course": 5,
+      "title": "Kubernetes Fundamentals",
+      "description": "Pods, deployments, services, and ingress.",
+      "order": 3,
+      "duration_days": 7,
+      "is_locked": true
+    }
+  },
+  {
+    "model": "courses.module",
+    "pk": 16,
+    "fields": {
+      "course": 6,
+      "title": "SQL Basics",
+      "description": "SELECT, INSERT, UPDATE, DELETE operations.",
+      "order": 1,
+      "duration_days": 4,
+      "is_locked": false
+    }
+  },
+  {
+    "model": "courses.module",
+    "pk": 17,
+    "fields": {
+      "course": 6,
+      "title": "Advanced Queries",
+      "description": "JOINs, subqueries, and aggregate functions.",
+      "order": 2,
+      "duration_days": 5,
+      "is_locked": false
+    }
+  },
+  {
+    "model": "courses.module",
+    "pk": 18,
+    "fields": {
+      "course": 6,
+      "title": "Database Design",
+      "description": "Normalization, indexes, and optimization.",
+      "order": 3,
+      "duration_days": 5,
+      "is_locked": false
+    }
+  },
+  {
+    "model": "courses.module",
+    "pk": 19,
+    "fields": {
+      "course": 7,
+      "title": "Vue Basics",
+      "description": "Introduction to Vue.js and reactive data binding.",
+      "order": 1,
+      "duration_days": 4,
+      "is_locked": false
+    }
+  },
+  {
+    "model": "courses.module",
+    "pk": 20,
+    "fields": {
+      "course": 7,
+      "title": "Composition API",
+      "description": "ref, reactive, computed, and watchers.",
+      "order": 2,
+      "duration_days": 5,
+      "is_locked": false
+    }
+  },
+  {
+    "model": "courses.module",
+    "pk": 21,
+    "fields": {
+      "course": 7,
+      "title": "State Management",
+      "description": "Vuex and Pinia for global state.",
+      "order": 3,
+      "duration_days": 5,
+      "is_locked": true
+    }
+  },
+  {
+    "model": "courses.module",
+    "pk": 22,
+    "fields": {
+      "course": 8,
+      "title": "TypeScript Basics",
+      "description": "Types, interfaces, and type inference.",
+      "order": 1,
+      "duration_days": 4,
+      "is_locked": false
+    }
+  },
+  {
+    "model": "courses.module",
+    "pk": 23,
+    "fields": {
+      "course": 8,
+      "title": "Advanced Types",
+      "description": "Generics, unions, intersections, and type guards.",
+      "order": 2,
+      "duration_days": 5,
+      "is_locked": false
+    }
+  },
+  {
+    "model": "courses.module",
+    "pk": 24,
+    "fields": {
+      "course": 8,
+      "title": "TypeScript with Frameworks",
+      "description": "Using TypeScript with React and Vue.",
+      "order": 3,
+      "duration_days": 6,
+      "is_locked": true
+    }
+  },
+  {
+    "model": "courses.module",
+    "pk": 25,
+    "fields": {
+      "course": 9,
+      "title": "React Native Basics",
+      "description": "Setup, components, and styling.",
+      "order": 1,
+      "duration_days": 5,
+      "is_locked": false
+    }
+  },
+  {
+    "model": "courses.module",
+    "pk": 26,
+    "fields": {
+      "course": 9,
+      "title": "Navigation",
+      "description": "React Navigation and routing.",
+      "order": 2,
+      "duration_days": 4,
+      "is_locked": false
+    }
+  },
+  {
+    "model": "courses.module",
+    "pk": 27,
+    "fields": {
+      "course": 9,
+      "title": "Native Features",
+      "description": "Camera, storage, and device APIs.",
+      "order": 3,
+      "duration_days": 6,
+      "is_locked": false
+    }
+  }
+]

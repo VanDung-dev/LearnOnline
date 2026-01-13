@@ -1,0 +1,75 @@
+[
+  {
+    "model": "accounts.profile",
+    "pk": 1,
+    "fields": {
+      "user": 1,
+      "role": "admin",
+      "bio": "System Administrator",
+      "location": "Server Room",
+      "birth_date": "1980-01-01"
+    }
+  },
+  {
+    "model": "accounts.profile",
+    "pk": 6,
+    "fields": {
+      "user": 6,
+      "role": "school_admin",
+      "bio": "School Admin for Đại học A",
+      "location": "Campus A",
+      "birth_date": "1982-02-02",
+      "school": 1
+    }
+  },
+  {
+    "model": "accounts.profile",
+    "pk": 2,
+    "fields": {
+      "user": 2,
+      "role": "instructor",
+      "bio": "Python expert with 10 years of experience. Specializes in backend development, machine learning, and data science.",
+      "location": "San Francisco, CA",
+      "birth_date": "1985-05-15",
+      "website": "https://johndoe.dev",
+      "school": 1,
+      "employee_id": "GV001"
+    }
+  },
+  {
+    "model": "accounts.profile",
+    "pk": 3,
+    "fields": {
+      "user": 3,
+      "role": "instructor",
+      "bio": "Frontend wizard primarily focused on React and Vue. Expert in UI/UX design and modern JavaScript frameworks.",
+      "location": "New York, NY",
+      "birth_date": "1990-08-20",
+      "website": "https://janesmith.io",
+      "school": 2,
+      "employee_id": "GV002"
+    }
+  },
+  {
+    "model": "accounts.profile",
+    "pk": 4,
+    "fields": {
+      "user": 4,
+      "role": "student",
+      "bio": "Eager learner getting into tech. Currently studying 5 courses and has earned 3 certificates.",
+      "location": "Austin, TX",
+      "birth_date": "1995-03-10"
+    }
+  },
+  {
+    "model": "accounts.profile",
+    "pk": 5,
+    "fields": {
+      "user": 5,
+      "role": "student",
+      "bio": "Building things one brick at a time. Currently learning 2 courses.",
+      "location": "London, UK",
+      "birth_date": "1992-11-25"
+    }
+  }
+]

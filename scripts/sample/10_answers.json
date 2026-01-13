@@ -1,0 +1,422 @@
+[
+  {
+    "model": "courses.answer",
+    "pk": 1,
+    "fields": {
+      "question": 1,
+      "text": ".py",
+      "is_correct": true,
+      "order": 1
+    }
+  },
+  {
+    "model": "courses.answer",
+    "pk": 2,
+    "fields": {
+      "question": 1,
+      "text": ".python",
+      "is_correct": false,
+      "order": 2
+    }
+  },
+  {
+    "model": "courses.answer",
+    "pk": 3,
+    "fields": {
+      "question": 1,
+      "text": ".pt",
+      "is_correct": false,
+      "order": 3
+    }
+  },
+  {
+    "model": "courses.answer",
+    "pk": 4,
+    "fields": {
+      "question": 2,
+      "text": "my_var",
+      "is_correct": true,
+      "order": 1
+    }
+  },
+  {
+    "model": "courses.answer",
+    "pk": 5,
+    "fields": {
+      "question": 2,
+      "text": "_var",
+      "is_correct": true,
+      "order": 2
+    }
+  },
+  {
+    "model": "courses.answer",
+    "pk": 6,
+    "fields": {
+      "question": 2,
+      "text": "2var",
+      "is_correct": false,
+      "order": 3
+    }
+  },
+  {
+    "model": "courses.answer",
+    "pk": 7,
+    "fields": {
+      "question": 3,
+      "text": "if",
+      "is_correct": true,
+      "order": 1
+    }
+  },
+  {
+    "model": "courses.answer",
+    "pk": 8,
+    "fields": {
+      "question": 3,
+      "text": "when",
+      "is_correct": false,
+      "order": 2
+    }
+  },
+  {
+    "model": "courses.answer",
+    "pk": 9,
+    "fields": {
+      "question": 3,
+      "text": "case",
+      "is_correct": false,
+      "order": 3
+    }
+  },
+  {
+    "model": "courses.answer",
+    "pk": 10,
+    "fields": {
+      "question": 4,
+      "text": "useEffect",
+      "is_correct": true,
+      "order": 1
+    }
+  },
+  {
+    "model": "courses.answer",
+    "pk": 11,
+    "fields": {
+      "question": 4,
+      "text": "useState",
+      "is_correct": false,
+      "order": 2
+    }
+  },
+  {
+    "model": "courses.answer",
+    "pk": 12,
+    "fields": {
+      "question": 4,
+      "text": "useContext",
+      "is_correct": false,
+      "order": 3
+    }
+  },
+  {
+    "model": "courses.answer",
+    "pk": 13,
+    "fields": {
+      "question": 5,
+      "text": "Pass data without prop drilling",
+      "is_correct": true,
+      "order": 1
+    }
+  },
+  {
+    "model": "courses.answer",
+    "pk": 14,
+    "fields": {
+      "question": 5,
+      "text": "Style components",
+      "is_correct": false,
+      "order": 2
+    }
+  },
+  {
+    "model": "courses.answer",
+    "pk": 15,
+    "fields": {
+      "question": 6,
+      "text": "Continuous value prediction",
+      "is_correct": true,
+      "order": 1
+    }
+  },
+  {
+    "model": "courses.answer",
+    "pk": 16,
+    "fields": {
+      "question": 6,
+      "text": "Classification",
+      "is_correct": false,
+      "order": 2
+    }
+  },
+  {
+    "model": "courses.answer",
+    "pk": 17,
+    "fields": {
+      "question": 7,
+      "text": "Logistic Regression",
+      "is_correct": true,
+      "order": 1
+    }
+  },
+  {
+    "model": "courses.answer",
+    "pk": 18,
+    "fields": {
+      "question": 7,
+      "text": "Linear Regression",
+      "is_correct": false,
+      "order": 2
+    }
+  },
+  {
+    "model": "courses.answer",
+    "pk": 19,
+    "fields": {
+      "question": 8,
+      "text": "python manage.py migrate",
+      "is_correct": true,
+      "order": 1
+    }
+  },
+  {
+    "model": "courses.answer",
+    "pk": 20,
+    "fields": {
+      "question": 8,
+      "text": "python manage.py runserver",
+      "is_correct": false,
+      "order": 2
+    }
+  },
+  {
+    "model": "courses.answer",
+    "pk": 21,
+    "fields": {
+      "question": 9,
+      "text": "ListView",
+      "is_correct": true,
+      "order": 1
+    }
+  },
+  {
+    "model": "courses.answer",
+    "pk": 22,
+    "fields": {
+      "question": 9,
+      "text": "DetailView",
+      "is_correct": false,
+      "order": 2
+    }
+  },
+  {
+    "model": "courses.answer",
+    "pk": 23,
+    "fields": {
+      "question": 10,
+      "text": "docker-compose.yml",
+      "is_correct": true,
+      "order": 1
+    }
+  },
+  {
+    "model": "courses.answer",
+    "pk": 24,
+    "fields": {
+      "question": 10,
+      "text": "Dockerfile",
+      "is_correct": false,
+      "order": 2
+    }
+  },
+  {
+    "model": "courses.answer",
+    "pk": 25,
+    "fields": {
+      "question": 11,
+      "text": "Pod",
+      "is_correct": true,
+      "order": 1
+    }
+  },
+  {
+    "model": "courses.answer",
+    "pk": 26,
+    "fields": {
+      "question": 11,
+      "text": "Container",
+      "is_correct": false,
+      "order": 2
+    }
+  },
+  {
+    "model": "courses.answer",
+    "pk": 27,
+    "fields": {
+      "question": 12,
+      "text": "LEFT JOIN",
+      "is_correct": true,
+      "order": 1
+    }
+  },
+  {
+    "model": "courses.answer",
+    "pk": 28,
+    "fields": {
+      "question": 12,
+      "text": "RIGHT JOIN",
+      "is_correct": false,
+      "order": 2
+    }
+  },
+  {
+    "model": "courses.answer",
+    "pk": 29,
+    "fields": {
+      "question": 13,
+      "text": "Reduce data redundancy",
+      "is_correct": true,
+      "order": 1
+    }
+  },
+  {
+    "model": "courses.answer",
+    "pk": 30,
+    "fields": {
+      "question": 13,
+      "text": "Increase query speed",
+      "is_correct": false,
+      "order": 2
+    }
+  },
+  {
+    "model": "courses.answer",
+    "pk": 31,
+    "fields": {
+      "question": 14,
+      "text": "ref()",
+      "is_correct": true,
+      "order": 1
+    }
+  },
+  {
+    "model": "courses.answer",
+    "pk": 32,
+    "fields": {
+      "question": 14,
+      "text": "useState()",
+      "is_correct": false,
+      "order": 2
+    }
+  },
+  {
+    "model": "courses.answer",
+    "pk": 33,
+    "fields": {
+      "question": 15,
+      "text": "Vue 3 state management library",
+      "is_correct": true,
+      "order": 1
+    }
+  },
+  {
+    "model": "courses.answer",
+    "pk": 34,
+    "fields": {
+      "question": 15,
+      "text": "CSS framework",
+      "is_correct": false,
+      "order": 2
+    }
+  },
+  {
+    "model": "courses.answer",
+    "pk": 35,
+    "fields": {
+      "question": 16,
+      "text": "<T>",
+      "is_correct": true,
+      "order": 1
+    }
+  },
+  {
+    "model": "courses.answer",
+    "pk": 36,
+    "fields": {
+      "question": 16,
+      "text": "[T]",
+      "is_correct": false,
+      "order": 2
+    }
+  },
+  {
+    "model": "courses.answer",
+    "pk": 37,
+    "fields": {
+      "question": 17,
+      "text": "interface Props {}",
+      "is_correct": true,
+      "order": 1
+    }
+  },
+  {
+    "model": "courses.answer",
+    "pk": 38,
+    "fields": {
+      "question": 17,
+      "text": "class Props {}",
+      "is_correct": false,
+      "order": 2
+    }
+  },
+  {
+    "model": "courses.answer",
+    "pk": 39,
+    "fields": {
+      "question": 18,
+      "text": "createBottomTabNavigator",
+      "is_correct": true,
+      "order": 1
+    }
+  },
+  {
+    "model": "courses.answer",
+    "pk": 40,
+    "fields": {
+      "question": 18,
+      "text": "createStackNavigator",
+      "is_correct": false,
+      "order": 2
+    }
+  },
+  {
+    "model": "courses.answer",
+    "pk": 41,
+    "fields": {
+      "question": 19,
+      "text": "expo-camera",
+      "is_correct": true,
+      "order": 1
+    }
+  },
+  {
+    "model": "courses.answer",
+    "pk": 42,
+    "fields": {
+      "question": 19,
+      "text": "react-camera",
+      "is_correct": false,
+      "order": 2
+    }
+  }
+]
