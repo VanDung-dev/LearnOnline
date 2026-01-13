@@ -62,18 +62,18 @@ def enroll_course(request, slug):
 
 @login_required
 def instructor_courses(request):
-    if (not request.user.is_superuser
-        and (not hasattr(request.user, 'profile')
-        or not (request.user.profile.is_instructor()
-        or request.user.profile.is_admin()))
-    ):
-        return HttpResponseForbidden("You must be an instructor to view this page.")
+    """
+    Deprecated: Redirect to unified dashboard.
+    """
+    return redirect('user_dashboard')
 
-    courses = Course.objects.filter(instructor=request.user)
-    context = {
-        'courses': courses,
-    }
-    return render(request, 'courses/instructor_courses.html', context)
+
+@login_required
+def student_dashboard(request):
+    """
+    Deprecated: Redirect to unified dashboard.
+    """
+    return redirect('user_dashboard')
 
 
 @login_required

@@ -223,9 +223,11 @@ def course_detail(request, slug):
         # Check if user is enrolled
         is_enrolled = course.enrollments.filter(user=request.user).exists()
         # Check if user is the instructor
-        is_instructor = (hasattr(request.user, 'profile') and 
-                         request.user.profile.is_instructor() and 
-                         course.instructor == request.user)
+        is_instructor = (
+                hasattr(request.user, 'profile') and
+                request.user.profile.is_instructor() and
+                course.instructor == request.user
+        )
     
     return render(request, 'courses/course_detail.html', {
         'course': course,
@@ -244,9 +246,11 @@ def course_learning_process(request, slug):
         # Check if user is enrolled
         is_enrolled = course.enrollments.filter(user=request.user).exists()
         # Check if user is the instructor
-        is_instructor = (hasattr(request.user, 'profile') and 
-                         request.user.profile.is_instructor() and 
-                         course.instructor == request.user)
+        is_instructor = (
+                hasattr(request.user, 'profile') and
+                request.user.profile.is_instructor() and
+                course.instructor == request.user
+        )
     
     # Only allow enrolled users or instructors to view the learning process
     if not is_enrolled and not is_instructor:
@@ -258,12 +262,6 @@ def course_learning_process(request, slug):
         'is_enrolled': is_enrolled,
         'is_instructor': is_instructor
     })
-
-
-@login_required
-def instructor_courses(request):
-    courses = Course.objects.filter(instructor=request.user)
-    return render(request, 'courses/instructor_courses.html', {'courses': courses})
 
 
 @require_http_methods(["POST"])

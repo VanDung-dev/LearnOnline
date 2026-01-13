@@ -17,7 +17,7 @@ from .includes.views_lesson_detail import (
 )
 from .includes.views_other import (
     home, enroll_course, support,
-    instructor_courses, delete_lesson_video, upload_image
+    instructor_courses, student_dashboard, delete_lesson_video, upload_image
 )
 from .includes.views_error import (
     custom_page_not_found, custom_server_error,
@@ -38,7 +38,7 @@ from .includes.views_search import (
 
 __all__ = [
     'create_course', 'edit_course', 'delete_course', 'course_list',
-    'course_detail', 'enroll_course', 'instructor_courses',
+    'course_detail', 'enroll_course', 'instructor_courses', 'student_dashboard',
     'create_module', 'edit_module', 'delete_module', 'reorder_modules',
     'create_lesson', 'edit_lesson', 'delete_lesson', 'delete_lesson_video',
     'reorder_lessons', 'reorder_quiz_questions',

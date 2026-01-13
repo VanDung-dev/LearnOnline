@@ -21,6 +21,7 @@ urlpatterns = [
     
     # Instructor URLs
     path('instructor/courses/', views.instructor_courses, name='instructor_courses'),
+    path('student/dashboard/', views.student_dashboard, name='student_dashboard'),
     path('instructor/courses/create/', views.create_course, name='create_course'),
     path('instructor/courses/create-category-ajax/', views.create_category_ajax, name='create_category_ajax'),
     path('instructor/courses/<slug:slug>/edit/', views.edit_course, name='edit_course'),
