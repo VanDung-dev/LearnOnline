@@ -121,13 +121,47 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function onlyDigits(str) { return (str || '').replace(/\D+/g, ''); }
 
+    // Luhn algorithm to validate card numbers
+    function luhnCheck(cardNumber) {
+        const digits = onlyDigits(cardNumber);
+        if (digits.length < 13) return false;
+        let sum = 0;
+        let isEven = false;
+        for (let i = digits.length - 1; i >= 0; i--) {
+            let digit = parseInt(digits[i], 10);
+            if (isEven) {
+                digit *= 2;
+                if (digit > 9) digit -= 9;
+            }
+            sum += digit;
+            isEven = !isEven;
+        }
+        return sum % 10 === 0;
+    }
+
+    // Detect card type from BIN (Bank Identification Number)
+    function detectCardType(cardNumber) {
+        const digits = onlyDigits(cardNumber);
+        if (digits.length < 1) return null;
+        // Visa: starts with 4
+        if (/^4/.test(digits)) return 'visa';
+        // Mastercard: 51-55 or 2221-2720
+        const prefix2 = parseInt(digits.substring(0, 2), 10) || 0;
+        const prefix4 = parseInt(digits.substring(0, 4), 10) || 0;
+        if ((prefix2 >= 51 && prefix2 <= 55) || (prefix4 >= 2221 && prefix4 <= 2720)) {
+            return 'mastercard';
+        }
+        return null;
+    }
+
     function formatCardNumber(value) {
         const digits = onlyDigits(value).slice(0, 19);
         return digits.replace(/(.{4})/g, '$1 ').trim();
     }
     function validateCardNumber(value) {
         const digits = onlyDigits(value);
-        return digits.length >= 13 && digits.length <= 19;
+        if (digits.length < 13 || digits.length > 19) return false;
+        return luhnCheck(digits);
     }
     function formatExpiry(value) {
         const digits = onlyDigits(value).slice(0, 4);
@@ -165,12 +199,30 @@ document.addEventListener('DOMContentLoaded', function () {
                 setFieldError('card_number', 'Enter a valid card number.');
                 valid = false;
             }
+            // Validate cardholder name
+            const cardholderName = document.getElementById('cardholder_name');
+            if (cardholderName && (!cardholderName.value || cardholderName.value.trim().length < 2)) {
+                setFieldError('cardholder_name', 'Enter the cardholder name.');
+                valid = false;
+            }
             if (!validateExpiry(expiry.value)) {
                 setFieldError('expiry_date', 'Enter a valid expiry in MM/YY.');
                 valid = false;
             }
             if (!validateCVV(cvv.value)) {
                 setFieldError('cvv', 'Enter a valid CVV (3–4 digits).');
+                valid = false;
+            }
+
+            // Billing validation
+            const billingAddress = document.getElementById('billing_address');
+            if (billingAddress && !billingAddress.value.trim()) {
+                setFieldError('billing_address', 'Please enter your billing address.');
+                valid = false;
+            }
+            const zipCode = document.getElementById('zip_code');
+            if (zipCode && !zipCode.value.trim()) {
+                setFieldError('zip_code', 'Zip code required.');
                 valid = false;
             }
         }
@@ -182,6 +234,26 @@ document.addEventListener('DOMContentLoaded', function () {
         cardNumber.addEventListener('input', (e) => {
             const pos = e.target.selectionStart;
             e.target.value = formatCardNumber(e.target.value);
+
+            // Auto-detect card type from BIN
+            const detected = detectCardType(e.target.value);
+            if (detected && (detected === 'visa' || detected === 'mastercard')) {
+                // Auto-select the detected card type
+                const currentMethod = methodInput.value;
+                if (currentMethod !== detected) {
+                    methodInput.value = detected;
+                    document.getElementById('card_type').value = detected;
+                    // Update UI selection
+                    document.querySelectorAll('.method-option').forEach(opt => {
+                        const method = opt.getAttribute('data-method');
+                        if (method === detected) {
+                            opt.classList.add('selected', 'border-primary', 'bg-light');
+                        } else if (method === 'visa' || method === 'mastercard') {
+                            opt.classList.remove('selected', 'border-primary', 'bg-light');
+                        }
+                    });
+                }
+            }
             validateForm();
         });
     }
@@ -244,6 +316,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 payButton.innerHTML = originalText;
                 showOverlay(false);
             });
+    });
+
+    // Billing inputs listeners
+    ['billing_address', 'zip_code', 'phone_number'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('input', validateForm);
+        }
     });
 
     // Initial state
