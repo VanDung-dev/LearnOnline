@@ -7,12 +7,9 @@ from django.contrib.auth import logout, authenticate
 from django.contrib.auth.views import LoginView
 from django.contrib.auth.forms import AuthenticationForm
 from django.urls import reverse_lazy
-from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy
 from django.views import View
 from django.http import HttpResponseRedirect
-from django.core.exceptions import ValidationError
-from django_ratelimit.decorators import ratelimit
 from apps.courses.models import Course, Enrollment
 from apps.payments.models import Payment
 from .forms import UserRegistrationForm, UserUpdateForm, ProfileUpdateForm
@@ -164,7 +161,7 @@ def edit_profile(request):
             u_form.save()
             p_form.save()
             messages.success(request, 'Your profile has been updated successfully!')
-            return redirect('accounts:edit_profile')
+            return redirect('edit_profile')
     else:
         u_form = UserUpdateForm(instance=request.user)
         p_form = ProfileUpdateForm(instance=request.user.profile)

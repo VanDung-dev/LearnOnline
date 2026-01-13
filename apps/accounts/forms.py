@@ -47,4 +47,5 @@ class ProfileUpdateForm(forms.ModelForm):
         fields = ('bio', 'location', 'birth_date', 'website', 'profile_picture')
         widgets = {
             'birth_date': forms.DateInput(attrs={'type': 'date'}),
+            'bio': forms.Textarea(attrs={'style': 'height: 150px'}),
         }
