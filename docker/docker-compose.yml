@@ -8,23 +8,41 @@ services:
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - ..:/app
+      - static_volume:/app/staticfiles
+      - ../media:/app/media
     ports:
       - "8000:8000"
+    expose:
+      - "8000"
     environment:
-      - DEBUG=1
+      - DEBUG=True
       - DJANGO_SETTINGS_MODULE=DjangoProject.settings_docker
+      - SECRET_KEY=django-insecure-prod-simulation-key-12345
+      - ALLOWED_HOSTS=*
     depends_on:
       - db
       - redis
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '2'
+          memory: 4G
 
   db:
-    image: postgres:13
+    image: postgres:15
     volumes:
       - postgres_data:/var/lib/postgresql/data
     environment:
       - POSTGRES_DB=learnonline
       - POSTGRES_USER=learnonline_user
       - POSTGRES_PASSWORD=learnonline_password
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '4'
+          memory: 8G
 
   redis:
     image: redis:7-alpine
@@ -32,7 +50,14 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/data
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
 
 volumes:
   postgres_data:
   redis_data:
+  static_volume:

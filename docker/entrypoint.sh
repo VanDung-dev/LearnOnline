@@ -8,6 +8,10 @@ python manage.py collectstatic --noinput
 echo "Apply database migrations"
 python manage.py migrate
 
+# Load sample data
+echo "Loading sample data..."
+python scripts/load_sample_data.py
+
 # Start server
 echo "Starting server"
 exec "$@"
