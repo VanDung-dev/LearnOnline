@@ -14,6 +14,7 @@ from apps.courses.models import Course, Enrollment
 from apps.payments.models import Payment
 from .forms import UserRegistrationForm, UserUpdateForm, ProfileUpdateForm
 from apps.accounts.tasks import send_activation_email_task
+from django.core.exceptions import ValidationError
 
 
 class CustomAuthenticationForm(AuthenticationForm):
@@ -60,7 +61,7 @@ class CustomLoginView(LoginView):
         elif hasattr(user, 'profile') and user.profile.is_instructor():
             return reverse_lazy('accounts:profile')
         else:
-            return reverse_lazy('courses:home')
+            return reverse_lazy('user_dashboard')
 
     # @method_decorator(ratelimit(key='ip', rate='5/5m', method='POST', block=False))
     def post(self, request, *args, **kwargs):
