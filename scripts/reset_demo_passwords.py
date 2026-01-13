@@ -22,7 +22,7 @@ django.setup()
 
 from django.contrib.auth.models import User
 
-# Danh sách user cần reset mật khẩu
+# List of users who need to reset their passwords
 users = [
     'admin', 
     'admin_school_a',
