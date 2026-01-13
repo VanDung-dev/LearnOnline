@@ -15,13 +15,10 @@
                 </div>
                 <div class="card-body">
                     <form method="GET" action="{% url 'courses:course_list' %}" id="filter-form">
-                        <!-- Search Input -->
-                        <div class="mb-3">
-                            <label for="search-input" class="form-label fw-bold">Search</label>
-                            <input type="text" class="form-control" id="search-input" 
-                                   name="q" value="{{ query }}" placeholder="Search courses...">
-                        </div>
-
+                        <!-- Preserve search query when applying filters -->
+                        {% if query %}
+                        <input type="hidden" name="q" value="{{ query }}">
+                        {% endif %}
                         <!-- Category Filter -->
                         <div class="mb-3">
                             <label for="category-select" class="form-label fw-bold">Category</label>
@@ -38,8 +35,7 @@
                         <!-- Free Courses Checkbox -->
                         <div class="mb-3">
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="free-check" 
-                                       name="is_free" value="true" {% if is_free %}checked{% endif %}>
+                                <input class="form-check-input" type="checkbox" id="free-check" name="is_free" value="true" {% if is_free %}checked{% endif %}>
                                 <label class="form-check-label" for="free-check">
                                     Free Courses Only
                                 </label>
@@ -51,12 +47,10 @@
                             <label class="form-label fw-bold">Price Range</label>
                             <div class="row g-2">
                                 <div class="col-6">
-                                    <input type="number" class="form-control" name="min_price" 
-                                           placeholder="Min" value="{{ min_price }}" min="0" step="0.01">
+                                    <input type="number" class="form-control" name="min_price" placeholder="Min" value="{{ min_price }}" min="0" step="0.01">
                                 </div>
                                 <div class="col-6">
-                                    <input type="number" class="form-control" name="max_price" 
-                                           placeholder="Max" value="{{ max_price }}" min="0" step="0.01">
+                                    <input type="number" class="form-control" name="max_price" placeholder="Max" value="{{ max_price }}" min="0" step="0.01">
                                 </div>
                             </div>
                         </div>
@@ -135,11 +129,10 @@
             <div class="row">
                 {% for course in courses %}
                 <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="card h-100 shadow-sm course-card">
+                    <div class="card h-100 shadow-sm course-card" {% if course.slug %}data-url="{% url 'courses:course_detail' course.slug %}"{% endif %}>
                         <div class="ratio ratio-16x9">
                             {% if course.thumbnail %}
-                                <img src="{{ course.thumbnail.url }}" class="card-img-top" 
-                                     alt="{{ course.title }}" style="object-fit: cover;">
+                                <img src="{{ course.thumbnail.url }}" class="card-img-top" alt="{{ course.title }}" style="object-fit: cover;">
                             {% else %}
                                 <div class="bg-gradient bg-secondary w-100 h-100 d-flex align-items-center justify-content-center">
                                     <i class="bi bi-book text-white" style="font-size: 3rem;"></i>
@@ -171,8 +164,7 @@
                                     </div>
                                     <div>
                                         {% if course.slug %}
-                                            <a href="{% url 'courses:course_detail' course.slug %}" 
-                                               class="btn btn-outline-primary btn-sm">
+                                            <a href="{% url 'courses:course_detail' course.slug %}" class="btn btn-outline-primary btn-sm">
                                                 View Details
                                             </a>
                                         {% endif %}
@@ -244,13 +236,4 @@
     </div>
 </div>
 
-<style>
-.course-card {
-    transition: transform 0.2s, box-shadow 0.2s;
-}
-.course-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
-}
-</style>
 {% endblock %}

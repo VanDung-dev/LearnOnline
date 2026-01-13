@@ -2,63 +2,20 @@
 
 {% block title %}Home - Online Learning Platform{% endblock %}
 
+{% load static %}
+
 {% block content %}
-<div class="jumbotron bg-primary text-white p-5 rounded mb-5">
+<div class="jumbotron text-white p-5 rounded mb-5" style="background: linear-gradient(to right, rgba(13, 110, 253, 1) 0%, rgba(13, 110, 253, 0.8) 30%, rgba(13, 110, 253, 0.3) 100%), url('{% static 'images/home.webp' %}'); background-size: 40%; background-position: right center; background-repeat: no-repeat; background-color: #0d6efd;">
     <div class="container">
-        <h1 class="display-4">Welcome to LearnOnline</h1>
+        <h1 class="display-4 fw-bold">Welcome{% if user.is_authenticated %} {{ user.first_name|default:user.username }}{% endif %} to LearnOnline</h1>
         <p class="lead">Discover and learn new skills with our online courses from expert instructors.</p>
         <a class="btn btn-light btn-lg" href="{% url 'courses:course_list' %}" role="button">Browse All Courses</a>
     </div>
 </div>
 
 <div class="row">
-    <div class="col-md-8">
-        <h2>Featured Courses</h2>
-        <div class="row">
-            {% for course in courses %}
-            <div class="col-md-6 mb-4">
-                <div class="card h-100">
-                    <div class="ratio ratio-16x9">
-                        {% if course.thumbnail %}
-                            <img src="{{ course.thumbnail.url }}" class="card-img-top" alt="{{ course.title }}" style="object-fit: cover;">
-                        {% else %}
-                            <div class="bg-secondary w-100 h-100 d-flex align-items-center justify-content-center">
-                                <span class="text-white">No Image</span>
-                            </div>
-                        {% endif %}
-                    </div>
-                    <div class="card-body d-flex flex-column">
-                        <h5 class="card-title">{{ course.title }}</h5>
-                        <p class="card-text">{{ course.short_description|truncatewords:20 }}</p>
-                        <p class="text-muted">Instructor: {{ course.instructor.get_full_name|default:course.instructor.username }}</p>
-                        <div class="mt-auto">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    {% if course.price == 0 %}
-                                        <span class="badge bg-success fs-6">FREE</span>
-                                    {% else %}
-                                        <span class="badge bg-primary fs-6">${{ course.price }}</span>
-                                    {% endif %}
-                                </div>
-                                <div>
-                                    {% if course.slug %}
-                                        <a href="{% url 'courses:course_detail' course.slug %}" class="btn btn-outline-primary">View Details</a>
-                                    {% else %}
-                                        <a href="#" class="btn btn-outline-primary disabled">View Details</a>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {% empty %}
-            <p>No courses available at the moment.</p>
-            {% endfor %}
-        </div>
-    </div>
-    
-    <div class="col-md-4">
+    <!-- Sidebar - Categories & Popular Search -->
+    <div class="col-md-3">
         <h2>Categories</h2>
         <div class="list-group">
             {% for category in categories %}
@@ -77,6 +34,60 @@
             {% else %}
             <p class="text-muted">No popular searches yet.</p>
             {% endif %}
+        </div>
+    </div>
+
+    <!-- Featured Courses -->
+    <div class="col-md-9">
+        <h2>Featured Courses</h2>
+        <div class="row">
+            {% for course in courses %}
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card h-100 shadow-sm course-card" {% if course.slug %}data-url="{% url 'courses:course_detail' course.slug %}"{% endif %}>
+                    <div class="ratio ratio-16x9">
+                        {% if course.thumbnail %}
+                            <img src="{{ course.thumbnail.url }}" class="card-img-top" alt="{{ course.title }}" style="object-fit: cover;">
+                        {% else %}
+                            <div class="bg-gradient bg-secondary w-100 h-100 d-flex align-items-center justify-content-center">
+                                <i class="bi bi-book text-white" style="font-size: 3rem;"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">{{ course.title|truncatewords:8 }}</h5>
+                        <p class="card-text text-muted small">{{ course.short_description|truncatewords:15|default:"No description available." }}</p>
+                        {% if course.category %}
+                        <p class="mb-1">
+                            <span class="badge bg-light text-dark">{{ course.category.name }}</span>
+                        </p>
+                        {% endif %}
+                        <p class="text-muted small mb-2">
+                            <i class="bi bi-person"></i> {{ course.instructor.get_full_name|default:course.instructor.username }}
+                        </p>
+                        <div class="mt-auto">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    {% if course.price == 0 %}
+                                        <span class="badge bg-success fs-6">FREE</span>
+                                    {% else %}
+                                        <span class="badge bg-primary fs-6">${{ course.price }}</span>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    {% if course.slug %}
+                                        <a href="{% url 'courses:course_detail' course.slug %}" class="btn btn-outline-primary btn-sm">View Details</a>
+                                    {% else %}
+                                        <a href="#" class="btn btn-outline-primary btn-sm disabled">View Details</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <p>No courses available at the moment.</p>
+            {% endfor %}
         </div>
     </div>
 </div>
