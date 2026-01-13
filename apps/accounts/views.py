@@ -13,7 +13,8 @@ from django.views import View
 from django.http import HttpResponseRedirect
 from django.core.exceptions import ValidationError
 from django_ratelimit.decorators import ratelimit
-from apps.courses.models import Course
+from apps.courses.models import Course, Enrollment
+from apps.payments.models import Payment
 from .forms import UserRegistrationForm, UserUpdateForm, ProfileUpdateForm
 from apps.accounts.tasks import send_activation_email_task
 
@@ -123,11 +124,16 @@ def profile(request):
     if user_role == 'student':
         # Student dashboard
         enrollments = request.user.enrollments.all()
+        payments = Payment.objects.filter(user=request.user).order_by('-created_at')
         context['enrollments'] = enrollments
+        context['payments'] = payments
     elif user_role == 'instructor':
         # Instructor dashboard
         courses = Course.objects.filter(instructor=request.user)
+        # Fetch enrollments for courses taught by this instructor
+        enrollments = Enrollment.objects.filter(course__instructor=request.user).select_related('user', 'course').order_by('-enrolled_at')
         context['courses'] = courses
+        context['enrollments'] = enrollments
     elif user_role == 'admin':
         # Admin dashboard
         total_students = User.objects.students().count()
@@ -139,7 +145,9 @@ def profile(request):
     else:
         # Default to student dashboard
         enrollments = request.user.enrollments.all()
+        payments = Payment.objects.filter(user=request.user).order_by('-created_at')
         context['enrollments'] = enrollments
+        context['payments'] = payments
     
     template = 'accounts/user_dashboard.html'
     
