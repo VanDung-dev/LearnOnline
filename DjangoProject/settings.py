@@ -257,6 +257,13 @@ CORS_ALLOWED_ORIGINS = config(
 )
 CORS_ALLOW_CREDENTIALS = True
 
+# CSRF Trusted Origins (for tunneling services like serveo, ngrok, etc.)
+CSRF_TRUSTED_ORIGINS = config(
+    "CSRF_TRUSTED_ORIGINS",
+    default="https://*.serveousercontent.com,https://*.serveo.net,https://*.ngrok.io,https://*.ngrok-free.app",
+    cast=lambda v: [s.strip() for s in v.split(",")]
+)
+
 # ============================================
 # OpenAPI/Swagger Configuration
 # ============================================
