@@ -5,6 +5,7 @@ Files are loaded in order based on their numeric prefix.
 import os
 import sys
 import glob
+import shutil
 
 # Add project root to path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -17,10 +18,39 @@ django.setup()
 
 from django.core.management import call_command
 
+
+def copy_course_thumbnails():
+    """Copy course thumbnail images from scripts/imgs to media/course_thumbnails/"""
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    imgs_dir = os.path.join(script_dir, 'imgs')
+    project_root = os.path.dirname(script_dir)
+    thumbnails_dir = os.path.join(project_root, 'media', 'course_thumbnails')
+
+    # Create destination directory if it doesn't exist
+    os.makedirs(thumbnails_dir, exist_ok=True)
+
+    # Copy all images from imgs directory
+    if os.path.exists(imgs_dir):
+        copied_count = 0
+        for img_file in os.listdir(imgs_dir):
+            src = os.path.join(imgs_dir, img_file)
+            dst = os.path.join(thumbnails_dir, img_file)
+            if os.path.isfile(src):
+                shutil.copy2(src, dst)
+                copied_count += 1
+        return copied_count
+    return 0
+
+
 def main():
     print("=" * 50)
     print("Loading Sample Data Fixtures")
     print("=" * 50)
+
+    # Copy course thumbnails first
+    print("\nCopying course thumbnails...")
+    copied = copy_course_thumbnails()
+    print(f"  [OK] Copied {copied} thumbnail images")
     
     # Get sample directory
     sample_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'sample')
