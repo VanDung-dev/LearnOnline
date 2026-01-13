@@ -1,3 +1,4 @@
+import re
 import uuid
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
@@ -9,6 +10,39 @@ from django.views.decorators.csrf import csrf_exempt
 from apps.courses.models import Course, Enrollment, Certificate
 from .models import Payment, PaymentLog
 from .services.payment_service import get_payment_service, PaymentStatus
+
+
+def luhn_check(card_number):
+    """Luhn algorithm to validate card numbers."""
+    digits = [int(d) for d in card_number]
+    odd_digits = digits[-1::-2]
+    even_digits = digits[-2::-2]
+    checksum = sum(odd_digits)
+    for d in even_digits:
+        checksum += sum(divmod(d * 2, 10))
+    return checksum % 10 == 0
+
+
+def validate_card_number(card_number, payment_method):
+    """Validate card number format and BIN for Visa/Mastercard."""
+    digits = re.sub(r'\D', '', card_number or '')
+    if len(digits) < 13 or len(digits) > 19:
+        return False, 'Card number must be 13-19 digits.'
+
+    # BIN validation
+    if payment_method == 'visa' and not digits.startswith('4'):
+        return False, 'Visa cards must start with 4.'
+    if payment_method == 'mastercard':
+        prefix2 = int(digits[:2]) if len(digits) >= 2 else 0
+        prefix4 = int(digits[:4]) if len(digits) >= 4 else 0
+        if not (51 <= prefix2 <= 55 or 2221 <= prefix4 <= 2720):
+            return False, 'Invalid Mastercard number.'
+
+    # Luhn check
+    if not luhn_check(digits):
+        return False, 'Invalid card number (checksum failed).'
+
+    return True, None
 
 
 def payment_policy(request):
@@ -115,24 +149,39 @@ def process_payment(request, course_slug, purchase_type='course'):
         payment_method = request.POST.get('card_type')
         
     card_number = request.POST.get('card_number')
+    cardholder_name = request.POST.get('cardholder_name')
     expiry_date = request.POST.get('expiry_date')
     cvv = request.POST.get('cvv')
     
-    purchase_type = request.POST.get('purchase_type', purchase_type)  # Get from form if available
-    client_token = request.POST.get('client_token')  # idempotency key from client
-    
+    billing_address = request.POST.get('billing_address')
+    zip_code = request.POST.get('zip_code')
+    phone_number = request.POST.get('phone_number')
+    email = request.POST.get('email', request.user.email)
+
+    purchase_type = request.POST.get('purchase_type', purchase_type)
+    client_token = request.POST.get('client_token')
+
     # Validate details
     missing_fields = {}
     if not payment_method:
         missing_fields['payment_method'] = ['Please select a payment method.']
-        
+
     if payment_method in ['visa', 'mastercard']:
         if not card_number:
             missing_fields['card_number'] = ['This field is required.']
+        if not cardholder_name or len(cardholder_name.strip()) < 2:
+            missing_fields['cardholder_name'] = ['Please enter cardholder name.']
         if not expiry_date:
             missing_fields['expiry_date'] = ['This field is required.']
         if not cvv:
             missing_fields['cvv'] = ['This field is required.']
+        
+        if not billing_address:
+            missing_fields['billing_address'] = ['Please enter billing address.']
+        if not zip_code:
+            missing_fields['zip_code'] = ['Please enter zip code.']
+        if not email:
+            missing_fields['email'] = ['Email is required.']
             
     if missing_fields:
         return JsonResponse({
@@ -143,6 +192,19 @@ def process_payment(request, course_slug, purchase_type='course'):
             'transaction_id': None,
             'redirect_url': None,
         }, status=400)
+
+    # Validate card number for Visa/Mastercard (BIN + Luhn check)
+    if payment_method in ['visa', 'mastercard'] and card_number:
+        is_valid, error_msg = validate_card_number(card_number, payment_method)
+        if not is_valid:
+            return JsonResponse({
+                'success': False,
+                'code': 'validation_error',
+                'message': 'Invalid card number',
+                'errors': {'card_number': [error_msg]},
+                'transaction_id': None,
+                'redirect_url': None,
+            }, status=400)
     
     # Prepare service and idempotency
     service = get_payment_service()
@@ -220,7 +282,14 @@ def process_payment(request, course_slug, purchase_type='course'):
             amount=str(course.price),
             currency=payment.currency,
             idempotency_key=client_token,
-            metadata={"payment_id": payment.id},
+            metadata={
+                "payment_id": payment.id,
+                "cardholder_name": cardholder_name,
+                "billing_address": billing_address,
+                "zip_code": zip_code,
+                "phone_number": phone_number,
+                "email": email
+            },
         )
 
         payment.processor_transaction_id = result.processor_transaction_id
@@ -301,7 +370,14 @@ def process_payment(request, course_slug, purchase_type='course'):
             amount=str(course.certificate_price),
             currency=payment.currency,
             idempotency_key=client_token,
-            metadata={"payment_id": payment.id},
+            metadata={
+                "payment_id": payment.id,
+                "cardholder_name": cardholder_name,
+                "billing_address": billing_address,
+                "zip_code": zip_code,
+                "phone_number": phone_number,
+                "email": email
+            },
         )
 
         payment.processor_transaction_id = result.processor_transaction_id

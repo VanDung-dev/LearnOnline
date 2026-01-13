@@ -71,7 +71,11 @@ class MockPaymentService(PaymentService):
     ) -> PaymentResult:
         # In mock, we simply return a completed result with a fake processor id.
         prefix = "MOCK"
-        if payment_method == "momo":
+        if payment_method == "visa":
+            prefix = "VISA"
+        elif payment_method == "mastercard":
+            prefix = "MCRD"
+        elif payment_method == "momo":
             prefix = "MOMO"
         elif payment_method == "zalopay":
             prefix = "ZALO"

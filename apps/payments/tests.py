@@ -50,10 +50,13 @@ class PaymentFlowTests(TestCase):
         url = reverse("payments:process_payment", kwargs={"course_slug": self.course.slug})
         resp = self.client.post(url, {
             "card_number": "4242424242424242",
+            "cardholder_name": "JOHN DOE",
             "expiry_date": "12/30",
             "cvv": "123",
             "card_type": "visa",
             "purchase_type": "course",
+            "billing_address": "123 Main St",
+            "zip_code": "10000",
         })
         self.assertEqual(resp.status_code, 200)
         data = resp.json()
@@ -74,11 +77,14 @@ class PaymentFlowTests(TestCase):
 
         payload = {
             "card_number": "4242424242424242",
+            "cardholder_name": "JOHN DOE",
             "expiry_date": "12/30",
             "cvv": "123",
             "card_type": "visa",
             "purchase_type": "course",
             "client_token": token,
+            "billing_address": "123 Main St",
+            "zip_code": "10000",
         }
         resp1 = self.client.post(url, data=payload)
         self.assertEqual(resp1.status_code, 200)
@@ -122,3 +128,127 @@ class PaymentFlowTests(TestCase):
         self.assertEqual(resp.status_code, 200)
         pay.refresh_from_db()
         self.assertEqual(pay.status, "completed")
+
+
+    def test_process_payment_uses_custom_email(self):
+        url = reverse("payments:process_payment", kwargs={"course_slug": self.course.slug})
+        resp = self.client.post(url, {
+            "card_number": "4242424242424242",
+            "cardholder_name": "JOHN DOE",
+            "expiry_date": "12/30",
+            "cvv": "123",
+            "card_type": "visa",
+            "purchase_type": "course",
+            "billing_address": "123 Main St",
+            "zip_code": "10000",
+            "email": "custom@example.com",
+        })
+        self.assertEqual(resp.status_code, 200)
+        self.assertTrue(resp.json().get("success"))
+
+
+class CardValidationTests(TestCase):
+    """Test cases for card number validation (BIN and Luhn)."""
+
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="cardtest", password="pass12345"
+        )
+        self.client.login(username="cardtest", password="pass12345")
+        self.category = Category.objects.create(name="Cat2", description="D")
+        self.course = Course.objects.create(
+            title="Validation Course",
+            slug="validation-course",
+            short_description="Short",
+            description="Desc",
+            category=self.category,
+            instructor=self.user,
+            price=Decimal("10.00"),
+            certificate_price=Decimal("0.00"),
+            created_at=timezone.now(),
+        )
+        self.url = reverse(
+            "payments:process_payment",
+            kwargs={"course_slug": self.course.slug}
+        )
+
+    def test_visa_card_with_valid_bin_succeeds(self):
+        """Visa cards starting with 4 should pass BIN validation."""
+        resp = self.client.post(self.url, {
+            "card_number": "4242424242424242",
+            "cardholder_name": "JOHN DOE",
+            "expiry_date": "12/30",
+            "cvv": "123",
+            "card_type": "visa",
+            "purchase_type": "course",
+            "billing_address": "123 Main St",
+            "zip_code": "10000",
+        })
+        self.assertEqual(resp.status_code, 200)
+        self.assertTrue(resp.json().get("success"))
+
+    def test_mastercard_with_valid_bin_succeeds(self):
+        """Mastercard starting with 51-55 should pass BIN validation."""
+        resp = self.client.post(self.url, {
+            "card_number": "5555555555554444",
+            "cardholder_name": "JANE SMITH",
+            "expiry_date": "12/30",
+            "cvv": "123",
+            "card_type": "mastercard",
+            "purchase_type": "course",
+            "billing_address": "123 Main St",
+            "zip_code": "10000",
+        })
+        self.assertEqual(resp.status_code, 200)
+        self.assertTrue(resp.json().get("success"))
+
+    def test_visa_card_with_wrong_bin_fails(self):
+        """Visa payment with non-4 starting card should fail."""
+        resp = self.client.post(self.url, {
+            "card_number": "5555555555554444",
+            "cardholder_name": "JOHN DOE",
+            "expiry_date": "12/30",
+            "cvv": "123",
+            "card_type": "visa",
+            "purchase_type": "course",
+            "billing_address": "123 Main St",
+            "zip_code": "10000",
+        })
+        self.assertEqual(resp.status_code, 400)
+        data = resp.json()
+        self.assertFalse(data.get("success"))
+        self.assertIn("card_number", data.get("errors", {}))
+
+    def test_mastercard_with_wrong_bin_fails(self):
+        """Mastercard payment with Visa BIN should fail."""
+        resp = self.client.post(self.url, {
+            "card_number": "4242424242424242",
+            "cardholder_name": "JOHN DOE",
+            "expiry_date": "12/30",
+            "cvv": "123",
+            "card_type": "mastercard",
+            "purchase_type": "course",
+            "billing_address": "123 Main St",
+            "zip_code": "10000",
+        })
+        self.assertEqual(resp.status_code, 400)
+        data = resp.json()
+        self.assertFalse(data.get("success"))
+        self.assertIn("card_number", data.get("errors", {}))
+
+    def test_invalid_luhn_checksum_fails(self):
+        """Card number with invalid Luhn checksum should fail."""
+        resp = self.client.post(self.url, {
+            "card_number": "4242424242424241",
+            "cardholder_name": "JOHN DOE",
+            "expiry_date": "12/30",
+            "cvv": "123",
+            "card_type": "visa",
+            "purchase_type": "course",
+            "billing_address": "123 Main St",
+            "zip_code": "10000",
+        })
+        self.assertEqual(resp.status_code, 400)
+        data = resp.json()
+        self.assertFalse(data.get("success"))
+        self.assertIn("card_number", data.get("errors", {}))
