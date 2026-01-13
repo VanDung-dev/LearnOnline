@@ -25,6 +25,7 @@ from django.contrib.auth.models import User
 # Danh sách user cần reset mật khẩu
 users = [
     'admin', 
+    'admin_school_a',
     'instructor_john', 
     'instructor_jane', 
     'student_alice', 
