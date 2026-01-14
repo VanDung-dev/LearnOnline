@@ -104,14 +104,16 @@ class Course(models.Model):
                 self.thumbnail = content_file
 
         if not self.slug:
-            import uuid
-            # Generate a random unique ID (12 characters)
-            # This ensures URLs are random/encrypted-like: /courses/4f2a3b1c9d8e/
-            self.slug = str(uuid.uuid4()).replace("-", "")[:12]
+            import secrets
+            import string
+
+            # Generate random 12 chars (lowercase, uppercase, digits)
+            alphabet = string.ascii_letters + string.digits
+            self.slug = ''.join(secrets.choice(alphabet) for _ in range(12))
             
             # Ensure uniqueness
             while Course.objects.filter(slug=self.slug).exists():
-                self.slug = str(uuid.uuid4()).replace("-", "")[:12]
+                self.slug = ''.join(secrets.choice(alphabet) for _ in range(12))
         super().save(*args, **kwargs)
 
     def get_absolute_url(self):
@@ -416,9 +418,16 @@ class Certificate(models.Model):
     def save(self, *args, **kwargs):
         if not self.certificate_number:
             # Generate a unique certificate number
-            import uuid
+            import secrets
+            import string
 
-            self.certificate_number = str(uuid.uuid4()).replace("-", "").upper()[:12]
+            # Generate random 12 chars (lowercase, uppercase, digits)
+            alphabet = string.ascii_letters + string.digits
+            self.certificate_number = ''.join(secrets.choice(alphabet) for _ in range(12))
+            
+            # Ensure uniqueness
+            while Certificate.objects.filter(certificate_number=self.certificate_number).exists():
+                self.certificate_number = ''.join(secrets.choice(alphabet) for _ in range(12))
         super().save(*args, **kwargs)
 
 
