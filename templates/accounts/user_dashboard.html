@@ -295,7 +295,7 @@
                                         data-title="{{ enrollment.course.title|lower }}"
                                         data-status="{% if enrollment.is_completed %}completed{% else %}progress{% endif %}"
                                         data-enrolled="{{ enrollment.enrollment_date|date:'U' }}">
-                                        <div class="card h-100 shadow-sm course-card">
+                                        <div class="card h-100 shadow-sm course-card" data-url="{% url 'courses:course_detail' slug=enrollment.course.slug %}">
                                             <div class="ratio ratio-16x9">
                                                 {% if enrollment.course.thumbnail %}
                                                     <img src="{{ enrollment.course.thumbnail.url }}" class="card-img-top" alt="{{ enrollment.course.title }}" style="object-fit: cover;">
