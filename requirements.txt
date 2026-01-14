@@ -1,10 +1,11 @@
 # Core system libraries
-Django==5.2.7
+Django==5.2.10
 Pillow>=10.0.0
 psycopg2-binary>=2.9.0
 python-decouple>=3.0
 python-dotenv>=1.0.0
 django-ratelimit>=4.1.0
+django-tinymce==5.0.0
 
 # Async Task Processing (Celery + Redis)
 celery>=5.3.6
