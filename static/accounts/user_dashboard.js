@@ -14,7 +14,33 @@ document.addEventListener('DOMContentLoaded', function () {
             window.dispatchEvent(new Event('resize'));
         });
     });
+
+    // Initialize Delete Modal Logic
+    initDeleteModal();
 });
+
+function initDeleteModal() {
+    const deleteModal = document.getElementById('deleteCourseModal');
+    if (deleteModal) {
+        deleteModal.addEventListener('show.bs.modal', function (event) {
+            // Button that triggered the modal
+            const button = event.relatedTarget;
+
+            // Extract info from data-* attributes
+            const deleteUrl = button.getAttribute('data-delete-url');
+            const courseTitle = button.getAttribute('data-course-title');
+
+            // Update the modal's content.
+            const modalTitle = deleteModal.querySelector('.modal-title');
+            const itemElement = deleteModal.querySelector('[data-item-name]');
+            const form = deleteModal.querySelector('form');
+
+            if (modalTitle) modalTitle.textContent = 'Delete Course: ' + courseTitle;
+            if (itemElement) itemElement.textContent = courseTitle;
+            if (form) form.action = deleteUrl; // Update form action
+        });
+    }
+}
 
 function initDashboardFilters() {
     const searchInput = document.getElementById('search-input');

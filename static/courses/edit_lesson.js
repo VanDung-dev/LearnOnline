@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const lessonType = document.getElementById('lesson_type');
     const sections = {
         'text': document.getElementById('text-content-section'),
@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 section.style.display = type === selectedType ? 'block' : 'none';
             }
         });
-        
+
         // Re-initialize TinyMCE when switching to text section
         if (selectedType === 'text') {
             if (typeof tinymce !== 'undefined') {
@@ -21,7 +21,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 const editor = tinymce.get('lesson_content');
                 if (!editor) {
                     //Use shared TinyMCE configuration
-                    initSharedTinyMCE('#lesson_content', 1000);
+                    if (window.tinyMceConfig) {
+                        tinymce.init({
+                            ...window.tinyMceConfig,
+                            selector: '#lesson_content'
+                        });
+                    }
                 }
             }
         }
@@ -35,14 +40,19 @@ document.addEventListener('DOMContentLoaded', function() {
     if (lessonType && lessonType.value === 'text') {
         if (typeof tinymce !== 'undefined') {
             //Use shared TinyMCE configuration
-            initSharedTinyMCE('#lesson_content', 1000);
+            if (window.tinyMceConfig) {
+                tinymce.init({
+                    ...window.tinyMceConfig,
+                    selector: '#lesson_content'
+                });
+            }
         }
     }
 
     // Ensure TinyMCE content is synced before form submission
     const lessonForm = document.querySelector('form');
     if (lessonForm) {
-        lessonForm.addEventListener('submit', function(e) {
+        lessonForm.addEventListener('submit', function (e) {
             if (typeof tinymce !== 'undefined') {
                 const editor = tinymce.get('lesson_content');
                 if (editor) {
@@ -60,7 +70,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Handle video preview modal
     const videoModal = document.getElementById('deleteVideoModal');
     if (videoModal) {
-        videoModal.addEventListener('hidden.bs.modal', function() {
+        videoModal.addEventListener('hidden.bs.modal', function () {
             const videoPlayer = document.getElementById('videoPlayer');
             if (videoPlayer) {
                 videoPlayer.pause();
@@ -73,7 +83,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const videoFileInput = document.getElementById('lesson_video_file');
     const videoPreviewContainer = document.getElementById('video-preview-container');
     if (videoFileInput && videoPreviewContainer) {
-        videoFileInput.addEventListener('change', function(e) {
+        videoFileInput.addEventListener('change', function (e) {
             const file = e.target.files[0];
             if (file) {
                 const videoURL = URL.createObjectURL(file);
@@ -95,7 +105,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Handle URL/File toggle
     const videoUrlInput = document.getElementById('lesson_video_url');
     if (videoUrlInput && videoFileInput) {
-        videoUrlInput.addEventListener('input', function() {
+        videoUrlInput.addEventListener('input', function () {
             if (this.value) {
                 videoFileInput.disabled = true;
                 videoFileInput.value = '';
@@ -105,7 +115,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        videoFileInput.addEventListener('input', function() {
+        videoFileInput.addEventListener('input', function () {
             if (this.value) {
                 videoUrlInput.disabled = true;
                 videoUrlInput.value = '';
@@ -122,24 +132,24 @@ document.addEventListener('DOMContentLoaded', function() {
             videoUrlInput.disabled = true;
         }
     }
-    
+
     // Initialize question handlers
     initializeQuestionHandlers();
-    
+
     // Handle delete question buttons
     var deleteQuestionButtons = document.querySelectorAll('[data-bs-target^="#deleteQuestionModal"]');
-    deleteQuestionButtons.forEach(function(button) {
-        button.addEventListener('click', function() {
+    deleteQuestionButtons.forEach(function (button) {
+        button.addEventListener('click', function () {
             var questionId = this.getAttribute('data-question-id');
             var questionText = this.getAttribute('data-question-text');
-            
+
             // Update modal content
             var modal = document.getElementById('deleteQuestionModal');
             var itemNameElement = modal.querySelector('[data-item-name]');
             if (itemNameElement) {
                 itemNameElement.textContent = '"' + questionText + '"';
             }
-            
+
             // Update form action
             var form = document.getElementById('deleteQuestionForm' + questionId);
             var modalForm = modal.querySelector('form');
@@ -149,16 +159,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (action) {
                     modalForm.setAttribute('action', action);
                 }
-                
+
                 // Clear existing hidden inputs
                 var existingHiddenInputs = modalForm.querySelectorAll('input[type="hidden"]');
-                existingHiddenInputs.forEach(function(input) {
+                existingHiddenInputs.forEach(function (input) {
                     modalForm.removeChild(input);
                 });
-                
+
                 // Copy hidden inputs from the hidden form
                 var hiddenInputs = form.querySelectorAll('input[type="hidden"]');
-                hiddenInputs.forEach(function(input) {
+                hiddenInputs.forEach(function (input) {
                     var newInput = document.createElement('input');
                     newInput.type = 'hidden';
                     newInput.name = input.name;
@@ -181,7 +191,7 @@ function loadQuestionHandlers() {
 loadQuestionHandlers();
 
 // Enable drag and drop for quiz questions (using jQuery)
-$(document).ready(function() {
+$(document).ready(function () {
     const questionsContainer = $('.sortable-questions');
 
     if (questionsContainer.length > 0) {

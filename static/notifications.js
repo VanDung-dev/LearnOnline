@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             html += `<li><a class="dropdown-item small ${bgClass} ${textClass}" href="#" onclick="markRead(event, ${notif.id}, '${link}')">${notif.title}</a></li>`;
                         });
                     }
-                    html += '<li><hr class="dropdown-divider"></li><li><a class="dropdown-item text-center small" href="#">View all</a></li>';
+                    html += '<li><hr class="dropdown-divider"></li><li><a class="dropdown-item text-center small" href="/notifications/">View all</a></li>';
                     dropdownMenu.innerHTML = html;
                 })
                 .catch(err => console.error('Error loading notifications', err));
