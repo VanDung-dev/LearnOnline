@@ -8,12 +8,12 @@ LUA_SCRIPT="/tmp/stress_logic.lua"
 
 # --- Get parameters from the command line ---
 while getopts "u:t:h:" opt; do
-  case ${opt} in
-    u) USERS=$OPTARG ;;
-    t) DURATION=$OPTARG ;;
-    h) TARGET_URL=$OPTARG ;;
-    *) echo "How to use: $0 -u [Number of users] -t [Times] -h [url]"; exit 1 ;;
-  esac
+    case ${opt} in
+        u) USERS=$OPTARG ;;
+        t) DURATION=$OPTARG ;;
+        h) TARGET_URL=$OPTARG ;;
+        *) echo "How to use: $0 -u [Number of users] -t [Times] -h [url]"; exit 1 ;;
+    esac
 done
 
 # --- Tuning System ---
@@ -27,16 +27,21 @@ local guest_paths = {
     "/",
     "/courses/",
     "/courses/search/autocomplete/?term=react",
-    "/courses/react-for-beginners/"
+    "/courses/react-for-beginners/",
+    "/api/docs/",
+    "/api/courses/"
 }
 local student_paths = {
-    "/accounts/profile/",
+    "/dashboard/",
     "/courses/complete-python-bootcamp/",
-    "/courses/complete-python-bootcamp/learning-process/"
+    "/courses/complete-python-bootcamp/learning-process/",
+    "/courses/complete-python-bootcamp/discussions/",
+    "/notifications/",
+    "/api/notifications/api/unread-count/"
 }
 local instructor_paths = {
-    "/instructor/courses/",
-    "/instructor/courses/create/"
+    "/dashboard/courses/create/",
+    "/dashboard/courses/list/legacy/"
 }
 
 setup = function(thread)
