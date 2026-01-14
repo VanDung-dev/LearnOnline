@@ -6,31 +6,25 @@
     pip install -r requirements.txt
     ```
 
-2. Set up TinyMCE for rich text editing:
-
-    ```bash
-    python setup_tinymce.py
-    ```
-
-3. Apply database migrations:
+2. Apply database migrations:
 
     ```bash
     python manage.py migrate
     ```
 
-4. Create cache table (required for session/cache):
+3. Create cache table (required for session/cache):
 
     ```bash
     python manage.py createcachetable
     ```
 
-5. Create a Superuser (Admin):
+4. Create a Superuser (Admin):
 
     ```bash
     python manage.py createsuperuser
     ```
 
-6. Start the development server:
+5. Start the development server:
 
     ```bash
     python manage.py runserver
