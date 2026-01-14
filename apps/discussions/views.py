@@ -40,7 +40,21 @@ class DiscussionCreateView(LoginRequiredMixin, CourseContextMixin, CreateView):
             
         form.instance.course = course
         form.instance.author = self.request.user
-        return super().form_valid(form)
+        response = super().form_valid(form)
+        
+        # Notify instructor if the author is not the instructor
+        if course.instructor != self.request.user:
+            from apps.notifications.models import Notification
+            Notification.objects.create(
+                recipient=course.instructor,
+                sender=self.request.user,
+                title=f"New Discussion: {form.instance.title}",
+                message=f"{self.request.user.username} started a new discussion in {course.title}.",
+                link=reverse('discussions:discussion_detail', kwargs={'slug': course.slug, 'pk': self.object.pk}),
+                notification_type='discussion'
+            )
+            
+        return response
 
     def get_success_url(self):
         return reverse('discussions:discussion_list', kwargs={'slug': self.kwargs.get('slug')})
@@ -65,12 +79,72 @@ class DiscussionDetailView(LoginRequiredMixin, CourseContextMixin, DetailView):
     
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
+
+        # Handle Discussion Edit
+        if 'edit_discussion' in request.POST:
+            if self.object.author != request.user:
+                messages.error(request, "You are not allowed to edit this discussion.")
+                return redirect('discussions:discussion_detail', slug=self.kwargs.get('slug'), pk=self.object.pk)
+            
+            new_body = request.POST.get('body')
+            new_title = request.POST.get('title')
+            
+            if new_body:
+                self.object.body = new_body
+            
+            if new_title:
+                self.object.title = new_title
+                
+            self.object.save()
+            messages.success(request, "Discussion updated successfully.")
+            return redirect('discussions:discussion_detail', slug=self.kwargs.get('slug'), pk=self.object.pk)
+
+        # Handle Reply Edit
+        if 'edit_reply' in request.POST:
+            reply_id = request.POST.get('reply_id')
+            reply = get_object_or_404(Reply, id=reply_id)
+            if reply.author != request.user:
+                messages.error(request, "You are not allowed to edit this reply.")
+                return redirect('discussions:discussion_detail', slug=self.kwargs.get('slug'), pk=self.object.pk)
+            
+            new_body = request.POST.get('body')
+            if new_body:
+                reply.body = new_body
+                reply.save()
+                messages.success(request, "Reply updated successfully.")
+            return redirect('discussions:discussion_detail', slug=self.kwargs.get('slug'), pk=self.object.pk)
+
+        # Handle New Reply
         form = ReplyForm(request.POST)
         if form.is_valid():
             reply = form.save(commit=False)
             reply.discussion = self.object
             reply.author = request.user
             reply.save()
+            
+            # Notify discussion author (if reply author is not discussion author)
+            from apps.notifications.models import Notification
+            if self.object.author != request.user:
+                Notification.objects.create(
+                    recipient=self.object.author,
+                    sender=request.user,
+                    title=f"New Reply in: {self.object.title}",
+                    message=f"{request.user.username} replied to your discussion.",
+                    link=reverse('discussions:discussion_detail', kwargs={'slug': self.kwargs.get('slug'), 'pk': self.object.pk}),
+                    notification_type='discussion'
+                )
+            
+            # Notify instructor (if reply author is not instructor and instructor is not discussion author - already notified above)
+            course = self.object.course
+            if course.instructor != request.user and course.instructor != self.object.author:
+                 Notification.objects.create(
+                    recipient=course.instructor,
+                    sender=request.user,
+                    title=f"New Reply in: {self.object.title}",
+                    message=f"{request.user.username} replied to a discussion in {course.title}.",
+                    link=reverse('discussions:discussion_detail', kwargs={'slug': self.kwargs.get('slug'), 'pk': self.object.pk}),
+                    notification_type='discussion'
+                )
             messages.success(request, "Reply posted successfully.")
             return redirect('discussions:discussion_detail', slug=self.kwargs.get('slug'), pk=self.object.pk)
         return self.render_to_response(self.get_context_data(reply_form=form))

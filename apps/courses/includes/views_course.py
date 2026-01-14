@@ -105,12 +105,12 @@ def delete_course(request, slug):
             return JsonResponse({
                 'status': 'success',
                 'message': f'Course "{course_title}" has been deleted successfully!',
-                'redirect_url': '/instructor/courses/'  # URL to redirect after deletion
+                'redirect_url': '/dashboard/courses/'  # URL to redirect after deletion
             })
         else:
             # Traditional redirect for non-AJAX requests
             messages.success(request, f'Course "{course_title}" has been deleted successfully!')
-            return redirect('courses:instructor_courses')
+            return redirect('user_dashboard_with_tab', sub_page='courses')
     
     # For GET requests, redirect back to edit course page
     # This prevents the need for a separate delete confirmation page
@@ -215,19 +215,27 @@ def course_list(request):
 
 
 def course_detail(request, slug):
-    course = get_object_or_404(Course, slug=slug, is_active=True)
+    # First get the course without checking is_active
+    course = get_object_or_404(Course, slug=slug)
+    
     is_enrolled = False
     is_instructor = False
     
     if request.user.is_authenticated:
-        # Check if user is enrolled
-        is_enrolled = course.enrollments.filter(user=request.user).exists()
         # Check if user is the instructor
         is_instructor = (
                 hasattr(request.user, 'profile') and
                 request.user.profile.is_instructor() and
                 course.instructor == request.user
         )
+        # Check if user is enrolled
+        is_enrolled = course.enrollments.filter(user=request.user).exists()
+    
+    # If course is not active and user is NOT the instructor, return 404
+    if not course.is_active and not is_instructor:
+        # We use get_object_or_404 logic here manually to return 404
+        from django.http import Http404
+        raise Http404("No Course matches the given query.")
     
     return render(request, 'courses/course_detail.html', {
         'course': course,
@@ -257,10 +265,16 @@ def course_learning_process(request, slug):
         messages.error(request, 'You must be enrolled in this course to view the learning process.')
         return redirect('courses:course_detail', slug=slug)
     
+    # Check if user has certificate
+    user_certificate = None
+    if is_enrolled:
+        user_certificate = course.certificates.filter(user=request.user).first()
+    
     return render(request, 'courses/course_learning_process.html', {
         'course': course,
         'is_enrolled': is_enrolled,
-        'is_instructor': is_instructor
+        'is_instructor': is_instructor,
+        'user_certificate': user_certificate
     })
 
 

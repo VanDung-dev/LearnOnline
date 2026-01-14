@@ -104,13 +104,14 @@ class Course(models.Model):
                 self.thumbnail = content_file
 
         if not self.slug:
-            self.slug = slugify(self.title)
+            import uuid
+            # Generate a random unique ID (12 characters)
+            # This ensures URLs are random/encrypted-like: /courses/4f2a3b1c9d8e/
+            self.slug = str(uuid.uuid4()).replace("-", "")[:12]
+            
             # Ensure uniqueness
-            original_slug = self.slug
-            counter = 1
             while Course.objects.filter(slug=self.slug).exists():
-                self.slug = f"{original_slug}-{counter}"
-                counter += 1
+                self.slug = str(uuid.uuid4()).replace("-", "")[:12]
         super().save(*args, **kwargs)
 
     def get_absolute_url(self):

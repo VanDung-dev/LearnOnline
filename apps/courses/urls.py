@@ -20,16 +20,16 @@ urlpatterns = [
     path('courses/<slug:course_slug>/modules/<int:module_id>/lessons/<int:lesson_id>/video/delete/', views.delete_lesson_video, name='delete_lesson_video'),
     
     # Instructor URLs
-    path('instructor/courses/', views.instructor_courses, name='instructor_courses'),
+    path('dashboard/courses/list/legacy/', views.instructor_courses, name='instructor_courses'),
     path('student/dashboard/', views.student_dashboard, name='student_dashboard'),
-    path('instructor/courses/create/', views.create_course, name='create_course'),
-    path('instructor/courses/create-category-ajax/', views.create_category_ajax, name='create_category_ajax'),
-    path('instructor/courses/<slug:slug>/edit/', views.edit_course, name='edit_course'),
-    path('instructor/courses/<slug:slug>/delete/', views.delete_course, name='delete_course'),
-    path('instructor/courses/<slug:course_slug>/modules/create/', views.create_module, name='create_module'),
-    path('instructor/courses/<slug:course_slug>/modules/<int:module_id>/edit/', views.edit_module, name='edit_module'),
-    path('instructor/courses/<slug:course_slug>/modules/<int:module_id>/delete/', views.delete_module, name='delete_module'),
-    path('instructor/courses/<slug:course_slug>/reorder/', views.reorder_modules, name='reorder_modules'),
+    path('dashboard/courses/create/', views.create_course, name='create_course'),
+    path('dashboard/courses/create-category-ajax/', views.create_category_ajax, name='create_category_ajax'),
+    path('dashboard/courses/<slug:slug>/edit/', views.edit_course, name='edit_course'),
+    path('dashboard/courses/<slug:slug>/delete/', views.delete_course, name='delete_course'),
+    path('dashboard/courses/<slug:course_slug>/modules/create/', views.create_module, name='create_module'),
+    path('dashboard/courses/<slug:course_slug>/modules/<int:module_id>/edit/', views.edit_module, name='edit_module'),
+    path('dashboard/courses/<slug:course_slug>/modules/<int:module_id>/delete/', views.delete_module, name='delete_module'),
+    path('dashboard/courses/<slug:course_slug>/reorder/', views.reorder_modules, name='reorder_modules'),
 
     # Certificate URLs
     path('certificate/<str:certificate_id>/', views.course_certificate, name='course_certificate'),

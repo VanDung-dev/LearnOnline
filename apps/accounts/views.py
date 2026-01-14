@@ -109,15 +109,32 @@ def register(request):
 
 
 @login_required
-def profile(request):
+def profile(request, sub_page=None):
     # Check if user is admin and redirect to Django admin
     if request.user.is_superuser or (hasattr(request.user, 'profile') and request.user.profile.is_admin()):
-        return redirect('admin:index')
+        if sub_page is None: # Only redirect if accessing the root dashboard
+            return redirect('admin:index')
     
     # Get user role
     user_role = getattr(request.user.profile, 'role', 'student')
     
-    context = {}
+    # Determine active tab
+    valid_tabs = ['profile', 'courses', 'performance', 'enrollments', 'progress', 'history', 'certificates', 'admin']
+    
+    # Validate sub_page
+    if sub_page and sub_page not in valid_tabs:
+        return redirect('user_dashboard')
+        
+    
+    # Default tab based on role if not specified
+    if not sub_page:
+        return redirect('user_dashboard_with_tab', sub_page='profile')
+        
+    active_tab = sub_page
+
+    context = {
+        'active_tab': active_tab
+    }
     
     if user_role == 'student':
         # Student dashboard

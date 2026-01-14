@@ -7,7 +7,7 @@ class DiscussionForm(forms.ModelForm):
         fields = ['title', 'body']
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Discussion Title'}),
-            'body': forms.Textarea(attrs={'class': 'form-control', 'rows': 5, 'placeholder': 'What\'s on your mind?'}),
+            'body': forms.Textarea(attrs={'class': 'form-control tinymce-editor', 'rows': 5, 'placeholder': 'What\'s on your mind?'}),
         }
 
 class ReplyForm(forms.ModelForm):

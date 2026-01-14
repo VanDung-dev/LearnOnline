@@ -84,8 +84,11 @@ class LessonForm(forms.ModelForm):
         video_duration = cleaned_data.get('video_duration')
         
         # Validate based on lesson type
-        if lesson_type == 'text' and not content:
-            raise forms.ValidationError("Content is required for text lessons.")
+        if lesson_type == 'text':
+            if not content:
+                cleaned_data['content'] = ''
+            else:
+                cleaned_data['content'] = content.strip()
         
         if lesson_type == 'video':
             # Either video_url or video_file must be provided, but not both
