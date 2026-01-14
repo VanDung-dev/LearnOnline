@@ -25,6 +25,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('home/', RedirectView.as_view(url='/', permanent=True)),
     path('dashboard/', account_views.profile, name='user_dashboard'),
+    path('dashboard/<str:sub_page>/', account_views.profile, name='user_dashboard_with_tab'),
     path('dashboard/profile/edit/', account_views.edit_profile, name='edit_profile'),
     path('', include('apps.accounts.urls')),
     path('payments/', include('apps.payments.urls')),
@@ -32,6 +33,7 @@ urlpatterns = [
     path('analytics/', include('apps.analytics.urls', namespace='analytics')),
     path('', include('apps.courses.urls')),
     path('', include('apps.discussions.urls')),
+    path('tinymce/', include('tinymce.urls')),
     path('api/', include('apps.api.urls')),  # REST API
 ]
 

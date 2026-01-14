@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     "drf_spectacular",
     'django_celery_results',
     'django_celery_beat',
+    "tinymce", # Added tinymce
     # Local apps
     "apps.courses",
     "apps.accounts",
@@ -61,6 +62,20 @@ INSTALLED_APPS = [
     "apps.notifications",
     "apps.discussions",
 ]
+
+# TinyMCE Configuration
+TINYMCE_DEFAULT_CONFIG = {
+    "height": "500px",
+    "width": "100%",
+    "menubar": False,
+    "statusbar": False,
+    "plugins": "advlist autolink lists link image charmap print preview anchor searchreplace visualblocks code fullscreen insertdatetime media table paste code help wordcount",
+    "toolbar": "undo redo | formatselect | bold italic backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | removeformat | help",
+    "theme": "silver",
+    "images_upload_url": "/courses/upload_image/",
+    "automatic_uploads": True,
+    "images_reuse_filename": True,
+}
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
