@@ -12,39 +12,39 @@
         <div class="col-md-3 col-lg-3 d-md-block bg-light sidebar collapse show" id="sidebarMenu">
             <div class="position-sticky pt-3">
                 <div class="list-group list-group-flush">
-                    <a class="list-group-item list-group-item-action active" id="profile-tab" data-bs-toggle="list" href="#profile" role="tab">
+                    <a class="list-group-item list-group-item-action {% if active_tab == 'profile' %}active{% endif %}" id="profile-tab" href="{% url 'user_dashboard_with_tab' 'profile' %}">
                         <i class="bi bi-person me-2"></i> Profile
                     </a>
                     
                     {% if user.profile.is_student or user.profile.is_instructor %}
-                    <a class="list-group-item list-group-item-action" id="courses-tab" data-bs-toggle="list" href="#courses" role="tab">
+                    <a class="list-group-item list-group-item-action {% if active_tab == 'courses' %}active{% endif %}" id="courses-tab" href="{% url 'user_dashboard_with_tab' 'courses' %}">
                         <i class="bi bi-book me-2"></i> My Courses
                     </a>
                     {% endif %}
 
                     {% if user.profile.is_instructor %}
-                    <a class="list-group-item list-group-item-action" id="performance-tab" data-bs-toggle="list" href="#performance" role="tab">
+                    <a class="list-group-item list-group-item-action {% if active_tab == 'performance' %}active{% endif %}" id="performance-tab" href="{% url 'user_dashboard_with_tab' 'performance' %}">
                         <i class="bi bi-graph-up me-2"></i> Performance Overview
                     </a>
-                    <a class="list-group-item list-group-item-action" id="enrollments-tab" data-bs-toggle="list" href="#enrollments" role="tab">
+                    <a class="list-group-item list-group-item-action {% if active_tab == 'enrollments' %}active{% endif %}" id="enrollments-tab" href="{% url 'user_dashboard_with_tab' 'enrollments' %}">
                         <i class="bi bi-people me-2"></i> Recent Enrollments
                     </a>
                     {% endif %}
 
                     {% if user.profile.is_student %}
-                    <a class="list-group-item list-group-item-action" id="progress-tab" data-bs-toggle="list" href="#progress" role="tab">
+                    <a class="list-group-item list-group-item-action {% if active_tab == 'progress' %}active{% endif %}" id="progress-tab" href="{% url 'user_dashboard_with_tab' 'progress' %}">
                         <i class="bi bi-graph-up me-2"></i> Learning Progress
                     </a>
-                    <a class="list-group-item list-group-item-action" id="history-tab" data-bs-toggle="list" href="#history" role="tab">
+                    <a class="list-group-item list-group-item-action {% if active_tab == 'history' %}active{% endif %}" id="history-tab" href="{% url 'user_dashboard_with_tab' 'history' %}">
                         <i class="bi bi-clock-history me-2"></i> Payment History
                     </a>
-                    <a class="list-group-item list-group-item-action" id="certificates-tab" data-bs-toggle="list" href="#certificates" role="tab">
+                    <a class="list-group-item list-group-item-action {% if active_tab == 'certificates' %}active{% endif %}" id="certificates-tab" href="{% url 'user_dashboard_with_tab' 'certificates' %}">
                         <i class="bi bi-award me-2"></i> My Certificates
                     </a>
                     {% endif %}
                     
                     {% if user.profile.is_admin %}
-                    <a class="list-group-item list-group-item-action" id="admin-tab" data-bs-toggle="list" href="#admin" role="tab">
+                    <a class="list-group-item list-group-item-action {% if active_tab == 'admin' %}active{% endif %}" id="admin-tab" href="{% url 'user_dashboard_with_tab' 'admin' %}">
                         <i class="bi bi-speedometer2 me-2"></i> Admin Overview
                     </a>
                     {% endif %}
@@ -65,7 +65,7 @@
 
             <div class="tab-content" id="dashboardTabContent">
                 <!-- Profile Tab -->
-                <div class="tab-pane fade show active" id="profile" role="tabpanel">
+                <div class="tab-pane fade {% if active_tab == 'profile' %}show active{% endif %}" id="profile" role="tabpanel">
                     <div class="card shadow-sm">
                         <div class="card-header bg-white">
                             <h5 class="mb-0">Profile Information</h5>
@@ -114,7 +114,7 @@
                 </div>
 
                 <!-- My Courses Tab -->
-                <div class="tab-pane fade" id="courses" role="tabpanel">
+                <div class="tab-pane fade {% if active_tab == 'courses' %}show active{% endif %}" id="courses" role="tabpanel">
                     {% if user.profile.is_instructor %}
                         <!-- Instructor Courses Content -->
                         <div class="row">
@@ -200,7 +200,12 @@
                                                         {% if course.slug %}
                                                             <a href="{% url 'courses:course_detail' slug=course.slug %}" class="btn btn-outline-primary btn-sm">View</a>
                                                             <a href="{% url 'courses:edit_course' slug=course.slug %}" class="btn btn-outline-secondary btn-sm">Edit</a>
-                                                            <a href="{% url 'courses:delete_course' slug=course.slug %}" class="btn btn-outline-danger btn-sm">Delete</a>
+                                                            <button type="button" class="btn btn-outline-danger btn-sm delete-course-btn" 
+                                                                data-bs-toggle="modal" data-bs-target="#deleteCourseModal"
+                                                                data-delete-url="{% url 'courses:delete_course' slug=course.slug %}"
+                                                                data-course-title="{{ course.title }}">
+                                                                Delete
+                                                            </button>
                                                         {% else %}
                                                             <a href="#" class="btn btn-outline-primary btn-sm disabled">View</a>
                                                             <a href="#" class="btn btn-outline-secondary btn-sm disabled">Edit</a>
@@ -348,7 +353,7 @@
 
                 <!-- Instructor: Performance Tab -->
                 {% if user.profile.is_instructor %}
-                <div class="tab-pane fade" id="performance" role="tabpanel">
+                <div class="tab-pane fade {% if active_tab == 'performance' %}show active{% endif %}" id="performance" role="tabpanel">
                     <div class="card shadow-sm">
                         <div class="card-header bg-white">
                             <h5 class="mb-0">Performance Overview</h5>
@@ -374,7 +379,7 @@
                 </div>
 
                 <!-- Instructor: Recent Enrollments Tab -->
-                <div class="tab-pane fade" id="enrollments" role="tabpanel">
+                <div class="tab-pane fade {% if active_tab == 'enrollments' %}show active{% endif %}" id="enrollments" role="tabpanel">
                     <div class="card shadow-sm">
                         <div class="card-header bg-white">
                             <h5 class="mb-0">Recent Enrollments</h5>
@@ -431,7 +436,7 @@
 
                 <!-- Student: Progress Tab -->
                 {% if user.profile.is_student %}
-                <div class="tab-pane fade" id="progress" role="tabpanel">
+                <div class="tab-pane fade {% if active_tab == 'progress' %}show active{% endif %}" id="progress" role="tabpanel">
                     <div class="card shadow-sm">
                         <div class="card-header bg-white">
                             <h5 class="mb-0">Learning Progress</h5>
@@ -443,7 +448,7 @@
                 </div>
 
                 <!-- Student: Payment History Tab -->
-                <div class="tab-pane fade" id="history" role="tabpanel">
+                <div class="tab-pane fade {% if active_tab == 'history' %}show active{% endif %}" id="history" role="tabpanel">
                     <div class="card shadow-sm">
                         <div class="card-header bg-white">
                             <h5 class="mb-0">Payment History</h5>
@@ -499,7 +504,7 @@
                 </div>
 
                 <!-- Student: My Certificates Tab -->
-                <div class="tab-pane fade" id="certificates" role="tabpanel">
+                <div class="tab-pane fade {% if active_tab == 'certificates' %}show active{% endif %}" id="certificates" role="tabpanel">
                     <div class="card shadow-sm">
                         <div class="card-header bg-white">
                             <h5 class="mb-0">My Certificates</h5>
@@ -534,7 +539,7 @@
                 
                 <!-- Admin Tab -->
                 {% if user.profile.is_admin %}
-                <div class="tab-pane fade" id="admin" role="tabpanel">
+                <div class="tab-pane fade {% if active_tab == 'admin' %}show active{% endif %}" id="admin" role="tabpanel">
                     <div class="row">
                         <div class="col-md-4">
                             <div class="card text-white bg-primary mb-3">
@@ -579,6 +584,9 @@
         </main>
     </div>
 </div>
+
+<!-- Delete Course Modal -->
+{% include "courses/includes/delete_modal.html" with modal_id="deleteCourseModal" modal_title="Delete Course" item_type="course" warning_message="This action cannot be undone. All modules and lessons in this course will be permanently deleted." %}
 {% endblock %}
 
 {% block extra_js %}

@@ -3,194 +3,179 @@
 {% block title %}{{ lesson.title }} - {{ course.title }} - Online Learning Platform{% endblock %}
 
 {% block content %}
+{% load courses_extras %}
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="{% url 'courses:home' %}">Home</a></li>
-        <li class="breadcrumb-item"><a href="{% url 'courses:course_list' %}">Courses</a></li>
         <li class="breadcrumb-item"><a href="{% url 'courses:course_detail' course.slug %}">{{ course.title }}</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'courses:course_learning_process' course.slug %}">Learning Process</a></li>
+        <li class="breadcrumb-item">{{ lesson.module.title }}</li>
         <li class="breadcrumb-item active" aria-current="page">{{ lesson.title }}</li>
     </ol>
 </nav>
 
 <div class="row">
-    <div class="col-md-8">
-        <h1>{{ lesson.title }}</h1>
-        
-        {% if is_instructor %}
-        <div class="alert alert-info">
-            <strong>Instructor Preview:</strong> You are viewing this lesson as an instructor. Students will see this content when enrolled in the course.
-        </div>
-        {% endif %}
-        
-        {% load courses_extras %}
-        {% module_deadline lesson.module user as deadline %}
-        {% if deadline and deadline < now %}
-        <div class="alert alert-danger">
-            <strong>Warning:</strong> The deadline for this module was {{ deadline }}. You can still access the materials, but you are behind schedule.
-        </div>
-        {% elif deadline and not is_instructor %}
-        <div class="alert alert-info">
-            <strong>Module Deadline:</strong> Complete this module by {{ deadline }}.
-        </div>
-        {% endif %}
-        
-        {% if course.expiration_date and course.expiration_date < now %}
-        <div class="alert alert-danger">
-            <strong>Warning:</strong> This course has expired. You can still access the materials, but you will not be able to receive a certificate.
-        </div>
-        {% elif course.expiration_date and not is_instructor %}
-        <div class="alert alert-info">
-            <strong>Course Deadline:</strong> Complete this course by {{ course.expiration_date }} to receive your certificate.
-        </div>
-        {% endif %}
-        
-        {% if lesson.lesson_type == 'text' %}
-            <!--TEXT LESSON SECTION -->
-            <div class="lesson-content">
-                {{ lesson.content|safe }}
-            </div>
-        {% elif lesson.lesson_type == 'video' %}
-            <!-- VIDEO LESSON SECTION -->
-            {% if lesson.video_url %}
-                <div class="video-container mb-4">
-                    <div class="ratio ratio-16x9">
-                        <iframe src="{{ lesson.video_url|youtube_embed_url }}"
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-                                allowfullscreen
-                                loading="lazy"
-                                referrerpolicy="no-referrer-when-downgrade">
-                        </iframe>
-                    </div>
-                    <div class="mt-2 d-flex justify-content-between">
-                        <small class = "text-muted">External video source: {{ lesson.video_url|urlize }}</small>
-                        {% if lesson.video_duration%}
-                            <small class="text-muted">Duration: {{ lesson.video_duration }}</small>
-                        {% endif%}
-                    </div>
-                </div>
-            {% elif lesson.video_file %}
-                <div class="video-container mb-4">
-                    <div class="ratio ratio-16x9">
-                        <video controls>
-                            <source src="{{ lesson.video_file.url }}" type="video/mp4">
-                            Your browser does not support the video tag.
-                        </video>
-                    </div>
-                    <div class="mt-2 d-flex justify-content-between">
-                        <small class="text-muted">Uploadedvideo file: {{ lesson.video_file.name|truncatechars:50 }}</small>
-                        {% if lesson.video_duration %}
-                            <small class="text-muted">Duration: {{ lesson.video_duration }}</small>
-                        {% elif lesson.video_size%}
-                            <small class="text-muted">Size: {{ lesson.video_size|filesizeformat }}</small>
-                        {% endif%}
-                    </div>
-                </div>
-            {% else %}
-                <!-- Show a message when video URL is missing -->
-                <div class="alert alert-warning">
-                    <strong>Video not available:</strong> The instructor has not added a video URL or file for this lesson yet.
-                </div>
-            {% endif %}
-        {% elif lesson.lesson_type == 'quiz' %}
-            <!-- QUIZ LESSON SECTION -->
-            {% if already_submitted %}
-                <div class="alert alert-info">
-                    <h4>Quiz Submitted</h4>
-                    <p>You have already submitted this quiz. No retakes allowed.</p>
-                    <p><strong>Your Score: {{ attempt.score|floatformat:2 }}%</strong></p>
-                    {% if attempt.score >= 70 %}
-                        <p class="text-success">✓ You passed this quiz!</p>
-                    {% else %}
-                        <p class="text-danger">You need at least 70% to pass.</p>
-                    {% endif %}
-                </div>
-
-                <!-- Show quiz results -->
-                <div class="card">
-                    <div class="card-header">
-                        <h3>{{ quiz.title }} - Review</h3>
-                    </div>
-                    <div class="card-body">
-                        {% for question in quiz.questions.all %}
-                            <div class="mb-4">
-                                <h5>Question {{ forloop.counter }}: {{ question.text }}</h5>
-                                <p><small class="text-muted">{{ question.points }} point{{ question.points|pluralize }}</small></p>
-
-                                {% if question.question_type == 'single' %}
-                                    {% for answer in question.answers.all %}
-                                        <div class="form-check mb-2">
-                                            <input class="form-check-input" type="radio" disabled
-                                                {% for user_answer in attempt.user_answers.all %}
-                                                    {% if user_answer.question == question and answer in user_answer.selected_answers.all %}checked{% endif %}
-                                                {% endfor %}>
-                                            <label class="form-check-label">{{ answer.text }}
-                                                {% if answer.is_correct %}
-                                                    <span class="badge bg-success">Correct Answer</span>
-                                                {% endif %}
-                                                {% for user_answer in attempt.user_answers.all %}
-                                                    {% if user_answer.question == question and answer in user_answer.selected_answers.all %}
-                                                        {% if not answer.is_correct %}
-                                                            <span class="badge bg-danger">Your Incorrect Answer</span>
-                                                        {% else %}
-                                                            <span class="badge bg-primary">Your Answer</span>
-                                                        {% endif %}
-                                                    {% endif %}
-                                                {% endfor %}
-                                            </label>
-                                        </div>
-                                    {% endfor %}
-                                {% elif question.question_type == 'multiple' %}
-                                    {% for answer in question.answers.all %}
-                                        <div class="form-check mb-2">
-                                            <input class="form-check-input" type="checkbox" disabled
-                                                {% for user_answer in attempt.user_answers.all %}
-                                                    {% if user_answer.question == question and answer in user_answer.selected_answers.all %}checked{% endif %}
-                                                {% endfor %}>
-                                            <label class="form-check-label">{{ answer.text }}
-                                                {% if answer.is_correct %}
-                                                    <span class="badge bg-success">Correct Answer</span>
-                                                {% endif %}
-                                                {% for user_answer in attempt.user_answers.all %}
-                                                    {% if user_answer.question == question and answer in user_answer.selected_answers.all %}
-                                                        <span class="badge bg-primary">Your Selection</span>
-                                                    {% endif %}
-                                                {% endfor %}
-                                            </label>
-                                        </div>
-                                    {% endfor %}
+    <div class="col-md-4 d-flex flex-column gap-2">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title mb-3">Course Modules</h5>
+                <div class="accordion" id="modulesAccordion">
+                    {% for module in course.modules.all %}
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="heading{{ forloop.counter }}">
+                            <button class="accordion-button {% if module.id != lesson.module.id %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ forloop.counter }}" style="background-color: #f8f9fa !important; box-shadow: none !important; color: #212529 !important;">
+                                {{ module.title }}
+                                {% if module.is_locked %}
+                                    <span class="badge bg-warning ms-2">Locked</span>
                                 {% endif %}
+                            </button>
+                        </h2>
+                        <div id="collapse{{ forloop.counter }}" class="accordion-collapse collapse {% if module.id == lesson.module.id %}show{% endif %}">
+                            <div class="accordion-body">
+                                <div class="list-group">
+                                    {% for lesson_item in module.lessons.all %}
+                                        <a href="{% url 'courses:lesson_detail' course.slug lesson_item.slug %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center text-decoration-none {% if lesson_item.id == lesson.id %}active{% else %}text-dark{% endif %}">
+                                            {{ lesson_item.title }}
+                                            <span>
+                                                {% if lesson_item.is_locked %}
+                                                    <span class="badge bg-warning me-1">Locked</span>
+                                                {% endif %}
+                                                <span class="badge bg-secondary">{{ lesson_item.lesson_type }}</span>
+                                            </span>
+                                        </a>
+                                    {% endfor %}
+                                </div>
                             </div>
-                        {% endfor %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <a href="#" class="btn btn-outline-secondary" title="Bookmark this lesson">
+                            <i class="fas fa-bookmark"></i>
+                        </a>
+                    </div>
+                    <div class="d-flex gap-2">
+                        {% if prev_lesson %}
+                            <a href="{% url 'courses:lesson_detail' course.slug prev_lesson.slug %}" class="btn btn-outline-primary" title="Previous Lesson">
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+                        {% endif %}
+                        
+                        {% if next_lesson %}
+                            <a href="{% url 'courses:lesson_detail' course.slug next_lesson.slug %}" class="btn btn-outline-primary" title="Next Lesson">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                        {% else %}
+                            <a href="{% url 'courses:course_detail' course.slug %}" class="btn btn-outline-success">Return to Course</a>
+                        {% endif %}
                     </div>
                 </div>
-            {% else %}
-                <div class="card">
-                    <div class="card-header">
-                        <h3>{{ quiz.title }}</h3>
-                        <p>{{ quiz.description }}</p>
-                        {% if not is_instructor %}
-                            {% if lesson.max_check > 0 %}
-                                <p><strong>Remaining Checks:</strong>
-                                    <span class="badge bg-primary">{{ remaining_checks }}</span> / {{ lesson.max_check }}
-                                </p>
-                            {% else %}
-                                <p><strong>Checks:</strong> <span class="badge bg-success">Unlimited</span></p>
-                            {% endif %}
-                            {% if temp_score is not None %}
-                                <p><strong>Temporary Score:</strong> <span class="badge bg-info">{{ temp_score|floatformat:2 }}%</span></p>
-                            {% endif %}
+
+                <h1>{{ lesson.title }}</h1>
+            
+            {% if is_instructor %}
+            <div class="alert alert-info">
+                <strong>Instructor Preview:</strong> You are viewing this lesson as an instructor. Students will see this content when enrolled in the course.
+            </div>
+            {% endif %}
+            
+            {% load courses_extras %}
+            {% module_deadline lesson.module user as deadline %}
+            {% if deadline and deadline < now %}
+            <div class="alert alert-danger">
+                <strong>Warning:</strong> The deadline for this module was {{ deadline }}. You can still access the materials, but you are behind schedule.
+            </div>
+            {% elif deadline and not is_instructor %}
+            <div class="alert alert-info">
+                <strong>Module Deadline:</strong> Complete this module by {{ deadline }}.
+            </div>
+            {% endif %}
+            
+            {% if course.expiration_date and course.expiration_date < now %}
+            <div class="alert alert-danger">
+                <strong>Warning:</strong> This course has expired. You can still access the materials, but you will not be able to receive a certificate.
+            </div>
+            {% elif course.expiration_date and not is_instructor %}
+            <div class="alert alert-info">
+                <strong>Course Deadline:</strong> Complete this course by {{ course.expiration_date }} to receive your certificate.
+            </div>
+            {% endif %}
+            
+            {% if lesson.lesson_type == 'text' %}
+                <!--TEXT LESSON SECTION -->
+                <div class="lesson-content">
+                    {{ lesson.content|safe }}
+                </div>
+            {% elif lesson.lesson_type == 'video' %}
+                <!-- VIDEO LESSON SECTION -->
+                {% if lesson.video_url %}
+                    <div class="video-container mb-4">
+                        <div class="ratio ratio-16x9">
+                            <iframe src="{{ lesson.video_url|youtube_embed_url }}"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+                                    allowfullscreen
+                                    loading="lazy"
+                                    referrerpolicy="no-referrer-when-downgrade">
+                            </iframe>
+                        </div>
+                        <div class="mt-2 d-flex justify-content-between">
+                            <small class = "text-muted">External video source: {{ lesson.video_url|urlize }}</small>
+                            {% if lesson.video_duration%}
+                                <small class="text-muted">Duration: {{ lesson.video_duration }}</small>
+                            {% endif%}
+                        </div>
+                    </div>
+                {% elif lesson.video_file %}
+                    <div class="video-container mb-4">
+                        <div class="ratio ratio-16x9">
+                            <video controls>
+                                <source src="{{ lesson.video_file.url }}" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                        </div>
+                        <div class="mt-2 d-flex justify-content-between">
+                            <small class="text-muted">Uploadedvideo file: {{ lesson.video_file.name|truncatechars:50 }}</small>
+                            {% if lesson.video_duration %}
+                                <small class="text-muted">Duration: {{ lesson.video_duration }}</small>
+                            {% elif lesson.video_size%}
+                                <small class="text-muted">Size: {{ lesson.video_size|filesizeformat }}</small>
+                            {% endif%}
+                        </div>
+                    </div>
+                {% else %}
+                    <!-- Show a message when video URL is missing -->
+                    <div class="alert alert-warning">
+                        <strong>Video not available:</strong> The instructor has not added a video URL or file for this lesson yet.
+                    </div>
+                {% endif %}
+            {% elif lesson.lesson_type == 'quiz' %}
+                <!-- QUIZ LESSON SECTION -->
+                {% if already_submitted %}
+                    <div class="alert alert-info">
+                        <h4>Quiz Submitted</h4>
+                        <p>You have already submitted this quiz. No retakes allowed.</p>
+                        <p><strong>Your Score: {{ attempt.score|floatformat:2 }}%</strong></p>
+                        {% if attempt.score >= 70 %}
+                            <p class="text-success">✓ You passed this quiz!</p>
+                        {% else %}
+                            <p class="text-danger">You need at least 70% to pass.</p>
                         {% endif %}
                     </div>
-                    <div class="card-body">
-                        {% if is_instructor %}
-                        <div class="alert alert-info">
-                            <p>As an instructor, you are previewing this quiz. Students will be able to submit answers when taking the quiz.</p>
-                        </div>
-                        {% endif %}
 
-                        <form method="post">
-                            {% csrf_token %}
-                            
+                    <!-- Show quiz results -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>{{ quiz.title }} - Review</h3>
+                        </div>
+                        <div class="card-body">
                             {% for question in quiz.questions.all %}
                                 <div class="mb-4">
                                     <h5>Question {{ forloop.counter }}: {{ question.text }}</h5>
@@ -199,158 +184,171 @@
                                     {% if question.question_type == 'single' %}
                                         {% for answer in question.answers.all %}
                                             <div class="form-check mb-2">
-                                                <input class="form-check-input" type="radio"
-                                                    name="question_{{ question.id }}"
-                                                    id="answer_{{ answer.id }}"
-                                                    value="{{ answer.id }}"
-                                                    {% if is_instructor %}disabled{% endif %}>
-                                                <label class="form-check-label" for="answer_{{ answer.id }}">
-                                                    {{ answer.text }}
-                                                    {% if is_instructor and answer.is_correct %}
-                                                        <span class="badge bg-success">Correct</span>
+                                                <input class="form-check-input" type="radio" disabled
+                                                    {% for user_answer in attempt.user_answers.all %}
+                                                        {% if user_answer.question == question and answer in user_answer.selected_answers.all %}checked{% endif %}
+                                                    {% endfor %}>
+                                                <label class="form-check-label">{{ answer.text }}
+                                                    {% if answer.is_correct %}
+                                                        <span class="badge bg-success">Correct Answer</span>
                                                     {% endif %}
-                                                    {% if check_results %}
-                                                        {% for qid, result in check_results.items %}
-                                                            {% if qid == question.id %}
-                                                                {% if answer.id in result.selected %}
-                                                                    {% if result.correct %}
-                                                                        <span class="badge bg-success">✓ Correct</span>
-                                                                    {% else %}
-                                                                        <span class="badge bg-danger">✗ Incorrect</span>
-                                                                    {% endif %}
-                                                                {% endif %}
-                                                                {% if answer.is_correct %}
-                                                                    <span class="badge bg-info">Correct Answer</span>
-                                                                {% endif %}
+                                                    {% for user_answer in attempt.user_answers.all %}
+                                                        {% if user_answer.question == question and answer in user_answer.selected_answers.all %}
+                                                            {% if not answer.is_correct %}
+                                                                <span class="badge bg-danger">Your Incorrect Answer</span>
+                                                            {% else %}
+                                                                <span class="badge bg-primary">Your Answer</span>
                                                             {% endif %}
-                                                        {% endfor %}
-                                                    {% endif %}
+                                                        {% endif %}
+                                                    {% endfor %}
                                                 </label>
                                             </div>
                                         {% endfor %}
                                     {% elif question.question_type == 'multiple' %}
                                         {% for answer in question.answers.all %}
                                             <div class="form-check mb-2">
-                                                <input class="form-check-input" type="checkbox"
-                                                    name="question_{{ question.id }}"
-                                                    id="answer_{{ answer.id }}"
-                                                    value="{{ answer.id }}"
-                                                    {% if is_instructor %}disabled{% endif %}>
-                                                <label class="form-check-label" for="answer_{{ answer.id }}">
-                                                    {{ answer.text }}
-                                                    {% if is_instructor and answer.is_correct %}
-                                                        <span class="badge bg-success">Correct</span>
+                                                <input class="form-check-input" type="checkbox" disabled
+                                                    {% for user_answer in attempt.user_answers.all %}
+                                                        {% if user_answer.question == question and answer in user_answer.selected_answers.all %}checked{% endif %}
+                                                    {% endfor %}>
+                                                <label class="form-check-label">{{ answer.text }}
+                                                    {% if answer.is_correct %}
+                                                        <span class="badge bg-success">Correct Answer</span>
                                                     {% endif %}
-                                                    {% if check_results %}
-                                                        {% for qid, result in check_results.items %}
-                                                            {% if qid == question.id %}
-                                                                {% if answer.id in result.selected %}
-                                                                    <span class="badge bg-primary">Your Selection</span>
-                                                                {% endif %}
-                                                                {% if result.correct %}
-                                                                    {% if answer.is_correct %}
-                                                                        <span class="badge bg-success">✓ Correct</span>
-                                                                    {% endif %}
-                                                                {% else %}
-                                                                    {% if answer.is_correct %}
-                                                                        <span class="badge bg-info">Should Select</span>
-                                                                    {% endif %}
-                                                                {% endif %}
-                                                            {% endif %}
-                                                        {% endfor %}
-                                                    {% endif %}
+                                                    {% for user_answer in attempt.user_answers.all %}
+                                                        {% if user_answer.question == question and answer in user_answer.selected_answers.all %}
+                                                            <span class="badge bg-primary">Your Selection</span>
+                                                        {% endif %}
+                                                    {% endfor %}
                                                 </label>
                                             </div>
                                         {% endfor %}
                                     {% endif %}
                                 </div>
-                            {% empty %}
-                                <p class="text-muted">No questions available for this quiz.</p>
-                            {% endfor %}
-
-                            {% if not is_instructor %}
-                            <div class="d-flex gap-2">
-                                <button type="submit" name="check_answers" class="btn btn-info"
-                                    {% if lesson.max_check > 0 and remaining_checks <= 0 %}disabled{% endif %}>
-                                    Check Answers
-                                </button>
-                                <button type="submit" name="submit_quiz" class="btn btn-primary">
-                                    Submit Quiz (Final)
-                                </button>
-                            </div>
-                            {% endif %}
-                        </form>
-                    </div>
-                </div>
-            {% endif %}
-        {% endif %}
-    </div>
-    
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Course Navigation</h5>
-                <p class="card-text">Progress through the lessons in this course.</p>
-                
-                <div class="d-grid gap-2">
-                    {% if prev_lesson %}
-                        <a href="{% url 'courses:lesson_detail' course.slug prev_lesson.slug %}" class="btn btn-outline-primary">Previous: {{ prev_lesson.title }}</a>
-                    {% endif %}
-                    
-                    {% if next_lesson %}
-                        <a href="{% url 'courses:lesson_detail' course.slug next_lesson.slug %}" class="btn btn-primary">Next: {{ next_lesson.title }}</a>
-                    {% else %}
-                        <a href="{% url 'courses:course_detail' course.slug %}" class="btn btn-success">Return to Course</a>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-        
-        {% if not is_instructor %}
-        <!-- Certificate section -->
-        <div class="card mt-3">
-            <div class="card-body">
-                <h5 class="card-title">Certificate</h5>
-                {% load courses_extras %}
-                {% if user|has_certificate:course %}
-                    {% with certificate=user|get_certificate:course %}
-                    <p class="text-success"><strong>You have earned a certificate for this course!</strong></p>
-                    <a href="{% url 'courses:course_certificate' certificate.certificate_number %}" class="btn btn-success">View Certificate</a>
-                    {% endwith %}
-                {% else %}
-                    {% if course.is_certificate_free %}
-                        <p class="text-info">Certificate is free with course completion.</p>
-                    {% else %}
-                        <p class="card-text">Price: ${{ course.certificate_price }}</p>
-                        <a href="{% url 'payments:payment_page_type' course.slug 'certificate' %}" class="btn btn-warning">Purchase Certificate</a>
-                    {% endif %}
-                {% endif %}
-            </div>
-        </div>
-        {% endif %}
-        
-        <div class="card mt-3">
-            <div class="card-body">
-                <h5 class="card-title">Course Modules</h5>
-                <div class="list-group">
-                    {% for module in course.modules.all %}
-                        <div class="list-group-item list-group-item-action">
-                            <h6>{{ module.title }}</h6>
-                            {% if not is_instructor %}
-                            {% module_deadline module user as module_deadline %}
-                            {% if module_deadline %}
-                                <small class="text-muted">Deadline: {{ module_deadline }}</small>
-                            {% endif %}
-                            {% endif %}
-                            {% for lesson_item in module.lessons.all %}
-                                <a href="{% url 'courses:lesson_detail' course.slug lesson_item.slug %}" 
-                                    class="list-group-item list-group-item-action {% if lesson_item.id == lesson.id %}active{% endif %}">
-                                    {{ lesson_item.title }}
-                                </a>
                             {% endfor %}
                         </div>
-                    {% endfor %}
-                </div>
+                    </div>
+                {% else %}
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>{{ quiz.title }}</h3>
+                            <p>{{ quiz.description }}</p>
+                            {% if not is_instructor %}
+                                {% if lesson.max_check > 0 %}
+                                    <p><strong>Remaining Checks:</strong>
+                                        <span class="badge bg-primary">{{ remaining_checks }}</span> / {{ lesson.max_check }}
+                                    </p>
+                                {% else %}
+                                    <p><strong>Checks:</strong> <span class="badge bg-success">Unlimited</span></p>
+                                {% endif %}
+                                {% if temp_score is not None %}
+                                    <p><strong>Temporary Score:</strong> <span class="badge bg-info">{{ temp_score|floatformat:2 }}%</span></p>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                        <div class="card-body">
+                            {% if is_instructor %}
+                            <div class="alert alert-info">
+                                <p>As an instructor, you are previewing this quiz. Students will be able to submit answers when taking the quiz.</p>
+                            </div>
+                            {% endif %}
+
+                            <form method="post">
+                                {% csrf_token %}
+                                
+                                {% for question in quiz.questions.all %}
+                                    <div class="mb-4">
+                                        <h5>Question {{ forloop.counter }}: {{ question.text }}</h5>
+                                        <p><small class="text-muted">{{ question.points }} point{{ question.points|pluralize }}</small></p>
+
+                                        {% if question.question_type == 'single' %}
+                                            {% for answer in question.answers.all %}
+                                                <div class="form-check mb-2">
+                                                    <input class="form-check-input" type="radio"
+                                                        name="question_{{ question.id }}"
+                                                        id="answer_{{ answer.id }}"
+                                                        value="{{ answer.id }}"
+                                                        {% if is_instructor %}disabled{% endif %}>
+                                                    <label class="form-check-label" for="answer_{{ answer.id }}">
+                                                        {{ answer.text }}
+                                                        {% if is_instructor and answer.is_correct %}
+                                                            <span class="badge bg-success">Correct</span>
+                                                        {% endif %}
+                                                        {% if check_results %}
+                                                            {% for qid, result in check_results.items %}
+                                                                {% if qid == question.id %}
+                                                                    {% if answer.id in result.selected %}
+                                                                        {% if result.correct %}
+                                                                            <span class="badge bg-success">✓ Correct</span>
+                                                                        {% else %}
+                                                                            <span class="badge bg-danger">✗ Incorrect</span>
+                                                                        {% endif %}
+                                                                    {% endif %}
+                                                                    {% if answer.is_correct %}
+                                                                        <span class="badge bg-info">Correct Answer</span>
+                                                                    {% endif %}
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                        {% endif %}
+                                                    </label>
+                                                </div>
+                                            {% endfor %}
+                                        {% elif question.question_type == 'multiple' %}
+                                            {% for answer in question.answers.all %}
+                                                <div class="form-check mb-2">
+                                                    <input class="form-check-input" type="checkbox"
+                                                        name="question_{{ question.id }}"
+                                                        id="answer_{{ answer.id }}"
+                                                        value="{{ answer.id }}"
+                                                        {% if is_instructor %}disabled{% endif %}>
+                                                    <label class="form-check-label" for="answer_{{ answer.id }}">
+                                                        {{ answer.text }}
+                                                        {% if is_instructor and answer.is_correct %}
+                                                            <span class="badge bg-success">Correct</span>
+                                                        {% endif %}
+                                                        {% if check_results %}
+                                                            {% for qid, result in check_results.items %}
+                                                                {% if qid == question.id %}
+                                                                    {% if answer.id in result.selected %}
+                                                                        <span class="badge bg-primary">Your Selection</span>
+                                                                    {% endif %}
+                                                                    {% if result.correct %}
+                                                                        {% if answer.is_correct %}
+                                                                            <span class="badge bg-success">✓ Correct</span>
+                                                                        {% endif %}
+                                                                    {% else %}
+                                                                        {% if answer.is_correct %}
+                                                                            <span class="badge bg-info">Should Select</span>
+                                                                        {% endif %}
+                                                                    {% endif %}
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                        {% endif %}
+                                                    </label>
+                                                </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                {% empty %}
+                                    <p class="text-muted">No questions available for this quiz.</p>
+                                {% endfor %}
+
+                                {% if not is_instructor %}
+                                <div class="d-flex gap-2">
+                                    <button type="submit" name="check_answers" class="btn btn-info"
+                                        {% if lesson.max_check > 0 and remaining_checks <= 0 %}disabled{% endif %}>
+                                        Check Answers
+                                    </button>
+                                    <button type="submit" name="submit_quiz" class="btn btn-primary">
+                                        Submit Quiz (Final)
+                                    </button>
+                                </div>
+                                {% endif %}
+                            </form>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endif %}
             </div>
         </div>
     </div>

@@ -6,8 +6,6 @@
 
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="{% url 'courses:home' %}">Home</a></li>
-        <li class="breadcrumb-item"><a href="{% url 'courses:course_list' %}">Courses</a></li>
         <li class="breadcrumb-item active" aria-current="page">{{ course.title }}</li>
     </ol>
 </nav>
@@ -91,9 +89,12 @@
                     {% if user == course.instructor and not is_preview %}
                         <!-- Show edit and delete options for course instructor -->
                         <div class="mt-2 d-grid gap-2">
-                                <a href="{% url 'courses:edit_course' course.slug %}" class="btn btn-outline-secondary">Edit Course</a>
-                            <a href="{% url 'courses:delete_course' course.slug %}" class="btn btn-outline-danger">Delete Course</a>
+                            <a href="{% url 'courses:edit_course' course.slug %}" class="btn btn-outline-secondary">Edit Course</a>
+                            <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteCourseModal">Delete Course</button>
                         </div>
+                        
+                        <!-- Delete Course Modal -->
+                        {% include "courses/includes/delete_modal.html" with modal_id="deleteCourseModal" modal_title="Delete Course" item_type="course" item_name=course.title action_url=course.get_delete_url|default:request.path|add:"delete/" warning_message="This action cannot be undone. All modules and lessons in this course will be permanently deleted." %}
                     {% elif is_enrolled %}
                         <!-- Check if user has a certificate for this course -->
                         <div class="mt-2 d-grid gap-2">
