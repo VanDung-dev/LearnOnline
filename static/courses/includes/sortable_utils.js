@@ -81,24 +81,24 @@ function initSortable(config) {
     container.disableSelection();
 }
 
-// Initialize sortable for modules
-function initModuleSortable(courseSlug) {
+// Initialize sortable for sections
+function initSectionSortable(courseSlug) {
     initSortable({
-        containerSelector: '.sortable-modules',
-        itemSelector: '.sortable-module',
-        itemDataAttr: 'module-id',
+        containerSelector: '.sortable-sections',
+        itemSelector: '.sortable-section',
+        itemDataAttr: 'section-id',
         getUrl: function() {
             return `/instructor/courses/${encodeURIComponent(courseSlug)}/reorder/`;
         },
-        dataParam: 'module_order',
-        messageSelector: '.text-muted:contains("Drag and drop modules")',
+        dataParam: 'section_order',
+        messageSelector: '.text-muted:contains("Drag and drop sections")',
         messageText: null // Will use existing text
     });
 }
 
-// Initialize sortable for lessons within a module
-function initLessonSortable(moduleId, courseSlug) {
-    const container = $(`.sortable-lessons[data-module-id="${moduleId}"]`);
+// Initialize sortable for lessons within a section
+function initLessonSortable(sectionId, courseSlug) {
+    const container = $(`.sortable-lessons[data-section-id="${sectionId}"]`);
     const list = container.find('.lesson-list');
 
     if (list.length === 0) {
@@ -114,11 +114,11 @@ function initLessonSortable(moduleId, courseSlug) {
             });
 
             console.log('Sending lesson order:', lessonIds);
-            console.log('Module ID:', moduleId);
+            console.log('Module ID:', sectionId);
             console.log('Course slug:', courseSlug);
 
             $.ajax({
-                url: `/instructor/courses/${encodeURIComponent(courseSlug)}/modules/${moduleId}/lessons/reorder/`,
+                url: `/instructor/courses/${encodeURIComponent(courseSlug)}/sections/${sectionId}/lessons/reorder/`,
                 method: 'POST',
                 headers: {
                     'X-CSRFToken': $('[name=csrfmiddlewaretoken]').val(),
@@ -148,14 +148,14 @@ function initLessonSortable(moduleId, courseSlug) {
 
 // Initialize sortable for quiz questions
 function initQuestionSortable(params) {
-    const { courseSlug, moduleId, lessonId, quizId } = params;
+    const { courseSlug, sectionId, lessonId, quizId } = params;
 
     initSortable({
         containerSelector: '.sortable-questions',
         itemSelector: '.sortable-question',
         itemDataAttr: 'question-id',
         getUrl: function() {
-            return `/courses/${encodeURIComponent(courseSlug)}/modules/${moduleId}/lessons/${lessonId}/quiz/reorder/`;
+            return `/courses/${encodeURIComponent(courseSlug)}/sections/${sectionId}/lessons/${lessonId}/quiz/reorder/`;
         },
         dataParam: 'question_order',
         messageSelector: '.text-muted:contains("Drag and drop questions")',
@@ -166,7 +166,7 @@ function initQuestionSortable(params) {
 // Initialize all lesson sortables on the page
 function initAllLessonSortables(courseSlug) {
     $('.sortable-lessons').each(function() {
-        const moduleId = $(this).data('module-id');
-        initLessonSortable(moduleId, courseSlug);
+        const sectionId = $(this).data('section-id');
+        initLessonSortable(sectionId, courseSlug);
     });
 }

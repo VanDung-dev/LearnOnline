@@ -196,14 +196,14 @@ $(document).ready(function () {
 
     if (questionsContainer.length > 0) {
         const courseSlug = questionsContainer.data('course-slug');
-        const moduleId = questionsContainer.data('module-id');
+        const sectionId = questionsContainer.data('section-id');
         const lessonId = questionsContainer.data('lesson-id');
         const quizId = questionsContainer.data('quiz-id');
 
         // Initialize question sortable using utility function
         initQuestionSortable({
             courseSlug: courseSlug,
-            moduleId: moduleId,
+            sectionId: sectionId,
             lessonId: lessonId,
             quizId: quizId
         });

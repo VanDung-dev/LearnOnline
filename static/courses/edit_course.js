@@ -18,10 +18,10 @@ $(document).ready(function () {
         });
     }
 
-    // Initialize sortable for modules
-    const courseSlug = $('.sortable-modules').data('course-slug');
+    // Initialize sortable for sections
+    const courseSlug = $('.sortable-sections').data('course-slug');
     if (courseSlug) {
-        initModuleSortable(courseSlug);
+        initSectionSortable(courseSlug);
 
         // Initialize sortable for all lessons
         initAllLessonSortables(courseSlug);
@@ -29,10 +29,10 @@ $(document).ready(function () {
 
     // Handle lesson type changes in create lesson modals
     $('select[id^="lesson_type_"]').each(function () {
-        const moduleId = $(this).attr('id').split('_').pop();
-        const textSection = $(`#text-content-section-${moduleId}`);
-        const videoSection = $(`#video-content-section-${moduleId}`);
-        const quizSection = $(`#quiz-content-section-${moduleId}`);
+        const sectionId = $(this).attr('id').split('_').pop();
+        const textSection = $(`#text-content-section-${sectionId}`);
+        const videoSection = $(`#video-content-section-${sectionId}`);
+        const quizSection = $(`#quiz-content-section-${sectionId}`);
 
         $(this).on('change', function () {
             // Hide all sections

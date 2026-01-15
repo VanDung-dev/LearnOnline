@@ -187,13 +187,13 @@ $(document).ready(function() {
         });
     });
     
-    // Handle module creation via AJAX
-    $('#createModuleModal form').on('submit', function(e) {
+    // Handle section creation via AJAX
+    $('#createSectionModal form').on('submit', function(e) {
         e.preventDefault();
         
         const form = $(this);
         const formData = new FormData(form[0]);
-        const modal = $('#createModuleModal');
+        const modal = $('#createSectionModal');
         const submitButton = form.find('button[type="submit"]');
         const originalButtonText = submitButton.text();
         
@@ -217,23 +217,23 @@ $(document).ready(function() {
                     modal.modal('hide');
                     // Reset the form
                     form[0].reset();
-                    // Reload the page to show the new module
+                    // Reload the page to show the new section
                     setTimeout(() => location.reload(), 1000);
                 } else {
-                    showNotification(response.message || 'Error creating module', 'error');
+                    showNotification(response.message || 'Error creating section', 'error');
                     submitButton.prop('disabled', false).text(originalButtonText);
                 }
             },
             error: function(xhr, status, error) {
-                showNotification('Error creating module. Please try again.', 'error');
+                showNotification('Error creating section. Please try again.', 'error');
                 submitButton.prop('disabled', false).text(originalButtonText);
-                console.error('Error creating module:', error);
+                console.error('Error creating section:', error);
             }
         });
     });
     
-    // Handle module editing via AJAX
-    $('[id^="editModuleModal"] form').on('submit', function(e) {
+    // Handle section editing via AJAX
+    $('[id^="editSectionModal"] form').on('submit', function(e) {
         e.preventDefault();
         
         const form = $(this);
@@ -261,23 +261,23 @@ $(document).ready(function() {
                     showNotification(response.message, 'success');
                     // Close the modal
                     modal.modal('hide');
-                    // Reload the page to show the updated module
+                    // Reload the page to show the updated section
                     setTimeout(() => location.reload(), 1000);
                 } else {
-                    showNotification(response.message || 'Error updating module', 'error');
+                    showNotification(response.message || 'Error updating section', 'error');
                     submitButton.prop('disabled', false).text(originalButtonText);
                 }
             },
             error: function(xhr, status, error) {
-                showNotification('Error updating module. Please try again.', 'error');
+                showNotification('Error updating section. Please try again.', 'error');
                 submitButton.prop('disabled', false).text(originalButtonText);
-                console.error('Error updating module:', error);
+                console.error('Error updating section:', error);
             }
         });
     });
     
-    // Handle module deletion via AJAX
-    $('[id^="deleteModuleModal"] form').on('submit', function(e) {
+    // Handle section deletion via AJAX
+    $('[id^="deleteSectionModal"] form').on('submit', function(e) {
         e.preventDefault();
         
         const form = $(this);
@@ -285,7 +285,7 @@ $(document).ready(function() {
         const modal = $('#' + modalId);
         const submitButton = form.find('button[type="submit"]');
         const originalButtonText = submitButton.text();
-        const moduleCard = $(`[data-module-id=${form.closest('.modal').attr('id').replace('deleteModuleModal', '')}]`);
+        const sectionCard = $(`[data-section-id=${form.closest('.modal').attr('id').replace('deleteSectionModal', '')}]`);
         
         // Show loading state
         submitButton.prop('disabled', true).text('Deleting...');
@@ -303,19 +303,19 @@ $(document).ready(function() {
                     showNotification(response.message, 'success');
                     // Close the modal
                     modal.modal('hide');
-                    // Remove the module card from the DOM instead of reloading
-                    moduleCard.fadeOut(500, function() {
+                    // Remove the section card from the DOM instead of reloading
+                    sectionCard.fadeOut(500, function() {
                         $(this).remove();
                     });
                 } else {
-                    showNotification(response.message || 'Error deleting module', 'error');
+                    showNotification(response.message || 'Error deleting section', 'error');
                     submitButton.prop('disabled', false).text(originalButtonText);
                 }
             },
             error: function(xhr, status, error) {
-                showNotification('Error deleting module. Please try again.', 'error');
+                showNotification('Error deleting section. Please try again.', 'error');
                 submitButton.prop('disabled', false).text(originalButtonText);
-                console.error('Error deleting module:', error);
+                console.error('Error deleting section:', error);
             }
         });
     });
