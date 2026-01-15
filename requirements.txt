@@ -28,7 +28,6 @@ pytest>=7.0
 pytest-django>=4.5
 pytest-cov>=4.0
 coverage>=7.0
-locust>=2.43.0
 
 # Code Quality & Tooling
 flake8>=6.0
