@@ -54,16 +54,16 @@ def run_migrations():
 def verify_data_count():
     """Verify data counts after migration"""
     from django.contrib.auth.models import User
-    from courses.models import Course, Category, Module, Lesson, Enrollment
-    from accounts.models import Profile
-    from payments.models import Payment
+    from apps.courses.models import Course, Category, Section, Lesson, Enrollment
+    from apps.accounts.models import Profile
+    from apps.payments.models import Payment
     
     counts = {
         'Users': User.objects.count(),
         'Profiles': Profile.objects.count(),
         'Categories': Category.objects.count(),
         'Courses': Course.objects.count(),
-        'Modules': Module.objects.count(),
+        'Sections': Section.objects.count(),
         'Lessons': Lesson.objects.count(),
         'Enrollments': Enrollment.objects.count(),
         'Payments': Payment.objects.count(),
