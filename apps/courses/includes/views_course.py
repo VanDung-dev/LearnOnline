@@ -13,17 +13,45 @@ from ..services.search_service import log_search_query
 @login_required
 def create_course(request):
     if request.method == 'POST':
-        form = CourseForm(request.POST, request.FILES)
-        if form.is_valid():
-            course = form.save(commit=False)
-            course.instructor = request.user
-            course.save()
-            messages.success(request, 'Course created successfully!')
-            return redirect('courses:edit_course', slug=course.slug)
+        title = request.POST.get('title')
+        if not title:
+            messages.error(request, 'Please enter a course title.')
+            return redirect('user_dashboard_with_tab', sub_page='courses')
+            
+        # Check for duplicate title for this instructor
+        if Course.objects.filter(instructor=request.user, title__iexact=title).exists():
+             messages.error(request, 'You already have a course with this title.')
+             return redirect('user_dashboard_with_tab', sub_page='courses')
+
+        # Create Course
+        # We need a category. Find or create default.
+        category = Category.objects.first()
+        if not category:
+             category = Category.objects.create(name="General", description="Default category")
+        
+        from django.utils.text import slugify
+        base_slug = slugify(title)
+        slug = base_slug
+        counter = 1
+        while Course.objects.filter(slug=slug).exists():
+            slug = f"{base_slug}-{counter}"
+            counter += 1
+            
+        course = Course.objects.create(
+            title=title,
+            slug=slug,
+            instructor=request.user,
+            category=category,
+            description="",
+            price=0,
+            certificate_price=0
+        )
+        
+        messages.success(request, 'Course created successfully!')
+        return redirect('courses:edit_course', slug=course.slug)
     else:
-        form = CourseForm()
-    
-    return render(request, 'courses/create_course.html', {'form': form})
+        # Redirect back to dashboard courses tab if accessed via GET
+        return redirect('user_dashboard_with_tab', sub_page='courses')
 
 
 @login_required
@@ -270,8 +298,20 @@ def course_learning_process(request, slug):
     if is_enrolled:
         user_certificate = course.certificates.filter(user=request.user).first()
     
+    # Get sections with optimization
+    sections = course.sections.prefetch_related(
+        'subsections',
+        'subsections__lessons',
+        'lessons'
+    ).all()
+    
+    # Process sections to identify legacy lessons (lessons without subsection)
+    for section in sections:
+        section.has_legacy_lessons = section.lessons.filter(subsection__isnull=True).exists()
+
     return render(request, 'courses/course_learning_process.html', {
         'course': course,
+        'sections': sections,  # Pass processed sections
         'is_enrolled': is_enrolled,
         'is_instructor': is_instructor,
         'user_certificate': user_certificate
@@ -311,4 +351,18 @@ def create_category_ajax(request):
         'id': category.id,
         'name': category.name,
         'message': 'Category created successfully.'
+    })
+
+@require_http_methods(["GET"])
+@login_required
+def check_course_title(request):
+    title = request.GET.get('title', '').strip()
+    exists = False
+    
+    if title:
+        exists = Course.objects.filter(instructor=request.user, title__iexact=title).exists()
+    
+    return JsonResponse({
+        'exists': exists,
+        'valid': True,
     })

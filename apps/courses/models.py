@@ -186,6 +186,7 @@ class Subsection(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
     order = models.PositiveIntegerField(default=0)
+    is_locked = models.BooleanField(default=False, help_text="If checked, only students who purchased certificate can access this subsection")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

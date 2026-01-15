@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
-from ..models import Course, Lesson, Section, Quiz, Question
+from ..models import Course, Lesson, Section, Subsection, Quiz, Question
 
 
 @login_required
@@ -36,6 +36,30 @@ def reorder_sections(request, course_slug):
 
 
 @login_required
+def reorder_subsections(request, course_slug, section_id):
+    """
+    Handle subsection reordering via AJAX drag and drop
+    """
+    course = get_object_or_404(Course, slug=course_slug, instructor=request.user)
+    section = get_object_or_404(Section, id=section_id, course=course)
+
+    if request.method == 'POST' and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        try:
+            # Get the ordered subsection IDs from the request
+            subsection_order = request.POST.getlist('subsection_order[]')
+
+            # Update the order of each subsection
+            for index, subsection_id in enumerate(subsection_order):
+                Subsection.objects.filter(id=subsection_id, section=section).update(order=index)
+
+            return JsonResponse({'status': 'success'})
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)})
+
+    return JsonResponse({'status': 'error', 'message': 'Invalid request'})
+
+
+@login_required
 def reorder_lessons(request, course_slug, section_id):
     """
     Handle lesson reordering via AJAX drag and drop
@@ -62,6 +86,31 @@ def reorder_lessons(request, course_slug, section_id):
             return JsonResponse({'status': 'success'})
         except Exception as e:
             print(f"Error in reorder_lessons: {str(e)}")
+            return JsonResponse({'status': 'error', 'message': str(e)})
+
+    return JsonResponse({'status': 'error', 'message': 'Invalid request'})
+
+
+@login_required
+def reorder_subsection_lessons(request, course_slug, section_id, subsection_id):
+    """
+    Handle lesson reordering within a subsection via AJAX drag and drop
+    """
+    course = get_object_or_404(Course, slug=course_slug, instructor=request.user)
+    section = get_object_or_404(Section, id=section_id, course=course)
+    subsection = get_object_or_404(Subsection, id=subsection_id, section=section)
+
+    if request.method == 'POST' and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        try:
+            # Get the ordered lesson IDs from the request
+            lesson_order = request.POST.getlist('lesson_order[]')
+
+            # Update the order of each lesson
+            for index, lesson_id in enumerate(lesson_order):
+                Lesson.objects.filter(id=lesson_id, subsection=subsection).update(order=index)
+
+            return JsonResponse({'status': 'success'})
+        except Exception as e:
             return JsonResponse({'status': 'error', 'message': str(e)})
 
     return JsonResponse({'status': 'error', 'message': 'Invalid request'})

@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.contrib import messages
-from ..models import Course, Lesson, Section, Quiz, Answer, Question
+from ..models import Course, Lesson, Section, Subsection, Quiz, Answer, Question
 from ..forms import LessonForm, QuizForm
 
 
@@ -11,11 +11,18 @@ def create_lesson(request, course_slug, section_id):
     course = get_object_or_404(Course, slug=course_slug, instructor=request.user)
     section = get_object_or_404(Section, id=section_id, course=course)
 
+    subsection_id = request.GET.get('subsection_id')
+    subsection = None
+    if subsection_id:
+        subsection = get_object_or_404(Subsection, id=subsection_id, section=section)
+
     if request.method == 'POST':
         form = LessonForm(request.POST, request.FILES)
         if form.is_valid():
             lesson = form.save(commit=False)
             lesson.section = section
+            if subsection:
+                lesson.subsection = subsection
             lesson.save()
             
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
