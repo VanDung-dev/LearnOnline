@@ -47,9 +47,9 @@ class SearchCourseSerializer(serializers.ModelSerializer):
 class SearchLessonSerializer(serializers.ModelSerializer):
     """Serializer for lesson search results."""
 
-    course_title = serializers.CharField(source="module.course.title", read_only=True)
-    course_slug = serializers.CharField(source="module.course.slug", read_only=True)
-    module_title = serializers.CharField(source="module.title", read_only=True)
+    course_title = serializers.CharField(source="section.course.title", read_only=True)
+    course_slug = serializers.CharField(source="section.course.slug", read_only=True)
+    section_title = serializers.CharField(source="section.title", read_only=True)
     relevance_score = serializers.FloatField(read_only=True, required=False)
 
     class Meta:
@@ -61,7 +61,7 @@ class SearchLessonSerializer(serializers.ModelSerializer):
             "lesson_type",
             "course_title",
             "course_slug",
-            "module_title",
+            "section_title",
             "order",
             "relevance_score",
         ]

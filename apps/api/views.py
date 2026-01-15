@@ -15,13 +15,13 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 
 from apps.accounts.models import Profile
 from apps.courses.models import (
-    Category, Course, Module, Lesson, Quiz,
+    Category, Course, Section, Lesson, Quiz,
     Enrollment, Progress, Certificate, QuizAttempt
 )
 from .serializers import (
     UserSerializer, ProfileSerializer, RegisterSerializer, ChangePasswordSerializer,
     CategorySerializer, CourseListSerializer, CourseDetailSerializer,
-    ModuleSerializer, LessonSerializer, QuizSerializer,
+    SectionSerializer, LessonSerializer, QuizSerializer,
     EnrollmentSerializer, ProgressSerializer, CertificateSerializer,
     QuizSubmitSerializer, QuizAttemptSerializer,
     InstructorInviteSerializer
@@ -340,7 +340,7 @@ class CourseViewSet(viewsets.ReadOnlyModelViewSet):
     """
     queryset = Course.objects.select_related(
         'instructor', 'category'
-    ).prefetch_related('modules__lessons')
+    ).prefetch_related('sections__lessons')
     lookup_field = 'slug'
     permission_classes = [permissions.AllowAny]
 
@@ -399,18 +399,18 @@ class CourseViewSet(viewsets.ReadOnlyModelViewSet):
 # Module & Lesson Views
 # ============================================
 
-class ModuleViewSet(viewsets.ReadOnlyModelViewSet):
+class SectionViewSet(viewsets.ReadOnlyModelViewSet):
     """
-    ViewSet for modules.
-    GET /api/courses/{course_slug}/modules/
-    GET /api/courses/{course_slug}/modules/{id}/
+    ViewSet for sections (formerly modules).
+    GET /api/courses/{course_slug}/sections/
+    GET /api/courses/{course_slug}/sections/{id}/
     """
-    serializer_class = ModuleSerializer
+    serializer_class = SectionSerializer
     permission_classes = [permissions.AllowAny]
 
     def get_queryset(self):
         course_slug = self.kwargs.get('course_slug')
-        return Module.objects.filter(course__slug=course_slug).prefetch_related('lessons')
+        return Section.objects.filter(course__slug=course_slug).prefetch_related('lessons')
 
 
 class LessonDetailView(generics.RetrieveAPIView):
@@ -422,7 +422,7 @@ class LessonDetailView(generics.RetrieveAPIView):
     permission_classes = [permissions.IsAuthenticated, IsEnrolled]
 
     def get_queryset(self):
-        return Lesson.objects.select_related('module__course')
+        return Lesson.objects.select_related('section__course')
 
     def get_object(self):
         queryset = self.get_queryset()
@@ -462,7 +462,7 @@ class ProgressViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         return Progress.objects.filter(
             user=self.request.user
-        ).select_related('lesson__module__course')
+        ).select_related('lesson__section__course')
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
@@ -481,7 +481,7 @@ class ProgressViewSet(viewsets.ModelViewSet):
         
         # Check enrollment
         if not Enrollment.objects.filter(
-            user=request.user, course=lesson.module.course
+            user=request.user, course=lesson.section.course
         ).exists():
             return Response(
                 {"error": "You are not enrolled in this course."},
@@ -517,7 +517,7 @@ class QuizDetailView(generics.RetrieveAPIView):
         
         # Check enrollment
         if not Enrollment.objects.filter(
-            user=self.request.user, course=lesson.module.course
+            user=self.request.user, course=lesson.section.course
         ).exists():
             self.permission_denied(self.request, message="Not enrolled in this course.")
         
@@ -536,7 +536,7 @@ class QuizSubmitView(APIView):
         
         # Check enrollment
         if not Enrollment.objects.filter(
-            user=request.user, course=lesson.module.course
+            user=request.user, course=lesson.section.course
         ).exists():
             return Response(
                 {"error": "Not enrolled in this course."},

@@ -1,15 +1,15 @@
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
-from ..models import Course, Lesson, Module, Quiz, Question
+from ..models import Course, Lesson, Section, Quiz, Question
 
 
 @login_required
-def reorder_modules(request, course_slug):
+def reorder_sections(request, course_slug):
     """
-    Handle module reordering via AJAX drag and drop
+    Handle section reordering via AJAX drag and drop
     """
-    print(f"Reorder modules called with course_slug: {course_slug}")
+    print(f"Reorder sections called with course_slug: {course_slug}")
     print(f"Request method: {request.method}")
     print(f"Is AJAX: {request.headers.get('X-Requested-With') == 'XMLHttpRequest'}")
 
@@ -18,35 +18,35 @@ def reorder_modules(request, course_slug):
 
     if request.method == 'POST' and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
         try:
-            # Get the ordered module IDs from the request
-            module_order = request.POST.getlist('module_order[]')
-            print(f"Module order received: {module_order}")
+            # Get the ordered section IDs from the request
+            section_order = request.POST.getlist('section_order[]')
+            print(f"Section order received: {section_order}")
 
-            # Update the order of each module
-            for index, module_id in enumerate(module_order):
-                Module.objects.filter(id=module_id, course=course).update(order=index)
-                print(f"Updated module {module_id} order to {index}")
+            # Update the order of each section
+            for index, section_id in enumerate(section_order):
+                Section.objects.filter(id=section_id, course=course).update(order=index)
+                print(f"Updated section {section_id} order to {index}")
 
             return JsonResponse({'status': 'success'})
         except Exception as e:
-            print(f"Error in reorder_modules: {str(e)}")
+            print(f"Error in reorder_sections: {str(e)}")
             return JsonResponse({'status': 'error', 'message': str(e)})
 
     return JsonResponse({'status': 'error', 'message': 'Invalid request'})
 
 
 @login_required
-def reorder_lessons(request, course_slug, module_id):
+def reorder_lessons(request, course_slug, section_id):
     """
     Handle lesson reordering via AJAX drag and drop
     """
-    print(f"Reorder lessons called with course_slug: {course_slug}, module_id: {module_id}")
+    print(f"Reorder lessons called with course_slug: {course_slug}, section_id: {section_id}")
     print(f"Request method: {request.method}")
     print(f"Is AJAX: {request.headers.get('X-Requested-With') == 'XMLHttpRequest'}")
 
     course = get_object_or_404(Course, slug=course_slug, instructor=request.user)
-    module = get_object_or_404(Module, id=module_id, course=course)
-    print(f"Found module: {module.title}")
+    section = get_object_or_404(Section, id=section_id, course=course)
+    print(f"Found section: {section.title}")
 
     if request.method == 'POST' and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
         try:
@@ -56,7 +56,7 @@ def reorder_lessons(request, course_slug, module_id):
 
             # Update the order of each lesson
             for index, lesson_id in enumerate(lesson_order):
-                Lesson.objects.filter(id=lesson_id, module=module).update(order=index)
+                Lesson.objects.filter(id=lesson_id, section=section).update(order=index)
                 print(f"Updated lesson {lesson_id} order to {index}")
 
             return JsonResponse({'status': 'success'})
@@ -68,13 +68,13 @@ def reorder_lessons(request, course_slug, module_id):
 
 
 @login_required
-def reorder_quiz_questions(request, course_slug, module_id, lesson_id):
+def reorder_quiz_questions(request, course_slug, section_id, lesson_id):
     """
     Handle quiz question reordering via AJAX drag and drop
     """
     course = get_object_or_404(Course, slug=course_slug, instructor=request.user)
-    module = get_object_or_404(Module, id=module_id, course=course)
-    lesson = get_object_or_404(Lesson, id=lesson_id, module=module)
+    section = get_object_or_404(Section, id=section_id, course=course)
+    lesson = get_object_or_404(Lesson, id=lesson_id, section=section)
 
     # Ensure lesson has a quiz
     if lesson.lesson_type != 'quiz':

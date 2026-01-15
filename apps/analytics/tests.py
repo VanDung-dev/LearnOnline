@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
-from apps.courses.models import Course, Enrollment, Module, Lesson, Progress, Category
+from apps.courses.models import Course, Enrollment, Section, Lesson, Progress, Category
 from apps.analytics.services import get_student_progress, get_instructor_stats
 
 class AnalyticsServiceTests(TestCase):
@@ -21,9 +21,9 @@ class AnalyticsServiceTests(TestCase):
         )
 
         # Create Content
-        self.module = Module.objects.create(course=self.course, title="Module 1")
-        self.lesson1 = Lesson.objects.create(module=self.module, title="Lesson 1", order=1)
-        self.lesson2 = Lesson.objects.create(module=self.module, title="Lesson 2", order=2)
+        self.section = Section.objects.create(course=self.course, title="Section 1")
+        self.lesson1 = Lesson.objects.create(section=self.section, title="Lesson 1", order=1)
+        self.lesson2 = Lesson.objects.create(section=self.section, title="Lesson 2", order=2)
 
         # Enroll Student
         self.enrollment = Enrollment.objects.create(user=self.student, course=self.course)

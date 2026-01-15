@@ -2,20 +2,20 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.contrib import messages
-from ..models import Course, Lesson, Module, Quiz, Answer, Question
+from ..models import Course, Lesson, Section, Quiz, Answer, Question
 from ..forms import LessonForm, QuizForm
 
 
 @login_required
-def create_lesson(request, course_slug, module_id):
+def create_lesson(request, course_slug, section_id):
     course = get_object_or_404(Course, slug=course_slug, instructor=request.user)
-    module = get_object_or_404(Module, id=module_id, course=course)
+    section = get_object_or_404(Section, id=section_id, course=course)
 
     if request.method == 'POST':
         form = LessonForm(request.POST, request.FILES)
         if form.is_valid():
             lesson = form.save(commit=False)
-            lesson.module = module
+            lesson.section = section
             lesson.save()
             
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
@@ -51,10 +51,10 @@ def create_lesson(request, course_slug, module_id):
 
 
 @login_required
-def edit_lesson(request, course_slug, module_id, lesson_id):
+def edit_lesson(request, course_slug, section_id, lesson_id):
     course = get_object_or_404(Course, slug=course_slug, instructor=request.user)
-    module = get_object_or_404(Module, id=module_id, course=course)
-    lesson = get_object_or_404(Lesson, id=lesson_id, module=module)
+    section = get_object_or_404(Section, id=section_id, course=course)
+    lesson = get_object_or_404(Lesson, id=lesson_id, section=section)
 
     # Get or create quiz for this lesson if it's a quiz type
     if lesson.lesson_type == 'quiz':
@@ -99,7 +99,7 @@ def edit_lesson(request, course_slug, module_id, lesson_id):
             else:
                 messages.error(request, 'Question text is required!')
             
-            return redirect('courses:edit_lesson', course_slug=course.slug,module_id=module.id, lesson_id=lesson.id)
+            return redirect('courses:edit_lesson', course_slug=course.slug, section_id=section.id, lesson_id=lesson.id)
             
         elif action == 'add_multiple_choice_question' and lesson.lesson_type == 'quiz':
             # Add new multiple choice question
@@ -134,7 +134,7 @@ def edit_lesson(request, course_slug, module_id, lesson_id):
             else:
                 messages.error(request, 'Question text is required!')
             
-            return redirect('courses:edit_lesson', course_slug=course.slug, module_id=module.id, lesson_id=lesson.id)
+            return redirect('courses:edit_lesson', course_slug=course.slug, section_id=section.id, lesson_id=lesson.id)
             
         elif action == 'add_essay_question' and lesson.lesson_type == 'quiz':
             # Add new essay question
@@ -156,7 +156,7 @@ def edit_lesson(request, course_slug, module_id, lesson_id):
             else:
                 messages.error(request, 'Question text is required!')
             
-            return redirect('courses:edit_lesson', course_slug=course.slug, module_id=module.id, lesson_id=lesson.id)
+            return redirect('courses:edit_lesson', course_slug=course.slug, section_id=section.id, lesson_id=lesson.id)
             
         elif action == 'edit_single_choice_question' and lesson.lesson_type == 'quiz':
             # Edit existing single choice question
@@ -196,7 +196,7 @@ def edit_lesson(request, course_slug, module_id, lesson_id):
                     )
 
             messages.success(request, 'Single choice question updated successfully!')
-            return redirect('courses:edit_lesson', course_slug=course.slug, module_id=module.id, lesson_id=lesson.id)
+            return redirect('courses:edit_lesson', course_slug=course.slug, section_id=section.id, lesson_id=lesson.id)
             
         elif action == 'edit_multiple_choice_question' and lesson.lesson_type == 'quiz':
             # Edit existing multiple choice question
@@ -233,7 +233,7 @@ def edit_lesson(request, course_slug, module_id, lesson_id):
                     )
 
             messages.success(request, 'Multiple choice question updated successfully!')
-            return redirect('courses:edit_lesson', course_slug=course.slug, module_id=module.id, lesson_id=lesson.id)
+            return redirect('courses:edit_lesson', course_slug=course.slug, section_id=section.id, lesson_id=lesson.id)
             
         elif action == 'edit_essay_question' and lesson.lesson_type == 'quiz':
             # Edit existing essay question
@@ -247,7 +247,7 @@ def edit_lesson(request, course_slug, module_id, lesson_id):
             question.save()
 
             messages.success(request, 'Essay question updated successfully!')
-            return redirect('courses:edit_lesson', course_slug=course.slug, module_id=module.id, lesson_id=lesson.id)
+            return redirect('courses:edit_lesson', course_slug=course.slug, section_id=section.id, lesson_id=lesson.id)
             
         elif action == 'delete_question' and lesson.lesson_type == 'quiz':
             # Delete question
@@ -255,7 +255,7 @@ def edit_lesson(request, course_slug, module_id, lesson_id):
             question = get_object_or_404(Question, id=question_id, quiz=quiz)
             question.delete()
             messages.success(request, 'Question deleted successfully!')
-            return redirect('courses:edit_lesson', course_slug=course.slug, module_id=module.id, lesson_id=lesson.id)
+            return redirect('courses:edit_lesson', course_slug=course.slug, section_id=section.id, lesson_id=lesson.id)
             
         elif action is None and lesson.lesson_type == 'quiz':
             # Update quiz details
@@ -293,7 +293,7 @@ def edit_lesson(request, course_slug, module_id, lesson_id):
 
     context = {
         'course': course,
-        'module': module,
+        'section': section,
         'lesson': lesson,
         'form': form,
     }
@@ -301,10 +301,10 @@ def edit_lesson(request, course_slug, module_id, lesson_id):
 
 
 @login_required
-def delete_lesson(request, course_slug, module_id, lesson_id):
+def delete_lesson(request, course_slug, section_id, lesson_id):
     course = get_object_or_404(Course, slug=course_slug, instructor=request.user)
-    module = get_object_or_404(Module, id=module_id, course=course)
-    lesson = get_object_or_404(Lesson, id=lesson_id, module=module)
+    section = get_object_or_404(Section, id=section_id, course=course)
+    lesson = get_object_or_404(Lesson, id=lesson_id, section=section)
 
     if request.method == 'POST':
         lesson_title = lesson.title

@@ -13,7 +13,7 @@ from apps.organization.models import School, InstructorInvite
 from apps.courses.models import (
     Category,
     Course,
-    Module,
+    Section,
     Lesson,
     Quiz,
     Question,
@@ -205,14 +205,14 @@ class LessonSerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "slug"]
 
 
-class ModuleSerializer(serializers.ModelSerializer):
-    """Serializer for Module model"""
+class SectionSerializer(serializers.ModelSerializer):
+    """Serializer for Section model (formerly Module)"""
 
     lessons = LessonSerializer(many=True, read_only=True)
     lesson_count = serializers.SerializerMethodField()
 
     class Meta:
-        model = Module
+        model = Section
         fields = [
             "id",
             "title",
@@ -233,7 +233,7 @@ class CourseDetailSerializer(serializers.ModelSerializer):
 
     instructor = InstructorSerializer(read_only=True)
     category = CategorySerializer(read_only=True)
-    modules = ModuleSerializer(many=True, read_only=True)
+    sections = SectionSerializer(many=True, read_only=True)
     enrollment_count = serializers.SerializerMethodField()
     is_enrolled = serializers.SerializerMethodField()
     is_free = serializers.SerializerMethodField()
@@ -252,7 +252,7 @@ class CourseDetailSerializer(serializers.ModelSerializer):
             "certificate_price",
             "instructor",
             "category",
-            "modules",
+            "sections",
             "enrollment_count",
             "is_enrolled",
             "opening_date",

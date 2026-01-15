@@ -59,14 +59,14 @@ urlpatterns = [
     # Nested Course URLs
     # ============================================
     path(
-        'courses/<slug:course_slug>/modules/',
-        views.ModuleViewSet.as_view({'get': 'list'}),
-        name='course-modules'
+        'courses/<slug:course_slug>/sections/',
+        views.SectionViewSet.as_view({'get': 'list'}),
+        name='course-sections'
     ),
     path(
-        'courses/<slug:course_slug>/modules/<int:pk>/',
-        views.ModuleViewSet.as_view({'get': 'retrieve'}),
-        name='course-module-detail'
+        'courses/<slug:course_slug>/sections/<int:pk>/',
+        views.SectionViewSet.as_view({'get': 'retrieve'}),
+        name='course-section-detail'
     ),
 
     # ============================================

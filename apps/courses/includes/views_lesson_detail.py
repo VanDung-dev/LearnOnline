@@ -14,7 +14,7 @@ from apps.payments.models import Payment
 def lesson_detail(request, course_slug, lesson_slug):
     course = get_object_or_404(Course, slug=course_slug, is_active=True)
     # First get all lessons with the given slug in this course
-    lessons = Lesson.objects.filter(slug=lesson_slug, module__course=course, is_published=True)
+    lessons = Lesson.objects.filter(slug=lesson_slug, section__course=course, is_published=True)
     if not lessons.exists():
         raise Http404("Lesson not found")
     elif lessons.count() > 1:
@@ -56,7 +56,7 @@ def lesson_detail(request, course_slug, lesson_slug):
         logger.warning(f"Video lesson '{lesson.title}' (ID: {lesson.id}) has no video URL set")
 
     # Check if lesson/module is locked - instructors can always access
-    if not is_instructor and (lesson.is_locked or lesson.module.is_locked) and not has_certificate:
+    if not is_instructor and (lesson.is_locked or lesson.section.is_locked) and not has_certificate:
         # Lesson or module is locked and user doesn't have certificate
         messages.error(request, "This content is locked. Purchase a certificate to access it.")
         return redirect('courses:course_detail', slug=course.slug)
@@ -389,7 +389,7 @@ def lesson_detail(request, course_slug, lesson_slug):
         check_and_issue_certificate(request.user, course)
 
     # Get next and previous lessons
-    all_lessons = Lesson.objects.filter(module__course=course, is_published=True)
+    all_lessons = Lesson.objects.filter(section__course=course, is_published=True)
     all_lessons_list = list(all_lessons)
     try:
         current_index = all_lessons_list.index(lesson)
@@ -423,7 +423,7 @@ def check_and_issue_certificate(user, course):
     Check if user has completed all lessons in a course and issue certificate if so
     """
     # Get all lessons in the course
-    all_lessons = Lesson.objects.filter(module__course=course, is_published=True)
+    all_lessons = Lesson.objects.filter(section__course=course, is_published=True)
     total_lessons = all_lessons.count()
 
     if total_lessons == 0:

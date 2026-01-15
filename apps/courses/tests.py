@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 from django.utils import timezone
 from datetime import timedelta
-from .models import Category, Course, Enrollment, Certificate, Progress, Lesson, Module
+from .models import Category, Course, Enrollment, Certificate, Progress, Lesson, Section
 
 
 class CourseExpirationTestCase(TestCase):
@@ -46,16 +46,16 @@ class CourseExpirationTestCase(TestCase):
             price=100.00
         )
         
-        # Create module and lesson for the course
-        self.module = Module.objects.create(
+        # Create section and lesson for the course
+        self.section = Section.objects.create(
             course=self.expiring_course,
-            title='Test Module',
-            description='Test module description',
+            title='Test Section',
+            description='Test section description',
             order=1
         )
         
         self.lesson = Lesson.objects.create(
-            module=self.module,
+            section=self.section,
             title='Test Lesson',
             lesson_type='text',
             content='Test lesson content',
@@ -105,16 +105,16 @@ class CourseExpirationTestCase(TestCase):
             expiration_date=timezone.now() - timedelta(days=1)  # Expired yesterday
         )
         
-        # Create module and lesson for the expired course
-        module = Module.objects.create(
+        # Create section and lesson for the expired course
+        section = Section.objects.create(
             course=expired_course,
-            title='Test Module',
-            description='Test module description',
+            title='Test Section',
+            description='Test section description',
             order=1
         )
         
         lesson = Lesson.objects.create(
-            module=module,
+            section=section,
             title='Test Lesson',
             lesson_type='text',
             content='Test lesson content',

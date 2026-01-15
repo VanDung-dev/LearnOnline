@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, Course, Module, Lesson, Enrollment, Progress
+from .models import Category, Course, Section, Lesson, Enrollment, Progress
 
 
 @admin.register(Category)
@@ -21,8 +21,8 @@ class LessonInline(admin.StackedInline):
     extra = 1
 
 
-@admin.register(Module)
-class ModuleAdmin(admin.ModelAdmin):
+@admin.register(Section)
+class SectionAdmin(admin.ModelAdmin):
     list_display = ['title', 'course', 'order']
     list_filter = ['course']
     inlines = [LessonInline]
@@ -30,8 +30,8 @@ class ModuleAdmin(admin.ModelAdmin):
 
 @admin.register(Lesson)
 class LessonAdmin(admin.ModelAdmin):
-    list_display = ['title', 'module', 'lesson_type', 'order', 'is_published']
-    list_filter = ['module__course', 'lesson_type', 'is_published']
+    list_display = ['title', 'section', 'lesson_type', 'order', 'is_published']
+    list_filter = ['section__course', 'lesson_type', 'is_published']
     prepopulated_fields = {'slug': ('title',)}
 
 

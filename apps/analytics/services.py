@@ -14,10 +14,10 @@ def get_student_progress(user):
     for enrollment in enrollments:
         course = enrollment.course
         # Calculate progress using Progress model
-        total_lessons = Lesson.objects.filter(module__course=course).count()
+        total_lessons = Lesson.objects.filter(section__course=course).count()
         completed_lessons = Progress.objects.filter(
             user=user, 
-            lesson__module__course=course, 
+            lesson__section__course=course, 
             completed=True
         ).count()
         

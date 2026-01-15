@@ -31,9 +31,9 @@ def purchase_certificate(request, slug):
     # Check if certificate is free
     if course.is_certificate_free():
         messages.info(request, "Certificate is free for this course.")
-        first_module = course.modules.first()
-        if first_module:
-            first_lesson = first_module.lessons.first()
+        first_section = course.sections.first()
+        if first_section:
+            first_lesson = first_section.lessons.first()
             if first_lesson:
                 return redirect('courses:lesson_detail', course_slug=course.slug, lesson_slug=first_lesson.slug)
 

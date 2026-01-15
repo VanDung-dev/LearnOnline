@@ -185,7 +185,7 @@ class SearchLessonsView(APIView):
         # Apply filters
         course_slug = request.query_params.get("course")
         if course_slug:
-            queryset = queryset.filter(module__course__slug=course_slug)
+            queryset = queryset.filter(section__course__slug=course_slug)
 
         lesson_type = request.query_params.get("lesson_type")
         if lesson_type in ["text", "video", "quiz"]:
@@ -204,7 +204,7 @@ class SearchLessonsView(APIView):
         ).order_by("-relevance_score", "order")
 
         # Select related for efficiency
-        queryset = queryset.select_related("module", "module__course")
+        queryset = queryset.select_related("section", "section__course")
 
         # Pagination
         paginator = self.pagination_class()
@@ -324,7 +324,7 @@ class SearchGlobalView(APIView):
         ).filter(
             Q(title__icontains=query) |
             Q(content__icontains=query)
-        ).select_related("module", "module__course")[:5]
+        ).select_related("section", "section__course")[:5]
 
         results["lessons"] = SearchLessonSerializer(lessons, many=True).data
 

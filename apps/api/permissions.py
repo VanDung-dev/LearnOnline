@@ -42,9 +42,9 @@ class IsEnrolled(permissions.BasePermission):
         if not request.user.is_authenticated:
             return False
         
-        # Get the course from the object (lesson -> module -> course)
-        if hasattr(obj, 'module'):
-            course = obj.module.course
+        # Get the course from the object (lesson -> section -> course)
+        if hasattr(obj, 'section'):
+            course = obj.section.course
         elif hasattr(obj, 'course'):
             course = obj.course
         else:

@@ -6,6 +6,8 @@ from django.urls import reverse
 from django.utils.text import slugify
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
+from django.db.models import Max
+from django.utils import timezone
 
 
 class Category(models.Model):
@@ -126,18 +128,21 @@ class Course(models.Model):
         return self.price > 0 or self.certificate_price == 0
 
 
-class Module(models.Model):
-    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="modules")
+class Section(models.Model):
+    """Represents a section within a course (formerly called Module)."""
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="sections")
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
     order = models.PositiveIntegerField(default=0)
     duration_days = models.PositiveIntegerField(
-        default=7, help_text="Number of days students have to complete this module"
+        default=7, help_text="Number of days students have to complete this section"
     )
     is_locked = models.BooleanField(
         default=False,
-        help_text="If checked, only students who purchased certificate can access this module",
+        help_text="If checked, only students who purchased certificate can access this section",
     )
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(default=timezone.now)
 
     class Meta:
         ordering = ["order"]
@@ -147,8 +152,8 @@ class Module(models.Model):
 
     def get_deadline(self, enrollment_date=None):
         """
-        Calculate the deadline for this module based on the enrollment date and
-        the cumulative duration of preceding modules.
+        Calculate the deadline for this section based on the enrollment date and
+        the cumulative duration of preceding sections.
         If no enrollment_date is provided, use the course opening date.
         """
         # If no enrollment date provided, try to use course opening date
@@ -159,20 +164,43 @@ class Module(models.Model):
         else:
             start_date = enrollment_date
 
-        # Get all modules in the course ordered by their order
-        modules = Module.objects.filter(course=self.course).order_by("order")
+        # Get all sections in the course ordered by their order
+        sections = Section.objects.filter(course=self.course).order_by("order")
 
-        # Calculate cumulative days up to this module
+        # Calculate cumulative days up to this section
         cumulative_days = 0
-        for module in modules:
-            cumulative_days += module.duration_days
-            if module.id == self.id:
+        for section in sections:
+            cumulative_days += section.duration_days
+            if section.id == self.id:
                 break
 
         # Calculate deadline
         from datetime import timedelta
 
         return start_date + timedelta(days=cumulative_days)
+
+
+class Subsection(models.Model):
+    """Represents a subsection within a section."""
+    section = models.ForeignKey(Section, on_delete=models.CASCADE, related_name="subsections")
+    title = models.CharField(max_length=200)
+    description = models.TextField(blank=True)
+    order = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["order"]
+
+    def __str__(self):
+        return f"{self.section.title} - {self.title}"
+        
+    def save(self, *args, **kwargs):
+        # Ensure order is set if not provided
+        if not self.order:
+            max_order = Subsection.objects.filter(section=self.section).aggregate(Max('order'))['order__max']
+            self.order = (max_order or 0) + 1
+        super().save(*args, **kwargs)
 
 
 class Lesson(models.Model):
@@ -182,7 +210,8 @@ class Lesson(models.Model):
         ("quiz", "Quiz"),
     )
 
-    module = models.ForeignKey(Module, on_delete=models.CASCADE, related_name="lessons")
+    section = models.ForeignKey(Section, on_delete=models.CASCADE, related_name="lessons", null=True, blank=True)
+    subsection = models.ForeignKey(Subsection, on_delete=models.CASCADE, related_name="lessons", null=True, blank=True)
     title = models.CharField(max_length=200)
     slug = models.SlugField(max_length=200, unique=False)
     lesson_type = models.CharField(max_length=10, choices=LESSON_TYPES, default="text")
@@ -253,18 +282,31 @@ class Lesson(models.Model):
 
         if not self.slug:
             self.slug = slugify(self.title)
-            # Ensure uniqueness within the course (not just within the module)
+            # Ensure uniqueness within the course (not just within the section)
             original_slug = self.slug
             counter = 1
-            while Lesson.objects.filter(
-                slug=self.slug, module__course=self.module.course
-            ).exists():
-                self.slug = f"{original_slug}-{counter}"
-                counter += 1
+            # Check for uniqueness in subsection if available, else section
+            if self.subsection:
+                 while Lesson.objects.filter(
+                    slug=self.slug, subsection__section__course=self.subsection.section.course
+                ).exists():
+                    self.slug = f"{original_slug}-{counter}"
+                    counter += 1
+            elif self.section:
+                while Lesson.objects.filter(
+                    slug=self.slug, section__course=self.section.course
+                ).exists():
+                    self.slug = f"{original_slug}-{counter}"
+                    counter += 1
+                    
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.module.course.title} - {self.title}"
+        if self.subsection:
+             return f"{self.subsection.section.course.title} - {self.title}"
+        elif self.section:
+            return f"{self.section.course.title} - {self.title}"
+        return self.title
 
 
 # Quiz models

@@ -191,7 +191,7 @@ def course_list(request):
         courses = courses.order_by('-created_at')
     
     # Optimize query
-    courses = courses.select_related('category', 'instructor').prefetch_related('modules')
+    courses = courses.select_related('category', 'instructor').prefetch_related('sections')
     
     # Get all categories for filter dropdown
     categories = Category.objects.all().order_by('name')

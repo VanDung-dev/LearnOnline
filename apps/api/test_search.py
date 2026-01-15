@@ -7,7 +7,7 @@ from django.urls import reverse
 from rest_framework.test import APITestCase, APIClient
 from rest_framework import status
 
-from apps.courses.models import Category, Course, Module, Lesson
+from apps.courses.models import Category, Course, Section, Lesson
 
 
 class SearchCoursesAPITestCase(APITestCase):
@@ -161,7 +161,7 @@ class SearchLessonsAPITestCase(APITestCase):
             category=self.category,
             is_active=True
         )
-        self.module = Module.objects.create(
+        self.section = Section.objects.create(
             course=self.course,
             title='Getting Started',
             order=1
@@ -169,7 +169,7 @@ class SearchLessonsAPITestCase(APITestCase):
 
         # Create lessons
         self.lesson1 = Lesson.objects.create(
-            module=self.module,
+            section=self.section,
             title='Introduction to Python',
             slug='intro-python',
             content='Python is a powerful language',
@@ -178,7 +178,7 @@ class SearchLessonsAPITestCase(APITestCase):
             order=1
         )
         self.lesson2 = Lesson.objects.create(
-            module=self.module,
+            section=self.section,
             title='Variables and Data Types',
             slug='variables-data',
             content='Learn about Python variables',

@@ -40,7 +40,7 @@ def is_course_completed(user, course):
         return False
     
     # Get all lessons in the course
-    all_lessons = course.modules.values_list('lessons', flat=True)
+    all_lessons = course.sections.values_list('lessons', flat=True)
     
     if not all_lessons.exists():
         return False
@@ -65,25 +65,25 @@ def is_course_expired(course):
 @register.filter
 def course_duration_weeks(course):
     """
-    Calculate the total duration of a course in weeks based on module durations
+    Calculate the total duration of a course in weeks based on section durations
     """
-    total_days = sum(module.duration_days for module in course.modules.all())
+    total_days = sum(section.duration_days for section in course.sections.all())
     weeks = total_days / 7.0
     return round(weeks, 1) if weeks % 1 != 0 else int(weeks)
 
 @register.simple_tag
-def module_deadline(module, user):
+def section_deadline(section, user):
     """
-    Get the deadline for a module based on user's enrollment date
+    Get the deadline for a section based on user's enrollment date
     """
     if not user.is_authenticated:
         return None
     
     try:
-        enrollment = Enrollment.objects.get(user=user, course=module.course)
-        return module.get_deadline(enrollment.enrolled_at)
+        enrollment = Enrollment.objects.get(user=user, course=section.course)
+        return section.get_deadline(enrollment.enrolled_at)
     except Enrollment.DoesNotExist:
-        return module.get_deadline()
+        return section.get_deadline()
 
 @register.filter
 def youtube_embed_url(url):

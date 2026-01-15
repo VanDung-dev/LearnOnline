@@ -1,5 +1,5 @@
 from django import forms
-from .models import Course, Module, Lesson, Quiz, Question, Answer
+from .models import Course, Section, Lesson, Quiz, Question, Answer
 
 
 class CourseForm(forms.ModelForm):
@@ -44,9 +44,9 @@ class CourseForm(forms.ModelForm):
         return course
 
 
-class ModuleForm(forms.ModelForm):
+class SectionForm(forms.ModelForm):
     class Meta:
-        model = Module
+        model = Section
         fields = ['title', 'description', 'order', 'duration_days', 'is_locked']
         widgets = {
             'description': forms.Textarea(attrs={'rows': 3}),

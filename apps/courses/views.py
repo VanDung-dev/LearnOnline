@@ -6,8 +6,8 @@ from .includes.views_course import (
     create_course, edit_course, delete_course, course_list,
     course_detail, course_learning_process, create_category_ajax
 )
-from .includes.views_module import (
-    create_module, edit_module, delete_module
+from .includes.views_section import (
+    create_section, edit_section, delete_section
 )
 from .includes.views_lesson import (
     create_lesson, edit_lesson, delete_lesson
@@ -30,7 +30,7 @@ from .includes.views_certificate import (
     public_certificate, purchase_certificate, course_certificate
 )
 from .includes.views_reorder import (
-    reorder_modules, reorder_lessons, reorder_quiz_questions
+    reorder_sections, reorder_lessons, reorder_quiz_questions
 )
 from .includes.views_search import (
     search_autocomplete
@@ -39,7 +39,7 @@ from .includes.views_search import (
 __all__ = [
     'create_course', 'edit_course', 'delete_course', 'course_list',
     'course_detail', 'enroll_course', 'instructor_courses', 'student_dashboard',
-    'create_module', 'edit_module', 'delete_module', 'reorder_modules',
+    'create_section', 'edit_section', 'delete_section', 'reorder_sections',
     'create_lesson', 'edit_lesson', 'delete_lesson', 'delete_lesson_video',
     'reorder_lessons', 'reorder_quiz_questions',
     'lesson_detail', 'check_and_issue_certificate',

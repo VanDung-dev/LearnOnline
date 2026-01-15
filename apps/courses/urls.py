@@ -12,12 +12,12 @@ urlpatterns = [
     path('courses/<slug:slug>/learning-process/', views.course_learning_process, name='course_learning_process'),
     path('courses/<slug:slug>/enroll/', views.enroll_course, name='enroll_course'),
     path('courses/<slug:course_slug>/lessons/<slug:lesson_slug>/', views.lesson_detail, name='lesson_detail'),
-    path('courses/<slug:course_slug>/modules/<int:module_id>/lessons/<int:lesson_id>/reorder/', views.reorder_lessons, name='reorder_lessons'),
-    path('courses/<slug:course_slug>/modules/<int:module_id>/lessons/<int:lesson_id>/quiz/reorder/', views.reorder_quiz_questions, name='reorder_quiz_questions'),
-    path('courses/<slug:course_slug>/modules/<int:module_id>/lessons/create/', views.create_lesson, name='create_lesson'),
-    path('courses/<slug:course_slug>/modules/<int:module_id>/lessons/<int:lesson_id>/edit/', views.edit_lesson, name='edit_lesson'),
-    path('courses/<slug:course_slug>/modules/<int:module_id>/lessons/<int:lesson_id>/delete/', views.delete_lesson, name='delete_lesson'),
-    path('courses/<slug:course_slug>/modules/<int:module_id>/lessons/<int:lesson_id>/video/delete/', views.delete_lesson_video, name='delete_lesson_video'),
+    path('courses/<slug:course_slug>/sections/<int:section_id>/lessons/<int:lesson_id>/reorder/', views.reorder_lessons, name='reorder_lessons'),
+    path('courses/<slug:course_slug>/sections/<int:section_id>/lessons/<int:lesson_id>/quiz/reorder/', views.reorder_quiz_questions, name='reorder_quiz_questions'),
+    path('courses/<slug:course_slug>/sections/<int:section_id>/lessons/create/', views.create_lesson, name='create_lesson'),
+    path('courses/<slug:course_slug>/sections/<int:section_id>/lessons/<int:lesson_id>/edit/', views.edit_lesson, name='edit_lesson'),
+    path('courses/<slug:course_slug>/sections/<int:section_id>/lessons/<int:lesson_id>/delete/', views.delete_lesson, name='delete_lesson'),
+    path('courses/<slug:course_slug>/sections/<int:section_id>/lessons/<int:lesson_id>/video/delete/', views.delete_lesson_video, name='delete_lesson_video'),
     
     # Instructor URLs
     path('dashboard/courses/list/legacy/', views.instructor_courses, name='instructor_courses'),
@@ -26,10 +26,10 @@ urlpatterns = [
     path('dashboard/courses/create-category-ajax/', views.create_category_ajax, name='create_category_ajax'),
     path('dashboard/courses/<slug:slug>/edit/', views.edit_course, name='edit_course'),
     path('dashboard/courses/<slug:slug>/delete/', views.delete_course, name='delete_course'),
-    path('dashboard/courses/<slug:course_slug>/modules/create/', views.create_module, name='create_module'),
-    path('dashboard/courses/<slug:course_slug>/modules/<int:module_id>/edit/', views.edit_module, name='edit_module'),
-    path('dashboard/courses/<slug:course_slug>/modules/<int:module_id>/delete/', views.delete_module, name='delete_module'),
-    path('dashboard/courses/<slug:course_slug>/reorder/', views.reorder_modules, name='reorder_modules'),
+    path('dashboard/courses/<slug:course_slug>/sections/create/', views.create_section, name='create_section'),
+    path('dashboard/courses/<slug:course_slug>/sections/<int:section_id>/edit/', views.edit_section, name='edit_section'),
+    path('dashboard/courses/<slug:course_slug>/sections/<int:section_id>/delete/', views.delete_section, name='delete_section'),
+    path('dashboard/courses/<slug:course_slug>/reorder/', views.reorder_sections, name='reorder_sections'),
 
     # Certificate URLs
     path('certificate/<str:certificate_id>/', views.course_certificate, name='course_certificate'),

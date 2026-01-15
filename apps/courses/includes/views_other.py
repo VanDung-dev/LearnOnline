@@ -11,7 +11,7 @@ from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.conf import settings
-from ..models import Course, Lesson, Enrollment, Module, Category
+from ..models import Course, Lesson, Enrollment, Section, Category
 
 
 from ..services.search_service import get_popular_search_terms
@@ -77,10 +77,10 @@ def student_dashboard(request):
 
 
 @login_required
-def delete_lesson_video(request, course_slug, module_id, lesson_id):
+def delete_lesson_video(request, course_slug, section_id, lesson_id):
     course = get_object_or_404(Course, slug=course_slug, instructor=request.user)
-    module = get_object_or_404(Module, id=module_id, course=course)
-    lesson = get_object_or_404(Lesson, id=lesson_id, module=module)
+    section = get_object_or_404(Section, id=section_id, course=course)
+    lesson = get_object_or_404(Lesson, id=lesson_id, section=section)
 
     if request.method == 'POST':
         # Check if lesson has a video file

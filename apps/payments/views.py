@@ -90,7 +90,7 @@ def payment_page(request, course_slug, purchase_type='course'):
             messages.info(request, "You already have access to this course and its certificate.")
             return redirect('courses:lesson_detail', 
                            course_slug=course.slug, 
-                           lesson_slug=course.modules.first().lessons.first().slug)
+                           lesson_slug=course.sections.first().lessons.first().slug)
     
     # If purchasing certificate, check if user is enrolled in the course
     elif purchase_type == 'certificate':
@@ -428,8 +428,8 @@ def payment_success(request, transaction_id):
     course = payment.course
     # Compute CTA URLs
     first_lesson_url = None
-    if course and course.modules.first() and course.modules.first().lessons.first():
-        first_lesson = course.modules.first().lessons.first()
+    if course and course.sections.first() and course.sections.first().lessons.first():
+        first_lesson = course.sections.first().lessons.first()
         first_lesson_url = f'/courses/{course.slug}/lessons/{first_lesson.slug}/'
     context = {
         'payment': payment,
