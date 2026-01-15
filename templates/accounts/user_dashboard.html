@@ -123,9 +123,9 @@
                                 <div class="card shadow-sm">
                                     <div class="card-header bg-white d-flex justify-content-between align-items-center">
                                         <span><i class="bi bi-funnel"></i> Filter My Courses</span>
-                                        <a href="{% url 'courses:create_course' %}" class="btn btn-sm btn-primary">
+                                        <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#createCourseModal">
                                             <i class="bi bi-plus-circle"></i> Create New Course
-                                        </a>
+                                        </button>
                                     </div>
                                     <div class="card-body">
                                         <div class="row g-3">
@@ -229,9 +229,9 @@
                                     <i class="bi bi-journal-plus" style="font-size: 3rem;"></i>
                                     <h4 class="mt-3">You haven't created any courses yet.</h4>
                                     <p class="mb-3">Start sharing your knowledge with the world!</p>
-                                    <a href="{% url 'courses:create_course' %}" class="btn btn-primary">
+                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createCourseModal">
                                         <i class="bi bi-plus-circle"></i> Create Your First Course
-                                    </a>
+                                    </button>
                                 </div>
                                 {% endif %}
                             </div>
@@ -585,8 +585,13 @@
     </div>
 </div>
 
+
+<!-- Create Course Modal -->
+{% include "courses/includes/create_course_modal.html" %}
+
 <!-- Delete Course Modal -->
 {% include "courses/includes/delete_modal.html" with modal_id="deleteCourseModal" modal_title="Delete Course" item_type="course" warning_message="This action cannot be undone. All sections and lessons in this course will be permanently deleted." %}
+
 {% endblock %}
 
 {% block extra_js %}
