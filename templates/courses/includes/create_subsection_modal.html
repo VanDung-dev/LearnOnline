@@ -1,0 +1,35 @@
+<!-- Create Subsection Modal -->
+<div class="modal fade" id="createSubsectionModal{{ section.id }}" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form method="post" action="{% url 'courses:create_subsection' course_slug=course.slug section_id=section.id %}">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title">Create Subsection for Section: {{ section.title }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="subsection_title_{{ section.id }}" class="form-label">Subsection Title</label>
+                        <input type="text" class="form-control" id="subsection_title_{{ section.id }}" name="title" required>
+                    </div>
+
+                    
+                    <div class="mb-3">
+                        <label for="subsection_order_{{ section.id }}" class="form-label">Order</label>
+                        <input type="number" class="form-control" id="subsection_order_{{ section.id }}" name="order" min="0" value="0">
+                    </div>
+                    
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="subsection_is_locked_{{ section.id }}" name="is_locked">
+                        <label class="form-check-label" for="subsection_is_locked_{{ section.id }}">Lock subsection (Only accessible to students who purchased certificate)</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create Subsection</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

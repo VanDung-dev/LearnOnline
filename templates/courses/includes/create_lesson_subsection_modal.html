@@ -1,0 +1,81 @@
+<!-- Create Lesson Modal for Subsection -->
+<div class="modal fade" id="createLessonModal{{ subsection.id }}_sub" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form method="post" action="{% url 'courses:create_lesson' course_slug=course.slug section_id=section.id %}?subsection_id={{ subsection.id }}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title">Create Lesson for subsection: {{ subsection.title }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="lesson_title_sub{{ subsection.id }}" class="form-label">Lesson Title</label>
+                        <input type="text" class="form-control" id="lesson_title_sub{{ subsection.id }}" name="title" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="lesson_type_sub{{ subsection.id }}" class="form-label">Lesson Type</label>
+                        <select class="form-control" id="lesson_type_sub{{ subsection.id }}" name="lesson_type">
+                            <option value="text">Text</option>
+                            <option value="video">Video</option>
+                            <option value="quiz">Quiz</option>
+                        </select>
+                    </div>
+
+                    <!-- Section for Text Lessons -->
+                    <div class="mb-3 lesson-content-section" id="text-content-section-sub{{ subsection.id }}" style="display: block;">
+                        <div class="alert alert-info">
+                            You can add content after creating the lesson.
+                        </div>
+                    </div>
+
+                    <!-- Section for Video Lessons -->
+                    <div class="mb-3 lesson-content-section" id="video-content-section-sub{{ subsection.id }}" style="display: none;">
+                        <div class="mb-3">
+                            <label for="lesson_video_url_sub{{ subsection.id }}" class="form-label">Video URL</label>
+                            <input type="url" class="form-control" id="lesson_video_url_sub{{ subsection.id }}" name="video_url">
+                            <small class="form-text text-muted">For video lessons, add the video URL here (YouTube, Vimeo, etc.).</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="lesson_video_file_sub{{ subsection.id }}" class="form-label">Upload Video File</label>
+                            <input type="file" class="form-control" id="lesson_video_file_sub{{ subsection.id }}" name="video_file">
+                            <small class="form-text text-muted">Alternatively, you can upload a video file directly.</small>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <strong>Note:</strong> You must provide either a Video URL or upload a Video File, but not both.
+                        </div>
+                    </div>
+
+                    <!-- Section for Quiz Lessons -->
+                    <div class="mb-3 lesson-content-section" id="quiz-content-section-sub{{ subsection.id }}" style="display: none;">
+                        <label for="lesson_max_check_sub{{ subsection.id }}" class="form-label">Maximum Quiz Checks</label>
+                        <input type="number" class="form-control" id="lesson_max_check_sub{{ subsection.id }}" name="max_check" min="0" value="0">
+                        <small class="form-text text-muted">Set to 0 for unlimited checks. This limits how many times a student can check their answers before final submission.</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="lesson_order_sub{{ subsection.id }}" class="form-label">Order</label>
+                        <input type="number" class="form-control" id="lesson_order_sub{{ subsection.id }}" name="order" min="0" value="0">
+                    </div>
+
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="lesson_is_published_sub{{ subsection.id }}" name="is_published" checked>
+                        <label class="form-check-label" for="lesson_is_published_sub{{ subsection.id }}">Is Published</label>
+                    </div>
+
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="lesson_is_locked_sub{{ subsection.id }}" name="is_locked">
+                        <label class="form-check-label" for="lesson_is_locked_sub{{ subsection.id }}">Lock Lesson (Only accessible to students who purchased certificate)</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create Lesson</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
