@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+﻿{% extends 'base.html' %}
 {% load static courses_extras %}
 
 {% block title %}Edit Course - Instructor Dashboard{% endblock %}
@@ -143,47 +143,47 @@
 
 <hr>
 
-<h3>Course Modules</h3>
+<h3>Course Sections</h3>
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h4>Modules and Lessons</h4>
+    <h4>Sections and Lessons</h4>
     {% if course.slug %}
-        <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#createModuleModal">Add Module</button>
+        <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#createSectionModal">Add Section</button>
     {% else %}
-        <button type="button" class="btn btn-sm btn-outline-primary disabled">Add Module</button>
+        <button type="button" class="btn btn-sm btn-outline-primary disabled">Add Section</button>
     {% endif %}
 </div>
 
-<div class="sortable-modules" data-course-slug="{{ course.slug }}">
-    {% if course.modules.all %}
-        {% for module in course.modules.all %}
-            <div class="card mb-3 sortable-module" data-module-id="{{ module.id }}">
+<div class="sortable-sections" data-course-slug="{{ course.slug }}">
+    {% if course.sections.all %}
+        {% for section in course.sections.all %}
+            <div class="card mb-3 sortable-section" data-section-id="{{ section.id }}">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <div>
                         <i class="fas fa-grip-lines me-2 text-muted handle" style="cursor: move;"></i>
-                        <h5 class="d-inline mb-0">{{ module.title }}</h5>
+                        <h5 class="d-inline mb-0">{{ section.title }}</h5>
                     </div>
                     <div>
                         {% if course.slug %}
-                            <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#createLessonModal{{ module.id }}">Add Lesson</button>
-                            <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editModuleModal{{ module.id }}">Edit Module</button>
-                            <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModuleModal{{ module.id }}">Delete Module</button>
+                            <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#createLessonModal{{ section.id }}">Add Lesson</button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editSectionModal{{ section.id }}">Edit Section</button>
+                            <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteSectionModal{{ section.id }}">Delete Section</button>
                         {% else %}
-                            <button type="button" class="btn btn-sm btn-outline-secondary disabled">Edit Module</button>
-                            <button type="button" class="btn btn-sm btn-outline-danger disabled">Delete Module</button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary disabled">Edit Section</button>
+                            <button type="button" class="btn btn-sm btn-outline-danger disabled">Delete Section</button>
                             <button type="button" class="btn btn-sm btn-outline-primary disabled">Add Lesson</button>
                         {% endif %}
                     </div>
                 </div>
                 <div class="card-body">
-                    <p>{{ module.description }}</p>
+                    <p>{{ section.description }}</p>
                     <div class="alert alert-info">
-                        <strong>Duration:</strong> {{ module.duration_days }} days
-                        <br><strong>Default Deadline (based on course opening date):</strong> {{ module.get_deadline }}
+                        <strong>Duration:</strong> {{ section.duration_days }} days
+                        <br><strong>Default Deadline (based on course opening date):</strong> {{ section.get_deadline }}
                     </div>
-                    {% if module.lessons.all %}
-                        <div class="sortable-lessons" data-module-id="{{ module.id }}">
+                    {% if section.lessons.all %}
+                        <div class="sortable-lessons" data-section-id="{{ section.id }}">
                             <ul class="list-group lesson-list">
-                                {% for lesson in module.lessons.all %}
+                                {% for lesson in section.lessons.all %}
                                     <li class="list-group-item d-flex justify-content-between align-items-center sortable-lesson" data-lesson-id="{{ lesson.id }}">
                                         <div>
                                             <i class="fas fa-grip-lines me-2 text-muted handle" style="cursor: move;"></i>
@@ -197,8 +197,8 @@
                                             {% endif %}
                                         </div>
                                         <div>
-                                            {% if course.slug and module.id %}
-                                                <a href="{% url 'courses:edit_lesson' course_slug=course.slug module_id=module.id lesson_id=lesson.id %}" class="btn btn-sm btn-outline-secondary">Edit Lesson</a>
+                                            {% if course.slug and section.id %}
+                                                <a href="{% url 'courses:edit_lesson' course_slug=course.slug section_id=section.id lesson_id=lesson.id %}" class="btn btn-sm btn-outline-secondary">Edit Lesson</a>
                                                 <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteLessonModal{{ lesson.id }}">Delete Lesson</button>
                                             {% endif %}
                                         </div>
@@ -207,24 +207,24 @@
                             </ul>
                         </div>
                     {% else %}
-                        <p class="text-muted">No lessons in this module yet.</p>
+                        <p class="text-muted">No lessons in this section yet.</p>
                     {% endif %}
                 </div>
             </div>
 
-            {% include 'courses/includes/create_lesson_modal.html' with module=module %}
+            {% include 'courses/includes/create_lesson_modal.html' with section=section %}
 
-            {% include 'courses/includes/edit_module_modal.html' with module=module %}
+            {% include 'courses/includes/edit_section_modal.html' with section=section %}
 
-            <!-- Delete Module Modal -->
-            {% url 'courses:delete_module' course_slug=course.slug module_id=module.id as delete_module_url %}
-            {% with module_id_str=module.id|stringformat:"d" %}
-                {% include 'courses/includes/delete_modal.html' with modal_id="deleteModuleModal"|add:module_id_str modal_title='Delete Module' item_type='module' item_name=module.title warning_message='This action cannot be undone. All lessons associated with this module will also be deleted.' action_url=delete_module_url button_text='Yes, Delete Module' %}
+            <!-- Delete Section Modal -->
+            {% url 'courses:delete_section' course_slug=course.slug section_id=section.id as delete_section_url %}
+            {% with section_id_str=section.id|stringformat:"d" %}
+                {% include 'courses/includes/delete_modal.html' with modal_id="deleteSectionModal"|add:section_id_str modal_title='Delete Section' item_type='section' item_name=section.title warning_message='This action cannot be undone. All lessons associated with this section will also be deleted.' action_url=delete_section_url button_text='Yes, Delete Section' %}
             {% endwith %}
 
             <!-- Delete Lesson Modals -->
-            {% for lesson in module.lessons.all %}
-                {% url 'courses:delete_lesson' course_slug=course.slug module_id=module.id lesson_id=lesson.id as delete_lesson_url %}
+            {% for lesson in section.lessons.all %}
+                {% url 'courses:delete_lesson' course_slug=course.slug section_id=section.id lesson_id=lesson.id as delete_lesson_url %}
                 {% with lesson_id_str=lesson.id|stringformat:"d" %}
                     {% include 'courses/includes/delete_modal.html' with modal_id="deleteLessonModal"|add:lesson_id_str modal_title='Delete Lesson' item_type='lesson' item_name=lesson.title warning_message='This action cannot be undone.' action_url=delete_lesson_url button_text='Yes, Delete Lesson' %}
                 {% endwith %}
@@ -233,23 +233,23 @@
         {% endfor %}
     {% else %}
         <div class="alert alert-info">
-            <p>This course doesn't have any modules yet.</p>
+            <p>This course doesn't have any Sections yet.</p>
             {% if course.slug %}
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createModuleModal">Create Your First Module</button>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createSectionModal">Create Your First Section</button>
             {% else %}
-                <button type="button" class="btn btn-outline-primary disabled">Create Your First Module</button>
+                <button type="button" class="btn btn-outline-primary disabled">Create Your First Section</button>
             {% endif %}
         </div>
     {% endif %}
 </div>
 
-{% include 'courses/includes/create_module_modal.html' %}
+{% include 'courses/includes/create_section_modal.html' %}
 {% include 'courses/includes/add_category_modal.html' %}
 {% include 'courses/includes/validation_modal.html' %}
 
 <!-- Delete Course Modal -->
 {% url 'courses:delete_course' slug=course.slug as delete_course_url %}
-{% include 'courses/includes/delete_modal.html' with modal_id='deleteCourseModal' modal_title='Delete Course' item_type='course' item_name=course.title warning_message='This action cannot be undone. All modules, lessons, and enrollments associated with this course will also be deleted.' action_url=delete_course_url button_text='Yes, Delete Course' %}
+{% include 'courses/includes/delete_modal.html' with modal_id='deleteCourseModal' modal_title='Delete Course' item_type='course' item_name=course.title warning_message='This action cannot be undone. All Sections, lessons, and enrollments associated with this course will also be deleted.' action_url=delete_course_url button_text='Yes, Delete Course' %}
 
 {% endblock %}
 

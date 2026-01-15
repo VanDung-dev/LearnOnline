@@ -1,4 +1,4 @@
-<!-- Essay Question Modal -->
+﻿<!-- Essay Question Modal -->
 <div class="modal fade" id="{% if question %}editEssayQuestionModal{{ question.id }}{% else %}addEssayQuestionModal{% endif %}" tabindex="-1" data-question-type="essay">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -6,7 +6,7 @@
                 <h5 class="modal-title">{% if question %}Edit Essay Question{% else %}Add New Essay Question{% endif %}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form method="post" action="{% url 'courses:edit_lesson' course_slug=course.slug module_id=module.id lesson_id=lesson.id %}">
+            <form method="post" action="{% url 'courses:edit_lesson' course_slug=course.slug section_id=section.id lesson_id=lesson.id %}">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="{% if question %}edit_essay_question{% else %}add_essay_question{% endif %}">
                 {% if question %}

@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+﻿{% extends 'base.html' %}
 {% load static %}
 
 {% block title %}
@@ -586,7 +586,7 @@
 </div>
 
 <!-- Delete Course Modal -->
-{% include "courses/includes/delete_modal.html" with modal_id="deleteCourseModal" modal_title="Delete Course" item_type="course" warning_message="This action cannot be undone. All modules and lessons in this course will be permanently deleted." %}
+{% include "courses/includes/delete_modal.html" with modal_id="deleteCourseModal" modal_title="Delete Course" item_type="course" warning_message="This action cannot be undone. All sections and lessons in this course will be permanently deleted." %}
 {% endblock %}
 
 {% block extra_js %}

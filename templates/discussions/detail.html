@@ -37,7 +37,7 @@
                         <span class="badge bg-success fs-6 align-middle"><i class="fas fa-check"></i> Solved</span>
                         {% endif %}
                     </h3>
-                    <p class="card-text">{{ discussion.body|linebreaks }}</p>
+                    <p class="card-text">{{ discussion.body|safe }}</p>
                     <div class="text-muted small">
                         Asked by <strong>{{ discussion.author.get_full_name|default:discussion.author.username }}</strong>
                         on {{ discussion.created_at|date:"M d, Y H:i" }}
@@ -127,7 +127,7 @@
                                 {% endif %}
                             </div>
                             {% if reply.author == user %}
-                             <button class="btn btn-link btn-sm text-secondary p-0" onclick="toggleEdit('reply', {{ reply.id }})">Edit</button>
+                                <button class="btn btn-link btn-sm text-secondary p-0" onclick="toggleEdit('reply', {{ reply.id }})">Edit</button>
                             {% endif %}
                         </div>
                     </div>

@@ -83,7 +83,7 @@
                     <div class="alert alert-info mt-4">
                         <h4>Course Content</h4>
                         <p>Course content is only available to enrolled students.</p>
-                        <p>Enroll now to access all modules and lessons.</p>
+                        <p>Enroll now to access all sections and lessons.</p>
                     </div>
                     {% endif %}
                     {% if user == course.instructor and not is_preview %}
@@ -94,7 +94,7 @@
                         </div>
                         
                         <!-- Delete Course Modal -->
-                        {% include "courses/includes/delete_modal.html" with modal_id="deleteCourseModal" modal_title="Delete Course" item_type="course" item_name=course.title action_url=course.get_delete_url|default:request.path|add:"delete/" warning_message="This action cannot be undone. All modules and lessons in this course will be permanently deleted." %}
+                        {% include "courses/includes/delete_modal.html" with modal_id="deleteCourseModal" modal_title="Delete Course" item_type="course" item_name=course.title action_url=course.get_delete_url|default:request.path|add:"delete/" warning_message="This action cannot be undone. All sections and lessons in this course will be permanently deleted." %}
                     {% elif is_enrolled %}
                         <!-- Check if user has a certificate for this course -->
                         <div class="mt-2 d-grid gap-2">

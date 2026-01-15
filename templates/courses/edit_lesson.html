@@ -8,9 +8,9 @@
     <div class="row">
         <div class="col-12">
             <h1>Edit Lesson: {{ lesson.title }}</h1>
-            <p class="text-muted">Course: {{ course.title }} > Module: {{ module.title }}</p>
+            <p class="text-muted">Course: {{ course.title }} > Section: {{ section.title }}</p>
 
-            <form method="post" action="{% url 'courses:edit_lesson' course_slug=course.slug module_id=module.id lesson_id=lesson.id %}" enctype="multipart/form-data">
+            <form method="post" action="{% url 'courses:edit_lesson' course_slug=course.slug section_id=section.id lesson_id=lesson.id %}" enctype="multipart/form-data">
                 {% csrf_token %}
                 <div class="card">
                     <div class="card-body">
@@ -91,7 +91,7 @@
                                 </div>
                                 <div class="card-body">
                                     {% if lesson.quiz and lesson.quiz.questions.all %}
-                                        <div class="list-group sortable-questions" data-course-slug="{{ course.slug }}" data-module-id="{{ module.id }}" data-lesson-id="{{ lesson.id }}" data-quiz-id="{{ lesson.quiz.id }}">
+                                        <div class="list-group sortable-questions" data-course-slug="{{ course.slug }}" data-section-id="{{ section.id }}" data-lesson-id="{{ lesson.id }}" data-quiz-id="{{ lesson.quiz.id }}">
                                             {% for question in lesson.quiz.questions.all %}
                                                 <div class="list-group-item mb-3 sortable-question" data-question-id="{{ question.id }}">
                                                     <div class="d-flex justify-content-between align-items-center">
@@ -195,7 +195,7 @@
 
 <!-- Delete Question Modal - Using common delete modal -->
 {% for question in lesson.quiz.questions.all %}
-    <form method="post" action="{% url 'courses:edit_lesson' course_slug=course.slug module_id=module.id lesson_id=lesson.id %}" id="deleteQuestionForm{{ question.id }}">
+    <form method="post" action="{% url 'courses:edit_lesson' course_slug=course.slug section_id=section.id lesson_id=lesson.id %}" id="deleteQuestionForm{{ question.id }}">
         {% csrf_token %}
         <input type="hidden" name="action" value="delete_question">
         <input type="hidden" name="question_id" value="{{ question.id }}">
@@ -206,7 +206,7 @@
 
 {% if lesson.video_file %}
 <!-- Delete Video Modal -->
-{% url 'courses:delete_lesson_video' course_slug=course.slug module_id=module.id lesson_id=lesson.id as delete_video_url %}
+{% url 'courses:delete_lesson_video' course_slug=course.slug section_id=section.id lesson_id=lesson.id as delete_video_url %}
 {% include 'courses/includes/delete_modal.html' with modal_id='deleteVideoModal' modal_title='Delete Video' item_name='the current video file' action_url=delete_video_url button_text='Delete Video' %}
 {% endif %}
 

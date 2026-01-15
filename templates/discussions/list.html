@@ -25,7 +25,6 @@
                     </h5>
                     <small class="text-muted">{{ discussion.created_at|timesince }} ago</small>
                 </div>
-                <p class="mb-1 text-truncate" style="max-width: 80%;">{{ discussion.body }}</p>
                 <small>By {{ discussion.author.get_full_name|default:discussion.author.username }} • {{ discussion.reply_count }} replies</small>
             </a>
             {% empty %}
@@ -39,7 +38,7 @@
     {% if is_paginated %}
     <nav aria-label="Page navigation" class="mt-4">
         <ul class="pagination request-pagination justify-content-center">
-             {% if page_obj.has_previous %}
+            {% if page_obj.has_previous %}
                 <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
             {% endif %}
             <li class="page-item active"><span class="page-link">{{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span></li>
