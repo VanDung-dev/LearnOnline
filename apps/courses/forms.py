@@ -36,10 +36,24 @@ class CourseForm(forms.ModelForm):
         cleaned_data = super().clean()
         price = cleaned_data.get("price")
         certificate_price = cleaned_data.get("certificate_price")
+        is_active = cleaned_data.get("is_active")
 
         # If course price > 0, certificate price should be 0
         if price and price > 0:
             cleaned_data["certificate_price"] = 0
+
+        # Strict validation only when Course is Active
+        if is_active:
+            if not cleaned_data.get("short_description"):
+                self.add_error("short_description", "Short description is required for active courses.")
+            if not cleaned_data.get("opening_date"):
+                self.add_error("opening_date", "Opening date is required for active courses.")
+            if not cleaned_data.get("closing_date"):
+                self.add_error("closing_date", "Closing date is required for active courses.")
+            if not cleaned_data.get("expiration_date"):
+                self.add_error("expiration_date", "Expiration date is required for active courses.")
+            
+            # Additional logic for active courses can go here
 
         return cleaned_data
 
@@ -90,6 +104,7 @@ class LessonForm(forms.ModelForm):
             "order",
             "is_published",
             "is_locked",
+            "max_check",
         ]
         widgets = {
             "content": forms.Textarea(attrs={"rows": 10}),
@@ -136,6 +151,13 @@ class LessonForm(forms.ModelForm):
                 cleaned_data["content"] = content.strip()
 
         if lesson_type == "video":
+            # If a video URL is provided, check if we need to clear an existing video file
+            # This handles the case where switching from File -> URL causes ModelForm to retain the old file
+            if video_url and video_file:
+                if self.instance.pk and video_file == self.instance.video_file:
+                    cleaned_data["video_file"] = None
+                    video_file = None
+
             # Either video_url or video_file must be provided, but not both
             if not video_url and not video_file:
                 raise forms.ValidationError(

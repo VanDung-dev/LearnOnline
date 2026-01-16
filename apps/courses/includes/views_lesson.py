@@ -73,7 +73,23 @@ def edit_lesson(request, course_slug, section_id, lesson_id):
         # Handle quiz configuration actions
         action = request.POST.get('action')
         
-        if action == 'add_single_choice_question' and lesson.lesson_type == 'quiz':
+        # Auto-switch to quiz type for question-related actions
+        quiz_actions = [
+            'add_single_choice_question', 'add_multiple_choice_question', 'add_essay_question',
+            'edit_single_choice_question', 'edit_multiple_choice_question', 'edit_essay_question',
+            'delete_question'
+        ]
+        
+        if action in quiz_actions:
+            if lesson.lesson_type != 'quiz':
+                lesson.lesson_type = 'quiz'
+                lesson.save()
+            
+            # Ensure quiz exists
+            if not quiz:
+                quiz, created = Quiz.objects.get_or_create(lesson=lesson, defaults={'title': f'Quiz for {lesson.title}'})
+        
+        if action == 'add_single_choice_question':
             # Add new single choice question
             question_text = request.POST.get('question_text')
             question_type = 'single'
@@ -108,7 +124,7 @@ def edit_lesson(request, course_slug, section_id, lesson_id):
             
             return redirect('courses:edit_lesson', course_slug=course.slug, section_id=section.id, lesson_id=lesson.id)
             
-        elif action == 'add_multiple_choice_question' and lesson.lesson_type == 'quiz':
+        elif action == 'add_multiple_choice_question':
             # Add new multiple choice question
             question_text = request.POST.get('question_text')
             question_type = 'multiple'
@@ -143,7 +159,7 @@ def edit_lesson(request, course_slug, section_id, lesson_id):
             
             return redirect('courses:edit_lesson', course_slug=course.slug, section_id=section.id, lesson_id=lesson.id)
             
-        elif action == 'add_essay_question' and lesson.lesson_type == 'quiz':
+        elif action == 'add_essay_question':
             # Add new essay question
             question_text = request.POST.get('question_text')
             question_type = 'essay'
@@ -165,7 +181,7 @@ def edit_lesson(request, course_slug, section_id, lesson_id):
             
             return redirect('courses:edit_lesson', course_slug=course.slug, section_id=section.id, lesson_id=lesson.id)
             
-        elif action == 'edit_single_choice_question' and lesson.lesson_type == 'quiz':
+        elif action == 'edit_single_choice_question':
             # Edit existing single choice question
             question_id = request.POST.get('question_id')
             question = get_object_or_404(Question, id=question_id, quiz=quiz)
@@ -205,7 +221,7 @@ def edit_lesson(request, course_slug, section_id, lesson_id):
             messages.success(request, 'Single choice question updated successfully!')
             return redirect('courses:edit_lesson', course_slug=course.slug, section_id=section.id, lesson_id=lesson.id)
             
-        elif action == 'edit_multiple_choice_question' and lesson.lesson_type == 'quiz':
+        elif action == 'edit_multiple_choice_question':
             # Edit existing multiple choice question
             question_id = request.POST.get('question_id')
             question = get_object_or_404(Question, id=question_id, quiz=quiz)
@@ -242,7 +258,7 @@ def edit_lesson(request, course_slug, section_id, lesson_id):
             messages.success(request, 'Multiple choice question updated successfully!')
             return redirect('courses:edit_lesson', course_slug=course.slug, section_id=section.id, lesson_id=lesson.id)
             
-        elif action == 'edit_essay_question' and lesson.lesson_type == 'quiz':
+        elif action == 'edit_essay_question':
             # Edit existing essay question
             question_id = request.POST.get('question_id')
             question = get_object_or_404(Question, id=question_id, quiz=quiz)
@@ -256,28 +272,13 @@ def edit_lesson(request, course_slug, section_id, lesson_id):
             messages.success(request, 'Essay question updated successfully!')
             return redirect('courses:edit_lesson', course_slug=course.slug, section_id=section.id, lesson_id=lesson.id)
             
-        elif action == 'delete_question' and lesson.lesson_type == 'quiz':
+        elif action == 'delete_question':
             # Delete question
             question_id = request.POST.get('question_id')
             question = get_object_or_404(Question, id=question_id, quiz=quiz)
             question.delete()
             messages.success(request, 'Question deleted successfully!')
             return redirect('courses:edit_lesson', course_slug=course.slug, section_id=section.id, lesson_id=lesson.id)
-            
-        elif action is None and lesson.lesson_type == 'quiz':
-            # Update quiz details
-            quiz_form = QuizForm(request.POST, instance=quiz)
-            if quiz_form.is_valid():
-                quiz_form.save()
-                # Also update lesson max_check if provided
-                max_check = request.POST.get('max_check')
-                if max_check is not None:
-                    lesson.max_check = max_check
-                    lesson.save()
-                messages.success(request, 'Quiz updated successfully!')
-            else:
-                messages.error(request, 'Error updating quiz!')
-            return redirect('courses:edit_course', slug=course.slug)
             
         else:
             # Handle lesson form
