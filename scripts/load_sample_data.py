@@ -30,15 +30,31 @@ def copy_course_thumbnails():
     os.makedirs(thumbnails_dir, exist_ok=True)
 
     # Copy all images from imgs directory
-    if os.path.exists(imgs_dir):
-        copied_count = 0
-        for img_file in os.listdir(imgs_dir):
-            src = os.path.join(imgs_dir, img_file)
-            dst = os.path.join(thumbnails_dir, img_file)
-            if os.path.isfile(src):
-                shutil.copy2(src, dst)
+    # Define mappings: source_subfolder -> dest_subfolder
+    copy_map = {
+        '': 'course_thumbnails',  # files in root imgs/ -> media/course_thumbnails/
+        'logo': 'school_logos',   # files in imgs/logo/ -> media/school_logos/
+    }
+    
+    copied_count = 0
+    
+    for src_sub, dst_sub in copy_map.items():
+        src_path = os.path.join(imgs_dir, src_sub)
+        dst_path = os.path.join(project_root, 'media', dst_sub)
+        
+        if not os.path.exists(src_path):
+            continue
+            
+        os.makedirs(dst_path, exist_ok=True)
+        
+        for img_file in os.listdir(src_path):
+            src_file = os.path.join(src_path, img_file)
+            if os.path.isfile(src_file):
+                dst_file = os.path.join(dst_path, img_file)
+                shutil.copy2(src_file, dst_file)
                 copied_count += 1
-        return copied_count
+                
+    return copied_count
     return 0
 
 

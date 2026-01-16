@@ -4,9 +4,10 @@
     "model": "organization.school",
     "pk": 1,
     "fields": {
-      "name": "Đại học A",
-      "code": "uni_a",
-      "domain": "unia.edu.vn",
+      "name": "Nguyen Tat Thanh University",
+      "code": "nttu",
+      "domain": "ntt.edu.vn",
+      "logo": "school_logos/logo_nttu.webp",
       "status": "active",
       "created_at": "2025-01-01T00:00:00Z",
       "updated_at": "2025-01-01T00:00:00Z"
@@ -16,9 +17,10 @@
     "model": "organization.school",
     "pk": 2,
     "fields": {
-      "name": "Cao đẳng B",
-      "code": "col_b",
-      "domain": "colb.edu.vn",
+      "name": "Nguyen Tat Thanh University (Campus B)",
+      "code": "nttu_b",
+      "domain": "b.ntt.edu.vn",
+      "logo": "school_logos/logo_nttu.webp",
       "status": "active",
       "created_at": "2025-01-01T00:00:00Z",
       "updated_at": "2025-01-01T00:00:00Z"
