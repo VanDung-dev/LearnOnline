@@ -25,9 +25,7 @@ class DiscussionTests(TestCase):
         # Not enrolled yet
         data = {'title': 'Question?', 'body': 'Help', 'course_slug': self.course.slug}
         response = self.client.post('/api/discussions/', data)
-        with open(r'c:\Users\VanDungDev\Documents\GitHub\LearnOnline\debug_test.log', 'a') as f:
-            f.write(f"Response 1 status: {response.status_code}\n")
-            f.write(f"Response 1 data: {response.data}\n")
+
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         
         # Enroll (mock or manually create enrollment if needed, but here simple Check is fine)

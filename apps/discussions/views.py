@@ -18,7 +18,7 @@ class CourseContextMixin:
 
 class DiscussionListView(LoginRequiredMixin, CourseContextMixin, ListView):
     model = Discussion
-    template_name = 'discussions/list.html'
+    template_name = 'discussions/discussions_list.html'
     context_object_name = 'discussions'
     paginate_by = 10
 
@@ -29,7 +29,7 @@ class DiscussionListView(LoginRequiredMixin, CourseContextMixin, ListView):
 class DiscussionCreateView(LoginRequiredMixin, CourseContextMixin, CreateView):
     model = Discussion
     form_class = DiscussionForm
-    template_name = 'discussions/create.html'
+    template_name = 'discussions/create_discussions.html'
 
     def form_valid(self, form):
         course = get_object_or_404(Course, slug=self.kwargs.get('slug'))
@@ -61,7 +61,7 @@ class DiscussionCreateView(LoginRequiredMixin, CourseContextMixin, CreateView):
 
 class DiscussionDetailView(LoginRequiredMixin, CourseContextMixin, DetailView):
     model = Discussion
-    template_name = 'discussions/detail.html'
+    template_name = 'discussions/discussions_detail.html'
     context_object_name = 'discussion'
 
     def get_queryset(self):
