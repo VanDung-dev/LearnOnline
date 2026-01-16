@@ -82,47 +82,47 @@
                         
                         <div class="mb-4">
                             <h5 class="mb-3">Select Payment Method</h5>
-                            <div class="row g-2 mb-4" id="payment-method-selectors">
+                            <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-xl-6 g-2 mb-4" id="payment-method-selectors">
                                 <!-- Visa -->
-                                <div class="col-6 col-md-4 col-lg-2">
-                                    <div class="border rounded p-3 text-center cursor-pointer method-option selected" data-method="visa">
-                                        <img src="{% static 'payments/images/visa.webp' %}" class="payment-logo" alt="Visa" width="64" height="64">
-                                        <div class="mt-2 small fw-medium">Visa</div>
+                                <div class="col">
+                                    <div class="border rounded p-3 text-center cursor-pointer method-option h-100 d-flex flex-column align-items-center justify-content-center selected border-primary bg-light" data-method="visa">
+                                        <img src="{% static 'payments/images/visa.webp' %}" class="payment-logo img-fluid mb-2 border rounded" alt="Visa" style="max-height: 48px; width: auto;">
+                                        <div class="small fw-medium">Visa</div>
                                     </div>
                                 </div>
                                 <!-- Mastercard -->
-                                <div class="col-6 col-md-4 col-lg-2">
-                                    <div class="border rounded p-3 text-center cursor-pointer method-option" data-method="mastercard">
-                                        <img src="{% static 'payments/images/mastercard.webp' %}" class="payment-logo" alt="Mastercard" width="64" height="64">
-                                        <div class="mt-2 small fw-medium">Mastercard</div>
+                                <div class="col">
+                                    <div class="border rounded p-3 text-center cursor-pointer method-option h-100 d-flex flex-column align-items-center justify-content-center" data-method="mastercard">
+                                        <img src="{% static 'payments/images/mastercard.webp' %}" class="payment-logo img-fluid mb-2 border rounded" alt="Mastercard" style="max-height: 48px; width: auto;">
+                                        <div class="small fw-medium">Mastercard</div>
                                     </div>
                                 </div>
                                 <!-- MoMo -->
-                                <div class="col-6 col-md-4 col-lg-2">
-                                    <div class="border rounded p-3 text-center cursor-pointer method-option" data-method="momo">
-                                        <img src="{% static 'payments/images/momo.webp' %}" class="payment-logo" alt="MoMo" width="64" height="64">
-                                        <div class="mt-2 small fw-medium">MoMo</div>
+                                <div class="col">
+                                    <div class="border rounded p-3 text-center cursor-pointer method-option h-100 d-flex flex-column align-items-center justify-content-center" data-method="momo">
+                                        <img src="{% static 'payments/images/momo.webp' %}" class="payment-logo img-fluid mb-2 border rounded" alt="MoMo" style="max-height: 48px; width: auto;">
+                                        <div class="small fw-medium">MoMo</div>
                                     </div>
                                 </div>
                                 <!-- ZaloPay -->
-                                <div class="col-6 col-md-4 col-lg-2">
-                                    <div class="border rounded p-3 text-center cursor-pointer method-option" data-method="zalopay">
-                                        <img src="{% static 'payments/images/zalopay.webp' %}" class="payment-logo" alt="ZaloPay" width="64" height="64">
-                                        <div class="mt-2 small fw-medium">ZaloPay</div>
+                                <div class="col">
+                                    <div class="border rounded p-3 text-center cursor-pointer method-option h-100 d-flex flex-column align-items-center justify-content-center" data-method="zalopay">
+                                        <img src="{% static 'payments/images/zalopay.webp' %}" class="payment-logo img-fluid mb-2 border rounded" alt="ZaloPay" style="max-height: 48px; width: auto;">
+                                        <div class="small fw-medium">ZaloPay</div>
                                     </div>
                                 </div>
                                 <!-- Local Bank -->
-                                <div class="col-6 col-md-4 col-lg-2">
-                                    <div class="border rounded p-3 text-center cursor-pointer method-option" data-method="local_bank">
-                                        <img src="{% static 'payments/images/napas.webp' %}" class="payment-logo" alt="Napas" width="64" height="64">
-                                        <div class="mt-2 small fw-medium">Bank QR</div>
+                                <div class="col">
+                                    <div class="border rounded p-3 text-center cursor-pointer method-option h-100 d-flex flex-column align-items-center justify-content-center" data-method="local_bank">
+                                        <img src="{% static 'payments/images/napas.webp' %}" class="payment-logo img-fluid mb-2 border rounded" alt="Napas" style="max-height: 48px; width: auto;">
+                                        <div class="small fw-medium">Bank QR</div>
                                     </div>
                                 </div>
                                 <!-- PayPal -->
-                                <div class="col-6 col-md-4 col-lg-2">
-                                    <div class="border rounded p-3 text-center cursor-pointer method-option" data-method="paypal">
-                                        <img src="{% static 'payments/images/paypal.webp' %}" class="payment-logo" alt="PayPal" width="64" height="64">
-                                        <div class="mt-2 small fw-medium">PayPal</div>
+                                <div class="col">
+                                    <div class="border rounded p-3 text-center cursor-pointer method-option h-100 d-flex flex-column align-items-center justify-content-center" data-method="paypal">
+                                        <img src="{% static 'payments/images/paypal.webp' %}" class="payment-logo img-fluid mb-2 border rounded" alt="PayPal" style="max-height: 48px; width: auto;">
+                                        <div class="small fw-medium">PayPal</div>
                                     </div>
                                 </div>
                             </div>
@@ -378,22 +378,6 @@
 </div>
 
 <link rel="stylesheet" href="https://www.nerdfonts.com/assets/css/webfont.css">
-<link rel="stylesheet" type="text/css" href="{% static 'payments/payment_form.css' %}?v=8">
-<style>
-    /* Inline backup for caching issues */
-    .method-option {
-        cursor: pointer;
-        transition: all 0.2s ease-in-out;
-    }
-    .method-option:hover {
-        border-color: #0d6efd !important;
-        box-shadow: 0 0.125rem 0.25rem rgba(13, 110, 253, 0.25);
-    }
-    .method-option.selected {
-        border-color: #0d6efd !important;
-        background-color: rgba(13, 110, 253, 0.05);
-    }
-</style>
 
 <script>
 {% if purchase_type == 'certificate' %}

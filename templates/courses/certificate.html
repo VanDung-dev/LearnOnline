@@ -4,70 +4,149 @@
 {% block title %}Certificate - {{ certificate.course.title }}{% endblock %}
 
 {% block content %}
-<div class="container">
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap');
+
+    @page { 
+        size: landscape;
+        margin: 0;
+    }
+
+    .certificate-frame {
+        width: 297mm;
+        aspect-ratio: 297 / 180;
+        margin: 0 auto;
+        position: relative;
+        border: 1px solid #000;
+        overflow: hidden;
+        box-sizing: border-box;
+    }
+
+    .cert-signature {
+        font-family: 'Great Vibes', cursive;
+        font-size: clamp(1.5rem, 2.5vw, 2.5rem) !important;
+    }
+
+    @media print {
+        body, html { 
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+        
+        .no-print, .navbar, footer { display: none !important; }
+
+        /* Ensure the container fills the landscape page exactly */
+        .row, .col-12 {
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 100% !important;
+            max-width: 100% !important;
+        }
+
+        .certificate-frame {
+            position: absolute;
+            width: 297mm !important;
+            height: 180mm !important;
+            margin: 0 !important;
+            box-shadow: none !important;
+            border: 1px solid #000 !important;
+        }
+
+        img {
+            max-width: 100% !important;
+            print-color-adjust: exact;
+        }
+    }
+</style>
+
+<div class="container-fluid px-4 py-4">
     <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="card certificate-card"  id="print-section">
-                <div class="card-body text-center">
-                    <div class="certificate-header mb-4">
-                        <h1 class="certificate-title">Certificate of Completion</h1>
-                        <p class="certificate-subtitle">This is to certify that</p>
+        <div class="col-12 d-flex justify-content-center">
+        <!-- Certificate Frame with A4 Aspect Ratio -->
+        <div class="certificate-frame bg-white shadow-lg d-flex" id="print-section">
+            <!-- Left Main Content -->
+            <div class="d-flex flex-column justify-content-between p-5 col-8">
+                <div class="mb-4 mt-8">
+                    <h1 style="font-size: 5rem;"><strong><em>Verified</em></strong></h1>
+                    <h1>Certificate</h1>
+                </div>
+
+                <div class="d-flex flex-column mt-2">
+                    <p>This is to certify that</p>
+                    <h1><strong>{{ certificate.user.get_full_name|default:certificate.user.username }}</strong></h1>
+                    <p>successfully completed (and received a passing grade in)</p>
+                    <h1><strong>{{ certificate.course.title }}</strong></h1>
+                    <p>a course of study offered by {{ certificate.course.instructor.profile.school.name|default:"LearnOnline" }}, an online learning initiative of LearnOnline.</p>
+                </div>
+
+                <div class="d-flex align-items-center mt-auto">
+                    <div class="me-5">
+                        <h4><strong>LearnOnline</strong></h4>
                     </div>
-                    
-                    <div class="recipient-name mb-4">
-                        <h2>{{ certificate.user.get_full_name|default:certificate.user.username }}</h2>
-                    </div>
-                    
-                    <div class="certificate-content mb-4">
-                        <p>has successfully completed the course</p>
-                        <h3 class="course-title">{{ certificate.course.title }}</h3>
-                        <p>offered by Online Learning Platform</p>
-                    </div>
-                    
-                    <div class="certificate-details mb-4">
-                        <div class="row">
-                            <div class="col-6">
-                                <p><strong>Certificate ID:</strong><br>{{ certificate.certificate_number }}</p>
-                            </div>
-                            <div class="col-6">
-                                <p><strong>Date Issued:</strong><br>{{ certificate.issued_at|date:"F d, Y" }}</p>
-                            </div>
+                    <div class="d-flex gap-4">
+                        <div class="d-flex flex-column">
+                            <strong>
+                                <span style="color: gray; display: block;">Verified Certificate</span>
+                                <span style="color: gray; display: block;">Issued {{ certificate.issued_at|date:"F d, Y" }}</span>
+                            </strong>
                         </div>
-                    </div>
-                    
-                    <div class="certificate-footer">
-                        <div class="signature-section">
-                            <p>___________________________</p>
-                            <p>Course Instructor<br>
-                            {{ certificate.course.instructor.get_full_name|default:certificate.course.instructor.username }}</p>
+                        <div class="d-flex flex-column">
+                            <strong>
+                                <span style="color: gray; display: block;">Valid Certificate ID</span>
+                                <span style="display: block;">{{ certificate.certificate_number }}</span>
+                            </strong>
                         </div>
                     </div>
                 </div>
             </div>
-            
-            <div class="text-center mt-4">
-                {% if not is_public %}
-                <a href="{% url 'courses:course_detail' certificate.course.slug %}" class="btn btn-outline-secondary">Back to Course</a>
-                {% endif %}
-                <button class="btn btn-primary" onclick="printCertificate()">Print Certificate</button>
+
+            <!-- Right Sidebar -->
+            <div class="cert-sidebar d-flex flex-column align-items-end p-5 col-4">
+                <div class="org-branding mb-5">
+                    {% if certificate.course.instructor.profile.school and certificate.course.instructor.profile.school.logo %}
+                        <div class="mb-3">
+                            <img src="{{ certificate.course.instructor.profile.school.logo.url }}" alt="{{ certificate.course.instructor.profile.school.name }}" class="img-fluid">
+                        </div>
+                    {% elif certificate.course.instructor.profile.school %}
+                        <h2 class="cert-org-name">{{ certificate.course.instructor.profile.school.name }}</h2>
+                    {% else %}
+                        <h2 class="cert-org-name">LearnOnline</h2>
+                    {% endif %}
+                </div>
+
+                <div class="signatures text-end">
+                    <div class="signature-block">
+                        <h3 class="cert-signature">{{ certificate.course.instructor.get_full_name|default:certificate.course.instructor.username }}</h3>
+                        <h5>{{ certificate.course.instructor.get_full_name|default:certificate.course.instructor.username }}</h5>
+                        <p>Instructor</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+
+    <div class="text-center mt-4 no-print">
+        {% if not is_public %}
+        <a href="{% url 'courses:course_detail' certificate.course.slug %}" class="btn btn-outline-secondary me-2">Back to Course</a>
+        {% endif %}
+        <button class="btn btn-primary" onclick="printCertificate()">
+            <i class="bi bi-printer me-2"></i>Print Certificate
+        </button>
+    </div>
+</div>
 </div>
 
-<link rel="stylesheet" type="text/css" href="{% static 'courses/certificate.css' %}">
 
 <script>
-function printCertificate() {
-    // Temporarily change the title to reduce what appears in print header
-    var originalTitle = document.title;
-    document.title = "Certificate";
-    
-    // Print the document
-    window.print();
-    
-    // Restore the original title
-    document.title = originalTitle;
-}
+    function printCertificate() {
+        var originalTitle = document.title;
+        document.title = "Certificate - {{ certificate.user.username }}";
+        window.print();
+        document.title = originalTitle;
+    }
 </script>
 {% endblock %}

@@ -3,40 +3,37 @@
 
 {% block title %}{{ discussion.title }} - {{ course.title }}{% endblock %}
 
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'discussions/discussions.css' %}">
-{% endblock %}
-
 {% block content %}
-<div class="container mt-4" data-discussion-id="{{ discussion.id }}" data-current-user="{{ user_id }}">
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{% url 'courses:course_detail' course.slug %}">{{ course.title }}</a></li>
-            <li class="breadcrumb-item"><a href="{% url 'discussions:discussion_list' course.slug %}">Discussions</a></li>
-            <li class="breadcrumb-item active" aria-current="page">{{ discussion.title }}</li>
-        </ol>
-    </nav>
+
+<nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+    <ol class="breadcrumb align-items-center">
+        <li class="breadcrumb-item">
+            <a href="{% url 'courses:course_detail' course.slug %}" class="text-primary text-decoration-none">
+                {{ course.title }}
+            </a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="{% url 'discussions:discussion_list' course.slug %}" class="text-primary text-decoration-none">
+                Discussions
+            </a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">{{ discussion.title }}</li>
+    </ol>
+</nav>
+
+<div class="container mt-3" data-discussion-id="{{ discussion.id }}" data-current-user="{{ user_id }}">
 
     <!-- Main Question -->
     <div class="card mb-4 discussion-post">
         <div class="card-body">
             <div class="d-flex">
-                <div class="vote-column me-3 text-center">
-                    <button class="btn btn-link vote-btn upvote" data-type="discussion" data-id="{{ discussion.id }}" data-val="1">
-                        <i class="fas fa-chevron-up"></i>
-                    </button>
-                    <div class="vote-count h5 mb-0" id="discussion-score-{{ discussion.id }}">{{ discussion.vote_count }}</div>
-                    <button class="btn btn-link vote-btn downvote" data-type="discussion" data-id="{{ discussion.id }}" data-val="-1">
-                        <i class="fas fa-chevron-down"></i>
-                    </button>
-                </div>
-                <div class="flex-grow-1">
-                    <h3 class="card-title">
-                        {{ discussion.title }}
+                <div class="flex-grow-1 ps-3">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <h3 class="card-title">{{ discussion.title }}</h3>
                         {% if discussion.is_resolved %}
-                        <span class="badge bg-success fs-6 align-middle"><i class="fas fa-check"></i> Solved</span>
+                            <span class="badge bg-success fs-6"><i class="fas fa-check"></i> Solved</span>
                         {% endif %}
-                    </h3>
+                    </div>
                     <p class="card-text">{{ discussion.body|safe }}</p>
                     <div class="text-muted small">
                         Asked by <strong>{{ discussion.author.get_full_name|default:discussion.author.username }}</strong>
@@ -45,11 +42,13 @@
                         <span class="fst-italic ms-2" title="{{ discussion.updated_at }}">(Example: Edited {{ discussion.updated_at|timesince }} ago)</span>
                         {% endif %}
                     </div>
-                    
                     {% if discussion.author == user %}
-                    <div class="mt-2">
-                        <button class="btn btn-sm btn-outline-secondary" onclick="toggleEdit('discussion', {{ discussion.id }})">Edit</button>
+                    <div class="ms-auto text-end">
+                        <button class="btn btn-sm btn-outline-secondary" onclick="toggleEdit('discussion', {{ discussion.id }})">
+                            <i class="fas fa-edit"></i>
+                        </button>
                     </div>
+
                     <form method="post" id="edit-form-discussion-{{ discussion.id }}" class="mt-3 d-none">
                         {% csrf_token %}
                         <input type="hidden" name="edit_discussion" value="true">
@@ -75,31 +74,13 @@
     
     <div class="replies-list mb-4">
         {% for reply in discussion.replies.all %}
-        <div class="card mb-3 reply-post {% if reply.is_answer %}border-success answer-highlight{% endif %}" id="reply-{{ reply.id }}">
+        <div class="card mb-3 reply-post" id="reply-{{ reply.id }}">
             <div class="card-body">
                 <div class="d-flex">
-                    <div class="vote-column me-3 text-center">
-                        <button class="btn btn-link vote-btn upvote" data-type="reply" data-id="{{ reply.id }}" data-val="1">
-                            <i class="fas fa-chevron-up"></i>
-                        </button>
-                        <div class="vote-count h5 mb-0" id="reply-score-{{ reply.id }}">{{ reply.vote_count }}</div>
-                        <button class="btn btn-link vote-btn downvote" data-type="reply" data-id="{{ reply.id }}" data-val="-1">
-                            <i class="fas fa-chevron-down"></i>
-                        </button>
-                        
-                        {% if reply.is_answer %}
-                        <div class="mt-2 text-success" title="Accepted Answer">
-                            <i class="fas fa-check fa-lg"></i>
-                        </div>
-                        {% elif not discussion.is_resolved and is_instructor or discussion.author == user %}
-                        <button class="btn btn-link text-muted mt-2 mark-answer-btn" data-id="{{ reply.id }}" title="Mark as Answer">
-                            <i class="fas fa-check"></i>
-                        </button>
-                        {% endif %}
-                    </div>
-                    <div class="flex-grow-1">
+
+                    <div class="flex-grow-1 ps-3">
                         <div id="reply-content-{{ reply.id }}">
-                            <p class="card-text">{{ reply.body|safe }}</p>
+                            <div class="card-text">{{ reply.body|safe }}</div>
                         </div>
                         
                         {% if reply.author == user %}
@@ -127,7 +108,11 @@
                                 {% endif %}
                             </div>
                             {% if reply.author == user %}
-                                <button class="btn btn-link btn-sm text-secondary p-0" onclick="toggleEdit('reply', {{ reply.id }})">Edit</button>
+                                <div class="ms-auto">
+                                    <button class="btn btn-sm btn-outline-secondary" onclick="toggleEdit('reply', {{ reply.id }})">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                </div>
                             {% endif %}
                         </div>
                     </div>
@@ -159,5 +144,5 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="{% static 'discussions/discussions.js' %}"></script>
+<script src="{% static 'discussions/discussions_detail.js' %}"></script>
 {% endblock %}

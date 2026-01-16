@@ -67,8 +67,7 @@
             <label for="{{ form.certificate_price.id_for_label }}" class="form-label">Certificate Price ($)</label>
             <input type="number" class="form-control" id="{{ form.certificate_price.id_for_label }}" name="{{ form.certificate_price.html_name }}" step="0.01" min="0" value="{{ form.certificate_price.value|default:'0' }}" {% if form.price.value and form.price.value > 0 %}readonly{% endif %}>
             <div class="form-text">
-                Set to 0 for free certificate (included with course purchase or free course)<br>
-                <strong>Note:</strong> If course price > 0, certificate will be free automatically
+                Set to 0 for free certificate<br>
             </div>
             {% if form.certificate_price.errors %}
                 <div class="text-danger">{{ form.certificate_price.errors }}</div>
@@ -144,19 +143,20 @@
 <hr>
 
 <h3>Course Sections</h3>
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h4>Sections and Lessons</h4>
+
+<div class="text-end mb-3">
+
     {% if course.slug %}
-        <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#createSectionModal">Add Section</button>
+        <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#createSectionModal"><i class="fas fa-plus me-1"></i> Add Section</button>
     {% else %}
-        <button type="button" class="btn btn-sm btn-outline-primary disabled">Add Section</button>
+        <button type="button" class="btn btn-sm btn-outline-primary disabled"><i class="fas fa-plus me-1"></i> Add Section</button>
     {% endif %}
 </div>
 
 <div class="sortable-sections" data-course-slug="{{ course.slug }}">
     {% if course.sections.all %}
         {% for section in course.sections.all %}
-            <div class="card mb-3 sortable-section" data-section-id="{{ section.id }}">
+            <div class="card mb-3 sortable-section border border-2" data-section-id="{{ section.id }}">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <div>
                         <i class="fas fa-grip-lines me-2 text-muted handle" style="cursor: move;"></i>
@@ -164,11 +164,11 @@
                     </div>
                     <div>
                         {% if course.slug %}
-                            <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editSectionModal{{ section.id }}">Edit Section</button>
-                            <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteSectionModal{{ section.id }}">Delete Section</button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editSectionModal{{ section.id }}" title="Edit Section"><i class="fas fa-edit"></i></button>
+                            <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteSectionModal{{ section.id }}" title="Delete Section"><i class="fas fa-trash"></i></button>
                         {% else %}
-                            <button type="button" class="btn btn-sm btn-outline-secondary disabled">Edit Section</button>
-                            <button type="button" class="btn btn-sm btn-outline-danger disabled">Delete Section</button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary disabled"><i class="fas fa-edit"></i></button>
+                            <button type="button" class="btn btn-sm btn-outline-danger disabled"><i class="fas fa-trash"></i></button>
                         {% endif %}
                     </div>
                 </div>
@@ -180,31 +180,34 @@
                     </div>
 
                     <!-- Subsections -->
+                    {% if section.subsections.all %}
+                        <h6 class="mt-3 border-bottom border-2 pb-2">Subsections</h6>
+                    {% endif %}
                     <div class="sortable-subsections" data-section-id="{{ section.id }}">
                         {% if section.subsections.all %}
-                            <h6 class="mt-3 border-bottom pb-2">Subsections</h6>
                             {% for subsection in section.subsections.all %}
-                                <div class="card mb-3 sortable-subsection" data-subsection-id="{{ subsection.id }}">
+                                <div class="card mb-3 sortable-subsection border border-2" data-subsection-id="{{ subsection.id }}">
                                     <div class="card-header d-flex justify-content-between align-items-center bg-light">
                                         <div>
                                             <i class="fas fa-grip-lines me-2 text-muted handle" style="cursor: move;"></i>
                                             <strong>{{ subsection.title }}</strong>
                                             {% if subsection.is_locked %}
-                                                <span class="badge bg-danger ms-2">Locked</span>
+                                                <span class="badge bg-danger ms-2"><i class="fa fa-lock"></i></span>
                                             {% endif %}
                                         </div>
                                         <div>
-                                            <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editSubsectionModal{{ subsection.id }}">Edit</button>
-                                            <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteSubsectionModal{{ subsection.id }}">Delete</button>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editSubsectionModal{{ subsection.id }}" title="Edit Subsection"><i class="fas fa-edit"></i></button>
+                                            <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteSubsectionModal{{ subsection.id }}" title="Delete Subsection"><i class="fas fa-trash"></i></button>
                                         </div>
                                     </div>
                                     <div class="card-body p-2">
 
                                         <!-- Lessons in Subsection -->
                                         {% if subsection.lessons.all %}
+                                            <h6 class="mt-2 border-bottom border-2 pb-2">Lessons</h6>
                                             <div class="sortable-lessons" data-subsection-id="{{ subsection.id }}">
-                                                {% for lesson in subsection.lessons.all %}
-                                                    <div class="card mb-2 sortable-lesson" data-lesson-id="{{ lesson.id }}">
+                                        {% for lesson in subsection.lessons.all %}
+                                                    <div class="card mb-2 sortable-lesson border border-2" data-lesson-id="{{ lesson.id }}">
                                                         <div class="card-body p-2 d-flex justify-content-between align-items-center">
                                                             <div>
                                                                 <i class="fas fa-grip-lines me-2 text-muted handle" style="cursor: move;"></i>
@@ -214,13 +217,13 @@
                                                                     <span class="badge bg-warning ms-2">Draft</span>
                                                                 {% endif %}
                                                                 {% if lesson.is_locked %}
-                                                                    <span class="badge bg-danger ms-2">Locked</span>
+                                                                    <span class="badge bg-danger ms-2"><i class="fa fa-lock"></i></span>
                                                                 {% endif %}
                                                             </div>
                                                             <div>
                                                                 {% if course.slug and section.id %}
-                                                                    <a href="{% url 'courses:edit_lesson' course_slug=course.slug section_id=section.id lesson_id=lesson.id %}" class="btn btn-sm btn-outline-secondary">Edit</a>
-                                                                    <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteLessonModal{{ lesson.id }}">Delete</button>
+                                                                    <a href="{% url 'courses:edit_lesson' course_slug=course.slug section_id=section.id lesson_id=lesson.id %}" class="btn btn-sm btn-outline-secondary" title="Edit Lesson"><i class="fas fa-edit"></i></a>
+                                                                    <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteLessonModal{{ lesson.id }}" title="Delete Lesson"><i class="fas fa-trash"></i></button>
                                                                 {% endif %}
                                                             </div>
                                                         </div>
@@ -231,7 +234,7 @@
                                             <p class="text-muted small ms-3">No lessons in this subsection.</p>
                                         {% endif %}
                                         <div class="text-end mb-1 mt-2 me-1">
-                                            <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#createLessonModal{{ subsection.id }}_sub">Add Lesson</button>
+                                            <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#createLessonModal{{ subsection.id }}_sub"><i class="fas fa-plus me-1"></i> Add Lesson</button>
                                         </div>
                                     </div>
                                 </div>
@@ -251,52 +254,11 @@
                     </div>
                     
                     <div class="text-end mb-1 mt-2">
-                        <button type="button" class="btn btn-sm btn-outline-primary me-2" data-bs-toggle="modal" data-bs-target="#createSubsectionModal{{ section.id }}">Add Subsection</button>
-                        {% if course.slug %}
-                            <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#createLessonModal{{ section.id }}">Add Lesson</button>
-                        {% else %}
-                            <button type="button" class="btn btn-sm btn-outline-primary disabled">Add Lesson</button>
-                        {% endif %}
+                        <button type="button" class="btn btn-sm btn-outline-primary me-2" data-bs-toggle="modal" data-bs-target="#createSubsectionModal{{ section.id }}"><i class="fas fa-plus me-1"></i> Add Subsection</button>
                     </div>
-                    <small class="text-muted d-block mb-3">
-                        <i class="fas fa-info-circle me-1"></i>
-                        Note: You can only add Subsections OR Direct Lessons to a section, not both.
-                    </small>
-
-                    <!-- Legacy Lessons -->
-                    {% if section.lessons.all and not section.subsections.all %}
-                        <div class="sortable-lessons" data-section-id="{{ section.id }}">
-                            <ul class="list-group lesson-list">
-                                {% for lesson in section.lessons.all %}
-                                    {% if not lesson.subsection %}
-                                        <li class="list-group-item d-flex justify-content-between align-items-center sortable-lesson" data-lesson-id="{{ lesson.id }}">
-                                            <div>
-                                                <i class="fas fa-grip-lines me-2 text-muted handle" style="cursor: move;"></i>
-                                                <strong>{{ lesson.title }}</strong>
-                                                <span class="badge bg-secondary ms-2">{{ lesson.lesson_type|capfirst }}</span>
-                                                {% if not lesson.is_published %}
-                                                    <span class="badge bg-warning ms-2">Draft</span>
-                                                {% endif %}
-                                                {% if lesson.is_locked %}
-                                                    <span class="badge bg-danger ms-2">Locked</span>
-                                                {% endif %}
-                                            </div>
-                                            <div>
-                                                {% if course.slug and section.id %}
-                                                    <a href="{% url 'courses:edit_lesson' course_slug=course.slug section_id=section.id lesson_id=lesson.id %}" class="btn btn-sm btn-outline-secondary">Edit Lesson</a>
-                                                    <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteLessonModal{{ lesson.id }}">Delete Lesson</button>
-                                                {% endif %}
-                                            </div>
-                                        </li>
-                                    {% endif %}
-                                {% endfor %}
-                            </ul>
-                        </div>
-                    {% endif %}
                 </div>
             </div>
 
-            {% include 'courses/includes/create_lesson_modal.html' with section=section %}
             {% include 'courses/includes/create_subsection_modal.html' with section=section %}
 
             {% include 'courses/includes/edit_section_modal.html' with section=section %}

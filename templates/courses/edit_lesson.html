@@ -80,7 +80,7 @@
                                     <h5>Questions and Answers</h5>
                                     <div class="btn-group">
                                         <button type="button" class="btn btn-sm btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown">
-                                            Add Question
+                                            <i class="fas fa-plus me-1"></i> Add
                                         </button>
                                         <ul class="dropdown-menu">
                                             <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#addSingleChoiceQuestionModal">Single Choice Question</a></li>
@@ -105,14 +105,14 @@
                                                             <button type="button" class="btn btn-sm btn-outline-secondary"
                                                                     data-bs-toggle="modal"
                                                                     data-bs-target="{% if question.question_type == 'single' %}#editSingleChoiceQuestionModal{{ question.id }}{% elif question.question_type == 'multiple' %}#editMultipleChoiceQuestionModal{{ question.id }}{% else %}#editEssayQuestionModal{{ question.id }}{% endif %}">
-                                                                Edit
+                                                                <i class="fas fa-edit"></i>
                                                             </button>
                                                             <button type="button" class="btn btn-sm btn-outline-danger"
                                                                     data-bs-toggle="modal"
                                                                     data-bs-target="#deleteQuestionModal"
                                                                     data-question-id="{{ question.id }}"
                                                                     data-question-text="{{ question.text }}">
-                                                                Delete
+                                                                <i class="fas fa-trash"></i>
                                                             </button>
                                                         </div>
                                                     </div>
@@ -216,16 +216,7 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
 <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        if (window.tinyMceConfig) {
-             tinymce.init({
-                ...window.tinyMceConfig,
-                selector: '#lesson_content'
-            });
-        }
-    });
-</script>
+
 <script src="{% static 'courses/includes/sortable_utils.js' %}"></script>
 <script src="{% static 'courses/includes/question_handlers.js' %}"></script>
 <script src="{% static 'courses/edit_lesson.js' %}"></script>
