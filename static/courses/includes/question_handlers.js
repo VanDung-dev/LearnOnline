@@ -12,7 +12,7 @@ function handleEssayQuestion() {
 // Single Choice Question Handler
 function handleSingleChoiceQuestion() {
     // Handle add new answer for new single choice question
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', function (e) {
         if (e.target.id === 'add-new-single-choice-answer') {
             const container = document.getElementById('new-single-choice-answers-container');
             if (container) {
@@ -31,7 +31,7 @@ function handleSingleChoiceQuestion() {
                 `;
                 container.appendChild(newItem);
             }
-        } 
+        }
         // Handle add new answer for existing single choice questions
         else if (e.target.id && e.target.id.startsWith('add-single-choice-answer-')) {
             const questionId = e.target.getAttribute('data-question-id');
@@ -54,9 +54,9 @@ function handleSingleChoiceQuestion() {
             }
         }
     });
-    
+
     // Handle radio button changes for single choice questions to ensure only one correct answer
-    document.addEventListener('change', function(e) {
+    document.addEventListener('change', function (e) {
         // Handle new single choice question
         if (e.target.name === 'new_correct_answer' && e.target.checked) {
             const container = e.target.closest('#new-single-choice-answers-container');
@@ -101,7 +101,7 @@ function handleSingleChoiceQuestion() {
 // Multiple Choice Question Handler
 function handleMultipleChoiceQuestion() {
     // Handle add new answer for new multiple choice question
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', function (e) {
         if (e.target.id === 'add-new-multiple-choice-answer') {
             const container = document.getElementById('new-multiple-choice-answers-container');
             if (container) {
@@ -120,7 +120,7 @@ function handleMultipleChoiceQuestion() {
                 `;
                 container.appendChild(newItem);
             }
-        } 
+        }
         // Handle add new answer for existing multiple choice questions
         else if (e.target.id && e.target.id.startsWith('add-multiple-choice-answer-')) {
             const questionId = e.target.getAttribute('data-question-id');
@@ -147,16 +147,42 @@ function handleMultipleChoiceQuestion() {
 
 // General question handlers
 function handleRemoveAnswer() {
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', function (e) {
         if (e.target.classList.contains('remove-answer')) {
-            e.target.closest('.answer-item').remove();
+            const answerItem = e.target.closest('.answer-item');
+            if (answerItem) {
+                const container = answerItem.parentElement;
+                answerItem.remove();
+
+                // Re-index remaining new answers to ensure values match the backend enumeration
+                if (container) {
+                    const items = container.querySelectorAll('.answer-item');
+                    let newAnswerIndex = 0;
+
+                    items.forEach((item) => {
+                        // Check if this is a new answer item (look for new_answer_text input)
+                        const textInput = item.querySelector('input[type="text"]');
+                        if (textInput && textInput.name.indexOf('new_') !== -1) {
+                            // This is a new answer item, update its radio/checkbox value
+                            const choiceInput = item.querySelector('input[type="radio"], input[type="checkbox"]');
+                            if (choiceInput) {
+                                // Only update if it's a "new" choice input (starts with new_ or is associated with new question)
+                                if (choiceInput.name.indexOf('new_') !== -1) {
+                                    choiceInput.value = newAnswerIndex;
+                                }
+                            }
+                            newAnswerIndex++;
+                        }
+                    });
+                }
+            }
         }
     });
 }
 
 // Initialize handlers based on question type
 function initializeQuestionHandlersByType(questionType) {
-    switch(questionType) {
+    switch (questionType) {
         case 'essay':
             handleEssayQuestion();
             break;

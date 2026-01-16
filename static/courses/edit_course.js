@@ -54,45 +54,106 @@ $(document).ready(function () {
             }
         });
     });
-    // Check for sections with subsections and disable "Add Lesson" button for the section
-    $('.sortable-section').each(function () {
-        var sectionId = $(this).data('section-id');
-        var hasSubsections = $(this).find('.sortable-subsection').length > 0;
 
-        if (hasSubsections) {
-            // Find the Add Lesson button for this section
-            var addLessonBtn = $(this).find('button[data-bs-target="#createLessonModal' + sectionId + '"]');
+    // ---------------------------------------------------------
+    // Price & Certificate Price Mutual Exclusivity Logic
+    // ---------------------------------------------------------
+    const $priceInput = $('#id_price');
+    const $certPriceInput = $('#id_certificate_price');
+    let unlockTimeout = null;
 
-            if (addLessonBtn.length > 0) {
-                addLessonBtn.prop('disabled', true);
-                addLessonBtn.addClass('disabled');
-                addLessonBtn.removeClass('btn-outline-primary').addClass('btn-outline-secondary');
-                addLessonBtn.attr('title', 'Cannot add lessons directly to a section that has subsections.');
-            }
+    function setLocked($input, isLocked) {
+        if (isLocked) {
+            // Use a darker gray for better visibility (#d1d5db which is darker than standard disabled)
+            $input.prop('readonly', true).css('background-color', '#d1d5db').addClass('text-muted');
+            $input.removeClass('bg-light');
+        } else {
+            $input.prop('readonly', false).css('background-color', '').removeClass('text-muted');
         }
+    }
 
-        // SYMMETRIC CHECK: Check for sections with direct lessons and disable "Add Subsection" button
-        // Direct lessons are inside .sortable-lessons with data-section-id matching the section
-        var hasDirectLessons = $(this).find('.sortable-lessons[data-section-id="' + sectionId + '"] .sortable-lesson').length > 0;
-
-        if (hasDirectLessons) {
-            var addSubsectionBtn = $(this).find('button[data-bs-target="#createSubsectionModal' + sectionId + '"]');
-
-            if (addSubsectionBtn.length > 0) {
-                addSubsectionBtn.prop('disabled', true);
-                addSubsectionBtn.addClass('disabled');
-                addSubsectionBtn.removeClass('btn-outline-primary').addClass('btn-outline-secondary');
-                addSubsectionBtn.attr('title', 'Cannot add subsections to a section that has direct lessons.');
+    function handlePriceExclusivity($active, $passive) {
+        // On Focus: Lock the other immediately
+        $active.on('focus', function () {
+            // If I am already locked/readonly, do not attempt to lock the other.
+            // This prevents a deadlock where clicking a locked field locks the active field.
+            if ($(this).prop('readonly')) {
+                return;
             }
-        }
-    });
 
-    // Initialize TinyMCE if config is available
-    if (window.tinyMceConfig) {
-        tinymce.init({
-            ...window.tinyMceConfig,
-            selector: '#id_description' // Assuming form.description renders with this ID
+            // Cancel any pending unlock to avoid weird race conditions
+            if (unlockTimeout) {
+                clearTimeout(unlockTimeout);
+                unlockTimeout = null;
+            }
+            setLocked($passive, true);
+        });
+
+        // On Blur: If value is 0 or invalid, unlock the other immediately
+        // This ensures if user just clicks in and leaves without typing, we don't leave the other locked.
+        $active.on('blur', function () {
+            // If I am locked, I shouldn't affect state
+            if ($(this).prop('readonly')) {
+                return;
+            }
+
+            const val = parseFloat($(this).val());
+            if (isNaN(val) || val === 0) {
+                if (unlockTimeout) {
+                    clearTimeout(unlockTimeout);
+                    unlockTimeout = null;
+                }
+                setLocked($passive, false);
+            }
+        });
+
+        // On Input: Check value
+        $active.on('input', function () {
+            // If locked, ignore
+            if ($(this).prop('readonly')) {
+                return;
+            }
+
+            const val = parseFloat($(this).val());
+
+            // If value > 0, ensure the other is locked
+            if (val > 0) {
+                if (unlockTimeout) {
+                    clearTimeout(unlockTimeout);
+                    unlockTimeout = null;
+                }
+                setLocked($passive, true);
+            }
+            // If value is 0 (or invalid/empty treated as 0 intention), wait 1s then unlock
+            else {
+                if (unlockTimeout) {
+                    clearTimeout(unlockTimeout);
+                }
+
+                unlockTimeout = setTimeout(function () {
+                    // Double check value in case it changed rapidly
+                    const currentVal = parseFloat($active.val());
+                    if (isNaN(currentVal) || currentVal === 0) {
+                        setLocked($passive, false);
+                    }
+                }, 1000);
+            }
         });
     }
+
+    // Apply logic to both
+    handlePriceExclusivity($priceInput, $certPriceInput);
+    handlePriceExclusivity($certPriceInput, $priceInput);
+
+    // Initial State Check on Page Load
+    const initPrice = parseFloat($priceInput.val());
+    const initCertPrice = parseFloat($certPriceInput.val());
+
+    if (initPrice > 0) {
+        setLocked($certPriceInput, true);
+    } else if (initCertPrice > 0) {
+        setLocked($priceInput, true);
+    }
+
 
 });

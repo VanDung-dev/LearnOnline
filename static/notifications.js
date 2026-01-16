@@ -3,7 +3,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // 1. Polling Unread Count
     function fetchUnreadCount() {
-        if (!unreadBadge) return;
+        // Optimize: Don't fetch if tab is hidden to save resources
+        if (!unreadBadge || document.hidden) return;
         fetch('/notifications/api/unread-count/')
             .then(response => {
                 if (response.status === 403) return null;
@@ -24,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (unreadBadge) {
         fetchUnreadCount();
-        setInterval(fetchUnreadCount, 60000);
+        setInterval(fetchUnreadCount, 300000);
     }
 
     // 2. Load Notifications Logic
