@@ -547,6 +547,17 @@ class QuizSubmitView(APIView):
                 status=status.HTTP_403_FORBIDDEN
             )
 
+        # Check max_check limit (0 means unlimited)
+        current_attempts = QuizAttempt.objects.filter(
+            user=request.user, lesson=lesson
+        ).count()
+        
+        if lesson.max_check > 0 and current_attempts >= lesson.max_check:
+            return Response(
+                {"error": f"Maximum number of attempts ({lesson.max_check}) reached for this quiz."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
         serializer = QuizSubmitSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
