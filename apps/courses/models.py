@@ -87,6 +87,15 @@ class Course(models.Model):
                         % ", ".join(valid_extensions)
                     )
                 )
+        
+        # Validate date fields
+        if self.closing_date and self.opening_date:
+            if self.closing_date <= self.opening_date:
+                raise ValidationError(_("Closing date must be after opening date."))
+        
+        if self.expiration_date and self.opening_date:
+            if self.expiration_date <= self.opening_date:
+                raise ValidationError(_("Expiration date must be after opening date."))
 
     def save(self, *args, **kwargs):
         # Clean the instance before saving

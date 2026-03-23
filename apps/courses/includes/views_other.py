@@ -18,11 +18,13 @@ from ..services.search_service import get_popular_search_terms
 
 def home(request):
     categories = Category.objects.all()
-    # Show all active courses (regardless of opening date) but respect closing date
+    # Show all active courses but respect opening_date and closing_date
     now = timezone.now()
     courses = Course.objects.filter(is_active=True)
-    # Filter courses to exclude those that have closed
+    # Filter courses to only show those that are open for enrollment
     courses = courses.filter(
+        models.Q(opening_date__isnull=True) | models.Q(opening_date__lte=now)
+    ).filter(
         models.Q(closing_date__isnull=True) | models.Q(closing_date__gte=now)
     )[:6]
     
@@ -42,6 +44,13 @@ def enroll_course(request, slug):
 
     # Check if course is currently open for enrollment
     now = timezone.now()
+    
+    # Check if course has opening date and if it's not yet opened
+    if course.opening_date and now < course.opening_date:
+        messages.error(request, "Enrollment for this course is not yet open. Please come back later.")
+        return redirect('courses:course_detail', slug=slug)
+    
+    # Check if course is currently open for enrollment
     if course.closing_date and now > course.closing_date:
         messages.error(request, "Enrollment for this course is closed.")
         return redirect('courses:course_detail', slug=slug)
