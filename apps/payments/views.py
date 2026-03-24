@@ -156,7 +156,11 @@ def process_payment(request, course_slug, purchase_type='course'):
     billing_address = request.POST.get('billing_address')
     zip_code = request.POST.get('zip_code')
     phone_number = request.POST.get('phone_number')
-    email = request.POST.get('email', request.user.email)
+    email = request.POST.get('email')
+    if not email:
+        user_email = getattr(request.user, 'email', None)
+        if user_email and user_email.strip():
+            email = user_email.strip()
 
     purchase_type = request.POST.get('purchase_type', purchase_type)
     client_token = request.POST.get('client_token')
@@ -180,7 +184,10 @@ def process_payment(request, course_slug, purchase_type='course'):
             missing_fields['billing_address'] = ['Please enter billing address.']
         if not zip_code:
             missing_fields['zip_code'] = ['Please enter zip code.']
-        if not email:
+        # Email is required only if user doesn't have an email
+        user_email = getattr(request.user, 'email', None)
+        has_user_email = user_email and user_email.strip()
+        if not email and not has_user_email:
             missing_fields['email'] = ['Email is required.']
             
     if missing_fields:

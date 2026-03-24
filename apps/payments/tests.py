@@ -57,6 +57,7 @@ class PaymentFlowTests(TestCase):
             "purchase_type": "course",
             "billing_address": "123 Main St",
             "zip_code": "10000",
+            "email": "buyer@test.com",
         })
         self.assertEqual(resp.status_code, 200)
         data = resp.json()
@@ -85,6 +86,7 @@ class PaymentFlowTests(TestCase):
             "client_token": token,
             "billing_address": "123 Main St",
             "zip_code": "10000",
+            "email": "buyer@test.com",
         }
         resp1 = self.client.post(url, data=payload)
         self.assertEqual(resp1.status_code, 200)
@@ -183,6 +185,7 @@ class CardValidationTests(TestCase):
             "purchase_type": "course",
             "billing_address": "123 Main St",
             "zip_code": "10000",
+            "email": "cardtest@test.com",
         })
         self.assertEqual(resp.status_code, 200)
         self.assertTrue(resp.json().get("success"))
@@ -198,6 +201,7 @@ class CardValidationTests(TestCase):
             "purchase_type": "course",
             "billing_address": "123 Main St",
             "zip_code": "10000",
+            "email": "cardtest@test.com",
         })
         self.assertEqual(resp.status_code, 200)
         self.assertTrue(resp.json().get("success"))
@@ -213,6 +217,7 @@ class CardValidationTests(TestCase):
             "purchase_type": "course",
             "billing_address": "123 Main St",
             "zip_code": "10000",
+            "email": "cardtest@test.com",
         })
         self.assertEqual(resp.status_code, 400)
         data = resp.json()
@@ -230,6 +235,7 @@ class CardValidationTests(TestCase):
             "purchase_type": "course",
             "billing_address": "123 Main St",
             "zip_code": "10000",
+            "email": "cardtest@test.com",
         })
         self.assertEqual(resp.status_code, 400)
         data = resp.json()
@@ -247,6 +253,7 @@ class CardValidationTests(TestCase):
             "purchase_type": "course",
             "billing_address": "123 Main St",
             "zip_code": "10000",
+            "email": "cardtest@test.com",
         })
         self.assertEqual(resp.status_code, 400)
         data = resp.json()
