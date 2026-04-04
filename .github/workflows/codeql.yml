@@ -1,0 +1,62 @@
+name: "CodeQL"
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - 'apps/**'
+      - 'DjangoProject/**'
+      - 'manage.py'
+      - 'requirements.txt'
+  pull_request:
+    branches: ["main"]
+    paths:
+      - 'apps/**'
+      - 'DjangoProject/**'
+      - 'manage.py'
+      - 'requirements.txt'
+  schedule:
+    - cron: "0 0 1 * *"
+
+jobs:
+  analyze:
+    name: Analyze
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      security-events: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: python
+          config: |
+            paths:
+              - apps/**
+              - DjangoProject/**
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v4
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v4
+        with:
+          category: "/language:python"
+          output: sarif-results
+
+      - name: Upload SARIF as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-codeql-sarif
+          path: sarif-results
+          retention-days: 14
