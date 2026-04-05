@@ -63,7 +63,7 @@ class ProgressViewSet(viewsets.ModelViewSet):
         
         # Check enrollment
         if not Enrollment.objects.filter(
-            user=request.user, course=lesson.section.course
+            user=request.user, course=lesson.subsection.section.course
         ).exists():
             return Response(
                 {"error": "You are not enrolled in this course."},
@@ -95,7 +95,7 @@ class QuizDetailView(generics.RetrieveAPIView):
         
         # Check enrollment
         if not Enrollment.objects.filter(
-            user=self.request.user, course=lesson.section.course
+            user=self.request.user, course=lesson.subsection.section.course
         ).exists():
             self.permission_denied(self.request, message="Not enrolled in this course.")
         
@@ -114,7 +114,7 @@ class QuizSubmitView(APIView):
         
         # Check enrollment
         if not Enrollment.objects.filter(
-            user=request.user, course=lesson.section.course
+            user=request.user, course=lesson.subsection.section.course
         ).exists():
             return Response(
                 {"error": "Not enrolled in this course."},

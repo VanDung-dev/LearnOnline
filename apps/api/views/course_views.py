@@ -115,7 +115,7 @@ class LessonDetailView(generics.RetrieveAPIView):
     permission_classes = [permissions.IsAuthenticated, IsEnrolled]
 
     def get_queryset(self):
-        return Lesson.objects.select_related('section__course')
+        return Lesson.objects.select_related('subsection__section__course')
 
     def get_object(self):
         queryset = self.get_queryset()
