@@ -14,16 +14,29 @@ from drf_spectacular.views import (
     SpectacularRedocView,
 )
 
-from . import views
+from .views import (
+    # Auth
+    RegisterView, ProfileView, ChangePasswordView,
+    # Course
+    CategoryViewSet, CourseViewSet, SectionViewSet, LessonDetailView,
+    # Enrollment/Progress
+    EnrollmentListView, ProgressViewSet, QuizDetailView, QuizSubmitView, CertificateListView,
+    # Discussion
+    DiscussionViewSet, ReplyViewSet,
+    # Admin
+    InstructorInviteCreateView, InstructorInviteAcceptView, StudentJoinSchoolView,
+    SchoolAdminCoursesView, SchoolAdminEnrollmentsView, SchoolAdminCertificatesView,
+    SchoolAdminInstructorsView, SchoolAdminStudentsView
+)
 from . import search_views
 
 # Create a router for viewsets
 router = DefaultRouter()
-router.register(r'categories', views.CategoryViewSet, basename='category')
-router.register(r'courses', views.CourseViewSet, basename='course')
-router.register(r'progress', views.ProgressViewSet, basename='progress')
-router.register(r'discussions', views.DiscussionViewSet, basename='discussion')
-router.register(r'replies', views.ReplyViewSet, basename='reply')
+router.register(r'categories', CategoryViewSet, basename='category')
+router.register(r'courses', CourseViewSet, basename='course')
+router.register(r'progress', ProgressViewSet, basename='progress')
+router.register(r'discussions', DiscussionViewSet, basename='discussion')
+router.register(r'replies', ReplyViewSet, basename='reply')
 
 urlpatterns = [
     # Router URLs
@@ -32,62 +45,62 @@ urlpatterns = [
     # ============================================
     # Authentication URLs
     # ============================================
-    path('auth/register/', views.RegisterView.as_view(), name='api-register'),
+    path('auth/register/', RegisterView.as_view(), name='api-register'),
     path('auth/login/', TokenObtainPairView.as_view(), name='api-token-obtain'),
     path('auth/refresh/', TokenRefreshView.as_view(), name='api-token-refresh'),
-    path('auth/profile/', views.ProfileView.as_view(), name='api-profile'),
-    path('auth/change-password/', views.ChangePasswordView.as_view(), name='api-change-password'),
+    path('auth/profile/', ProfileView.as_view(), name='api-profile'),
+    path('auth/change-password/', ChangePasswordView.as_view(), name='api-change-password'),
 
     # ============================================
     # Organization / Instructor Invite URLs
     # ============================================
-    path('schools/<int:school_id>/instructor-invites/', views.InstructorInviteCreateView.as_view(), name='api-instructor-invite-create'),
-    path('instructor-invites/accept/', views.InstructorInviteAcceptView.as_view(), name='api-instructor-invite-accept'),
-    path('schools/<int:school_id>/join/', views.StudentJoinSchoolView.as_view(), name='api-student-join-school'),
+    path('schools/<int:school_id>/instructor-invites/', InstructorInviteCreateView.as_view(), name='api-instructor-invite-create'),
+    path('instructor-invites/accept/', InstructorInviteAcceptView.as_view(), name='api-instructor-invite-accept'),
+    path('schools/<int:school_id>/join/', StudentJoinSchoolView.as_view(), name='api-student-join-school'),
 
     # ============================================
     # School Admin (Tenant-filtered) URLs
     # ============================================
-    path('schools/<int:school_id>/admin/courses/', views.SchoolAdminCoursesView.as_view(), name='api-admin-courses'),
-    path('schools/<int:school_id>/admin/enrollments/', views.SchoolAdminEnrollmentsView.as_view(), name='api-admin-enrollments'),
-    path('schools/<int:school_id>/admin/certificates/', views.SchoolAdminCertificatesView.as_view(), name='api-admin-certificates'),
-    path('schools/<int:school_id>/admin/instructors/', views.SchoolAdminInstructorsView.as_view(), name='api-admin-instructors'),
-    path('schools/<int:school_id>/admin/students/', views.SchoolAdminStudentsView.as_view(), name='api-admin-students'),
+    path('schools/<int:school_id>/admin/courses/', SchoolAdminCoursesView.as_view(), name='api-admin-courses'),
+    path('schools/<int:school_id>/admin/enrollments/', SchoolAdminEnrollmentsView.as_view(), name='api-admin-enrollments'),
+    path('schools/<int:school_id>/admin/certificates/', SchoolAdminCertificatesView.as_view(), name='api-admin-certificates'),
+    path('schools/<int:school_id>/admin/instructors/', SchoolAdminInstructorsView.as_view(), name='api-admin-instructors'),
+    path('schools/<int:school_id>/admin/students/', SchoolAdminStudentsView.as_view(), name='api-admin-students'),
 
     # ============================================
     # Nested Course URLs
     # ============================================
     path(
         'courses/<slug:course_slug>/sections/',
-        views.SectionViewSet.as_view({'get': 'list'}),
+        SectionViewSet.as_view({'get': 'list'}),
         name='course-sections'
     ),
     path(
         'courses/<slug:course_slug>/sections/<int:pk>/',
-        views.SectionViewSet.as_view({'get': 'retrieve'}),
+        SectionViewSet.as_view({'get': 'retrieve'}),
         name='course-section-detail'
     ),
 
     # ============================================
     # Lesson URLs
     # ============================================
-    path('lessons/<int:pk>/', views.LessonDetailView.as_view(), name='lesson-detail'),
+    path('lessons/<int:pk>/', LessonDetailView.as_view(), name='lesson-detail'),
 
     # ============================================
     # Enrollment URLs
     # ============================================
-    path('enrollments/', views.EnrollmentListView.as_view(), name='enrollment-list'),
+    path('enrollments/', EnrollmentListView.as_view(), name='enrollment-list'),
 
     # ============================================
     # Quiz URLs
     # ============================================
-    path('quizzes/<int:lesson_id>/', views.QuizDetailView.as_view(), name='quiz-detail'),
-    path('quizzes/<int:lesson_id>/submit/', views.QuizSubmitView.as_view(), name='quiz-submit'),
+    path('quizzes/<int:lesson_id>/', QuizDetailView.as_view(), name='quiz-detail'),
+    path('quizzes/<int:lesson_id>/submit/', QuizSubmitView.as_view(), name='quiz-submit'),
 
     # ============================================
     # Certificate URLs
     # ============================================
-    path('certificates/', views.CertificateListView.as_view(), name='certificate-list'),
+    path('certificates/', CertificateListView.as_view(), name='certificate-list'),
 
     # ============================================
     # Search URLs
