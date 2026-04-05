@@ -1,7 +1,7 @@
 from django.shortcuts import render
 
 
-# Custom error views
+# Custom error handlers
 def custom_page_not_found(request, exception):
     context = {
         'error_code': 404,

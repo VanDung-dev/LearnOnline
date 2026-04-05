@@ -20,14 +20,14 @@ def create_course(request):
             
         # Check for duplicate title for this instructor
         if Course.objects.filter(instructor=request.user, title__iexact=title).exists():
-             messages.error(request, 'You already have a course with this title.')
-             return redirect('user_dashboard_with_tab', sub_page='courses')
+            messages.error(request, 'You already have a course with this title.')
+            return redirect('user_dashboard_with_tab', sub_page='courses')
 
         # Create Course
         # We need a category. Find or create default.
         category = Category.objects.first()
         if not category:
-             category = Category.objects.create(name="General", description="Default category")
+            category = Category.objects.create(name="General", description="Default category")
         
         from django.utils.text import slugify
         base_slug = slugify(title)

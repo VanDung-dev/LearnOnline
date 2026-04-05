@@ -469,7 +469,7 @@ def check_and_issue_certificate(user, course):
             status='completed'
         ).exists()
 
-        # Only create certificate if it's free or user has paid
+        # Only create certificate when it's free or user has paid
         if is_certificate_free or has_paid:
             # Create certificate if it doesn't exist and course hasn't expired
             certificate, created = Certificate.objects.get_or_create(
