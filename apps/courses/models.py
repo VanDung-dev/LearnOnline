@@ -220,7 +220,7 @@ class Lesson(models.Model):
         ("quiz", "Quiz"),
     )
 
-    subsection = models.ForeignKey(Subsection, on_delete=models.CASCADE, related_name="lessons", null=True, blank=True)
+    subsection = models.ForeignKey(Subsection, on_delete=models.CASCADE, related_name="lessons")
     title = models.CharField(max_length=200)
     slug = models.SlugField(max_length=200, unique=False)
     lesson_type = models.CharField(max_length=10, choices=LESSON_TYPES, default="text")

@@ -7,22 +7,16 @@ from ..forms import LessonForm, QuizForm
 
 
 @login_required
-def create_lesson(request, course_slug, section_id):
+def create_lesson(request, course_slug, section_id, subsection_id):
     course = get_object_or_404(Course, slug=course_slug, instructor=request.user)
     section = get_object_or_404(Section, id=section_id, course=course)
-
-    subsection_id = request.GET.get('subsection_id')
-    subsection = None
-    if subsection_id:
-        subsection = get_object_or_404(Subsection, id=subsection_id, section=section)
+    subsection = get_object_or_404(Subsection, id=subsection_id, section=section)
 
     if request.method == 'POST':
         form = LessonForm(request.POST, request.FILES)
         if form.is_valid():
             lesson = form.save(commit=False)
-            lesson.section = section
-            if subsection:
-                lesson.subsection = subsection
+            lesson.subsection = subsection
             lesson.save()
             
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
@@ -58,10 +52,11 @@ def create_lesson(request, course_slug, section_id):
 
 
 @login_required
-def edit_lesson(request, course_slug, section_id, lesson_id):
+def edit_lesson(request, course_slug, section_id, subsection_id, lesson_id):
     course = get_object_or_404(Course, slug=course_slug, instructor=request.user)
     section = get_object_or_404(Section, id=section_id, course=course)
-    lesson = get_object_or_404(Lesson, id=lesson_id, section=section)
+    subsection = get_object_or_404(Subsection, id=subsection_id, section=section)
+    lesson = get_object_or_404(Lesson, id=lesson_id, subsection=subsection)
 
     # Get or create quiz for this lesson if it's a quiz type
     if lesson.lesson_type == 'quiz':
