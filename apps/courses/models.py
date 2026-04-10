@@ -220,7 +220,6 @@ class Lesson(models.Model):
         ("quiz", "Quiz"),
     )
 
-    section = models.ForeignKey(Section, on_delete=models.CASCADE, related_name="lessons", null=True, blank=True)
     subsection = models.ForeignKey(Subsection, on_delete=models.CASCADE, related_name="lessons", null=True, blank=True)
     title = models.CharField(max_length=200)
     slug = models.SlugField(max_length=200, unique=False)

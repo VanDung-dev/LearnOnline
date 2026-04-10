@@ -16,22 +16,19 @@ class CourseAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('title',)}
 
 
-class LessonInline(admin.StackedInline):
-    model = Lesson
-    extra = 1
+
 
 
 @admin.register(Section)
 class SectionAdmin(admin.ModelAdmin):
     list_display = ['title', 'course', 'order']
     list_filter = ['course']
-    inlines = [LessonInline]
 
 
 @admin.register(Lesson)
 class LessonAdmin(admin.ModelAdmin):
-    list_display = ['title', 'section', 'lesson_type', 'order', 'is_published']
-    list_filter = ['section__course', 'lesson_type', 'is_published']
+    list_display = ['title', 'subsection', 'lesson_type', 'order', 'is_published']
+    list_filter = ['subsection__section__course', 'lesson_type', 'is_published']
     prepopulated_fields = {'slug': ('title',)}
 
 
