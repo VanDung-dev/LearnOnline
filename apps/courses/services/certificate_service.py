@@ -18,13 +18,16 @@ def can_generate_certificate(user: User, course: Course) -> bool:
         return False
 
     # Course must be 100% completed
-    total_lessons = course.sections.prefetch_related('subsections__lessons').count()
+    from ..models import Lesson, Progress
+    all_lessons = Lesson.objects.filter(subsection__section__course=course, is_published=True)
+    total_lessons = all_lessons.count()
     if total_lessons == 0:
         return False
 
-    completed_lessons = course.sections.filter(
-        subsections__lessons__progress_records__user=user,
-        subsections__lessons__progress_records__completed=True
+    completed_lessons = Progress.objects.filter(
+        user=user,
+        lesson__in=all_lessons,
+        completed=True
     ).count()
 
     return completed_lessons >= total_lessons

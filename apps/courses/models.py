@@ -459,6 +459,15 @@ class Certificate(models.Model):
     )
     issued_at = models.DateTimeField(auto_now_add=True)
     certificate_number = models.CharField(max_length=50, unique=True)
+    blockchain_tx_hash = models.CharField(max_length=66, blank=True, null=True, help_text="HieraChain Transaction Hash")
+    blockchain_block_number = models.PositiveIntegerField(blank=True, null=True, help_text="HieraChain Block Number")
+    blockchain_status = models.CharField(
+        max_length=20,
+        choices=[('local', 'Local Only'), ('pending', 'Syncing to HieraChain'), ('synced', 'Synced on HieraChain'), ('failed', 'Sync Failed')],
+        default='local',
+        help_text="Status of certificate on HieraChain"
+    )
+    cryptographic_hash = models.CharField(max_length=64, blank=True, null=True, help_text="SHA-256 hash of certificate content")
 
     class Meta:
         unique_together = ("user", "course")

@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 from django.utils import timezone
 from datetime import timedelta
-from .models import Category, Course, Enrollment, Certificate, Progress, Lesson, Section
+from apps.courses.models import Category, Course, Enrollment, Certificate, Progress, Lesson, Section, Subsection
 
 
 class CourseExpirationTestCase(TestCase):
@@ -46,7 +46,7 @@ class CourseExpirationTestCase(TestCase):
             price=100.00
         )
         
-        # Create section and lesson for the course
+        # Create section, subsection and lesson for the course
         self.section = Section.objects.create(
             course=self.expiring_course,
             title='Test Section',
@@ -54,8 +54,15 @@ class CourseExpirationTestCase(TestCase):
             order=1
         )
         
-        self.lesson = Lesson.objects.create(
+        self.subsection = Subsection.objects.create(
             section=self.section,
+            title='Test Subsection',
+            description='Test subsection description',
+            order=1
+        )
+        
+        self.lesson = Lesson.objects.create(
+            subsection=self.subsection,
             title='Test Lesson',
             lesson_type='text',
             content='Test lesson content',
@@ -105,7 +112,7 @@ class CourseExpirationTestCase(TestCase):
             expiration_date=timezone.now() - timedelta(days=1)  # Expired yesterday
         )
         
-        # Create section and lesson for the expired course
+        # Create section, subsection and lesson for the expired course
         section = Section.objects.create(
             course=expired_course,
             title='Test Section',
@@ -113,8 +120,15 @@ class CourseExpirationTestCase(TestCase):
             order=1
         )
         
-        lesson = Lesson.objects.create(
+        subsection = Subsection.objects.create(
             section=section,
+            title='Test Subsection',
+            description='Test subsection description',
+            order=1
+        )
+        
+        lesson = Lesson.objects.create(
+            subsection=subsection,
             title='Test Lesson',
             lesson_type='text',
             content='Test lesson content',
@@ -144,6 +158,49 @@ class CourseExpirationTestCase(TestCase):
             course=expired_course
         ).exists()
         self.assertFalse(certificate_exists)
+
+    def test_hierachain_readiness_schema(self):
+        """Test that HieraChain readiness fields exist on Certificate and save successfully"""
+        enrollment = Enrollment.objects.create(
+            user=self.user,
+            course=self.expiring_course
+        )
+        certificate = Certificate.objects.create(
+            user=self.user,
+            course=self.expiring_course,
+            enrollment=enrollment,
+            blockchain_tx_hash="0x" + "a" * 64,
+            blockchain_block_number=1000,
+            blockchain_status='synced',
+            cryptographic_hash="b" * 64
+        )
+        self.assertEqual(certificate.blockchain_tx_hash, "0x" + "a" * 64)
+        self.assertEqual(certificate.blockchain_block_number, 1000)
+        self.assertEqual(certificate.blockchain_status, 'synced')
+        self.assertEqual(certificate.cryptographic_hash, "b" * 64)
+
+    def test_can_generate_certificate_service_logic(self):
+        """Test that can_generate_certificate service counts lessons, not sections"""
+        from apps.courses.services.certificate_service import can_generate_certificate
+        
+        # Create enrollment
+        enrollment = Enrollment.objects.create(
+            user=self.user,
+            course=self.expiring_course
+        )
+        
+        # Initially, not eligible as lesson is not completed
+        self.assertFalse(can_generate_certificate(self.user, self.expiring_course))
+        
+        # Mark lesson completed
+        progress = Progress.objects.create(
+            user=self.user,
+            lesson=self.lesson,
+            completed=True
+        )
+        
+        # Eligible now that all lessons (1/1) in course are completed
+        self.assertTrue(can_generate_certificate(self.user, self.expiring_course))
 
 
 class CourseScheduleTestCase(TestCase):

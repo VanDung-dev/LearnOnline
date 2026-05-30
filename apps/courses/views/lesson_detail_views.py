@@ -423,7 +423,7 @@ def check_and_issue_certificate(user, course):
     Check if user has completed all lessons in a course and issue certificate if so
     """
     # Get all lessons in the course
-    all_lessons = Lesson.objects.filter(section__course=course, is_published=True)
+    all_lessons = Lesson.objects.filter(subsection__section__course=course, is_published=True)
     total_lessons = all_lessons.count()
 
     if total_lessons == 0:
