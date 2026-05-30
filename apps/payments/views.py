@@ -398,6 +398,10 @@ def process_payment(request, course_slug, purchase_type='course'):
         payment.save()
 
         if payment.status == 'completed':
+            # Check and issue certificate immediately if user already completed all lessons
+            from apps.courses.views.lesson_detail_views import check_and_issue_certificate
+            check_and_issue_certificate(request.user, course)
+
             messages.success(request, 'Certificate payment successful! You now have access to locked content.')
             success_url = reverse('payments:payment_success', kwargs={'transaction_id': payment.transaction_id})
             return JsonResponse({
@@ -484,6 +488,11 @@ def payment_webhook(request, provider: str):
                     )
                     payment.enrollment = enrollment
                     payment.save(update_fields=["enrollment", "updated_at"])
+                elif (payment.status == PaymentStatus.COMPLETED
+                        and payment.purchase_type == 'certificate'):
+                    # Check and issue certificate immediately upon webhook confirmation
+                    from apps.courses.views.lesson_detail_views import check_and_issue_certificate
+                    check_and_issue_certificate(payment.user, payment.course)
         except Payment.DoesNotExist:
             pass
 
