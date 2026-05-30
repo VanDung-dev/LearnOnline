@@ -7,14 +7,14 @@ on:
       - 'apps/**'
       - 'DjangoProject/**'
       - 'manage.py'
-      - 'requirements.txt'
+      - 'pyproject.toml'
   pull_request:
     branches: ["main"]
     paths:
       - 'apps/**'
       - 'DjangoProject/**'
       - 'manage.py'
-      - 'requirements.txt'
+      - 'pyproject.toml'
   schedule:
     - cron: "0 0 1 * *"
 
