@@ -1,6 +1,8 @@
 # Docker Setup for LearnOnline
 
 This directory contains the Docker configuration for the LearnOnline Django project.
+It leverages **uv** (the fast Python package installer) for ultra-fast, reproducible container builds and dependency resolution.
+
 It supports two environments:
 
 1. **Development (`docker-compose.yml`)**: For local development.
@@ -60,41 +62,41 @@ docker compose -f docker/docker-compose.prod.yml exec web python manage.py creat
 
 **Key Configuration Files:**
 
-- `docker/Dockerfile`: Builds the Python/Django image.
+- `docker/Dockerfile`: Builds the Python/Django image leveraging **uv** to install dependencies from `pyproject.toml` and `uv.lock`.
 - `docker/nginx/default.conf`: Nginx configuration (HTTPS, Static files).
 - `docker/docker-compose.prod.yml`: Define Prod services (Web, Nginx, DB, Redis).
 
 ---
 
-## 🧪 3. Load Testing (Chịu tải) with Locust
+## 🧪 3. Load Testing with Locust
 
 We use **Locust** to simulate thousands of users accessing the site.
 
-**Prerequisite:**
+**Prerequisite (Install with `uv`):**
 
-- Install Locust: `pip install locust` (in a separate venv is recommended)
-- **Note:** Ensure `locustfile.py` has `urllib3.disable_warnings` if testing HTTPS self-signed.
+To install and run Locust in your local environment using `uv` (recommended):
+
+```bash
+# Install locust using uv
+uv pip install locust
+```
 
 **Running Load Test:**
 
 ```powershell
-# Run Locust in Headless mode (CLI only)
+# Run Locust in Headless mode (CLI only) using uv run
 # --users: Total concurrent users
 # --spawn-rate: Users added per second
 # --host: Target URL (Use https://localhost for Prod)
 
-.venv\Scripts\locust --headless --users 2000 --spawn-rate 50 --run-time 60s --host https://localhost
+uv run locust --headless --users 2000 --spawn-rate 50 --run-time 60s --host https://localhost
 ```
 
-**Cause:** Django 5.x requires modern Postgres.
-**Fix:** Ensure `docker-compose.yml` uses `image: postgres:15`.
-If you upgraded from version 13, you MUST delete the old volume:
+---
 
-```bash
-docker compose -f docker/docker-compose.prod.yml down -v
-```
+## 🛠 4. Troubleshooting
 
-### 3. `ConnectionRefusedError` (Locust)
+### 1. `ConnectionRefusedError` (Locust)
 
 **Cause:** Server is overwhelmed or not running.
 **Fix:**
@@ -103,7 +105,7 @@ docker compose -f docker/docker-compose.prod.yml down -v
 - Reduce user count if testing Dev server.
 - Ensure containers are up: `docker ps`
 
-### 4. `SSL: WRONG_VERSION_NUMBER`
+### 2. `SSL: WRONG_VERSION_NUMBER`
 
 **Cause:** Testing HTTP target with HTTPS client or vice versa.
 **Fix:** Check `--host` parameter. Use `http://` for Dev and `https://` for Prod.

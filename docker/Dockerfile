@@ -18,9 +18,13 @@ RUN apt-get update \
     zlib1g-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Python dependencies
-COPY requirements.txt /app/
-RUN pip install --no-cache-dir -r requirements.txt
+# Install uv
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+
+# Install Python dependencies using uv
+COPY pyproject.toml uv.lock /app/
+RUN uv pip install --system --no-cache -r pyproject.toml
+
 
 # Install PostgreSQL client
 RUN apt-get update && apt-get install -y postgresql-client
