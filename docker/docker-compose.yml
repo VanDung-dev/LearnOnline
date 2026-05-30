@@ -19,6 +19,10 @@ services:
       - DJANGO_SETTINGS_MODULE=DjangoProject.settings_docker
       - SECRET_KEY=django-insecure-prod-simulation-key-12345
       - ALLOWED_HOSTS=*
+      - REDIS_CACHE_URL=redis://redis:6379/1
+      - REDIS_SESSION_URL=redis://redis:6379/1
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_TASK_ALWAYS_EAGER=True
     depends_on:
       - db
       - redis

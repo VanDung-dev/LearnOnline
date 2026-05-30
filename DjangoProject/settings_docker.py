@@ -34,19 +34,23 @@ STATIC_ROOT = '/app/staticfiles/'
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://redis_cache:6379/1",
+        "LOCATION": os.environ.get('REDIS_CACHE_URL', 'redis://redis_cache:6379/1'),
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
     },
     "session_storage": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://redis:6379/1",
+        "LOCATION": os.environ.get('REDIS_SESSION_URL', 'redis://redis:6379/1'),
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
     }
 }
+
+# Celery Configuration for Docker
+CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', 'redis://redis:6379/0')
+CELERY_TASK_ALWAYS_EAGER = os.environ.get('CELERY_TASK_ALWAYS_EAGER', 'False') == 'True'
 
 # Session configuration (Redis)
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
