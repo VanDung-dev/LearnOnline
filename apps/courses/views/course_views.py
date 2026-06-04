@@ -301,13 +301,12 @@ def course_learning_process(request, slug):
     # Get sections with optimization
     sections = course.sections.prefetch_related(
         'subsections',
-        'subsections__lessons',
-        'lessons'
+        'subsections__lessons'
     ).all()
     
     # Process sections to identify legacy lessons (lessons without subsection)
     for section in sections:
-        section.has_legacy_lessons = section.lessons.filter(subsection__isnull=True).exists()
+        section.has_legacy_lessons = False
 
     return render(request, 'courses/course_learning_process.html', {
         'course': course,
