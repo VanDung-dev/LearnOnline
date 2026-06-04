@@ -24,6 +24,7 @@ dependencies = [
     "django-cors-headers>=4.3.0",
     "django-filter>=23.0",
     "gunicorn>=23.0.0",
+    "hierachain==0.0.5rc2",
 ]
 
 [dependency-groups]
@@ -43,3 +44,6 @@ dev = [
 
 [tool.uv]
 managed = true
+
+[tool.uv.sources]
+hierachain = { path = "dist/hierachain-0.0.5rc2-py3-none-any.whl" }
