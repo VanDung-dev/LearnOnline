@@ -16,7 +16,7 @@
                 Learning Process
             </a>
         </li>
-        <li class="breadcrumb-item">{{ lesson.section.title }}</li>
+        <li class="breadcrumb-item">{{ lesson.subsection.section.title }}</li>
         <li class="breadcrumb-item active" aria-current="page">{{ lesson.title }}</li>
     </ol>
 </nav>
@@ -27,7 +27,7 @@
             <div class="card-body">
                 <h5 class="card-title mb-3">Course Content</h5>
                 <div class="course-structure">
-                    {% with section=lesson.section %}
+                    {% with section=lesson.subsection.section %}
                         <!-- Legacy Lessons (Show only if current lesson is legacy) -->
                         {% if not lesson.subsection and section.lessons.all %}
                             {% for lesson_item in section.lessons.all %}
@@ -114,7 +114,7 @@
             {% endif %}
             
             {% load courses_extras %}
-            {% section_deadline lesson.section user as deadline %}
+            {% section_deadline lesson.subsection.section user as deadline %}
             {% if deadline and deadline < now %}
             <div class="alert alert-danger">
                 <strong>Warning:</strong> The deadline for this section was {{ deadline }}. You can still access the materials, but you are behind schedule.
@@ -186,13 +186,19 @@
                 <!-- QUIZ LESSON SECTION -->
                 {% if already_submitted %}
                     <div class="alert alert-info">
-                        <h4>Quiz Submitted</h4>
-                        <p>You have already submitted this quiz. No retakes allowed.</p>
-                        <p><strong>Your Score: {{ attempt.score|floatformat:2 }}%</strong></p>
-                        {% if attempt.score >= 70 %}
-                            <p class="text-success">✓ You passed this quiz!</p>
+                        <h4>{% if reached_max_attempts %}Maximum Attempts Reached{% else %}Quiz Submitted{% endif %}</h4>
+                        {% if reached_max_attempts %}
+                            <p class="text-danger">You have reached the maximum limit of 3 attempts for this quiz.</p>
+                        {% elif attempt.score >= 70 %}
+                            <p class="text-success">✓ You have passed this quiz!</p>
                         {% else %}
-                            <p class="text-danger">You need at least 70% to pass.</p>
+                            <p>You have already submitted this attempt. You can retry (up to 3 attempts total).</p>
+                        {% endif %}
+                        <p><strong>Your Last Score: {{ attempt.score|floatformat:2 }}%</strong></p>
+                        {% if attempt.score >= 70 %}
+                            <p class="text-success">✓ Passed status locked.</p>
+                        {% else %}
+                            <p class="text-danger">Failed status. Attempts used: {{ attempt.attempt_number }}/3.</p>
                         {% endif %}
                     </div>
 
