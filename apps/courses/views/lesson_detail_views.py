@@ -14,7 +14,7 @@ from apps.payments.models import Payment
 def lesson_detail(request, course_slug, lesson_slug):
     course = get_object_or_404(Course, slug=course_slug, is_active=True)
     # First get all lessons with the given slug in this course
-    lessons = Lesson.objects.filter(slug=lesson_slug, section__course=course, is_published=True)
+    lessons = Lesson.objects.filter(slug=lesson_slug, subsection__section__course=course, is_published=True)
     if not lessons.exists():
         raise Http404("Lesson not found")
     elif lessons.count() > 1:
@@ -56,7 +56,7 @@ def lesson_detail(request, course_slug, lesson_slug):
         logger.warning(f"Video lesson '{lesson.title}' (ID: {lesson.id}) has no video URL set")
 
     # Check if lesson/module is locked - instructors can always access
-    if not is_instructor and (lesson.is_locked or lesson.section.is_locked) and not has_certificate:
+    if not is_instructor and (lesson.is_locked or lesson.subsection.section.is_locked) and not has_certificate:
         # Lesson or module is locked and user doesn't have certificate
         messages.error(request, "This content is locked. Purchase a certificate to access it.")
         return redirect('courses:course_detail', slug=course.slug)
@@ -220,6 +220,33 @@ def lesson_detail(request, course_slug, lesson_slug):
                 # Use current_attempt for final submission
                 new_attempt = current_attempt
 
+                # Save the latest answers from POST first
+                for question in quiz.questions.all():
+                    if question.question_type == 'single':
+                        answer_id = request.POST.get(f'question_{question.id}')
+                        if answer_id:
+                            try:
+                                selected_answer = Answer.objects.get(id=answer_id, question=question)
+                                user_answer, created = UserAnswer.objects.get_or_create(
+                                    quiz_attempt=new_attempt,
+                                    question=question
+                                )
+                                user_answer.selected_answers.clear()
+                                user_answer.selected_answers.add(selected_answer)
+                            except Answer.DoesNotExist:
+                                pass
+                    elif question.question_type == 'multiple':
+                        answer_ids = request.POST.getlist(f'question_{question.id}')
+                        if answer_ids:
+                            selected_answers = Answer.objects.filter(id__in=answer_ids, question=question)
+                            if selected_answers.exists():
+                                user_answer, created = UserAnswer.objects.get_or_create(
+                                    quiz_attempt=new_attempt,
+                                    question=question
+                                )
+                                user_answer.selected_answers.set(selected_answers)
+                new_attempt.save()
+
                 score = 0
                 total_points = 0
 
@@ -325,28 +352,54 @@ def lesson_detail(request, course_slug, lesson_slug):
             ).first()
 
             if not current_attempt:
-                #Check if user has any completed attempts
-                last_completed_attempt = QuizAttempt.objects.filter(
+                # Count completed attempts
+                completed_attempts_count = QuizAttempt.objects.filter(
                     user=request.user,
                     lesson=lesson,
                     completed_at__isnull=False
-                ).order_by('-completed_at').first()
+                ).count()
                 
-                # If there's a completed attempt, don'tallow a new one
-                if last_completed_attempt:
+                # Check if user has passed in any previous attempt
+                passed_attempt = QuizAttempt.objects.filter(
+                    user=request.user,
+                    lesson=lesson,
+                    completed_at__isnull=False,
+                    score__gte=70
+                ).first()
+                
+                if passed_attempt:
+                    context = {
+                        'course': course,
+                        'lesson': lesson,
+                        'quiz': quiz,
+                        'attempt': passed_attempt,
+                        'already_submitted': True,
+                        'is_instructor': is_instructor,
+                    }
+                    return render(request, 'courses/lesson_detail.html', context)
+                
+                # If they have completed 3 or more attempts and failed them all
+                if completed_attempts_count >= 3:
+                    last_completed_attempt = QuizAttempt.objects.filter(
+                        user=request.user,
+                        lesson=lesson,
+                        completed_at__isnull=False
+                    ).order_by('-completed_at').first()
                     context = {
                         'course': course,
                         'lesson': lesson,
                         'quiz': quiz,
                         'attempt': last_completed_attempt,
                         'already_submitted': True,
+                        'reached_max_attempts': True,
                         'is_instructor': is_instructor,
                     }
                     return render(request, 'courses/lesson_detail.html', context)
+                
                 current_attempt = QuizAttempt.objects.create(
                     user=request.user,
                     lesson=lesson,
-                    attempt_number=1
+                    attempt_number=completed_attempts_count + 1
                 )
 
             # Calculate remaining checks
@@ -389,7 +442,7 @@ def lesson_detail(request, course_slug, lesson_slug):
         check_and_issue_certificate(request.user, course)
 
     # Get next and previous lessons
-    all_lessons = Lesson.objects.filter(section__course=course, is_published=True)
+    all_lessons = Lesson.objects.filter(subsection__section__course=course, is_published=True)
     all_lessons_list = list(all_lessons)
     try:
         current_index = all_lessons_list.index(lesson)
