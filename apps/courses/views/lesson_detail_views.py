@@ -532,6 +532,10 @@ def check_and_issue_certificate(user, course):
             )
 
             if created:
+                # Sync certificate details to HieraChain ledger
+                from apps.courses.services.hierachain_service import sync_certificate_to_hierachain
+                sync_certificate_to_hierachain(certificate)
+
                 # Notify user about certificate
                 # Note: Since this is called from a background process, we can't directly send messages
                 # In a real implementation, you would use email notifications or a messaging system

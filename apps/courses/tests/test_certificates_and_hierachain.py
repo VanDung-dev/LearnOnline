@@ -94,11 +94,21 @@ class CourseExpirationTestCase(TestCase):
         check_and_issue_certificate(self.user, self.expiring_course)
         
         # Check that certificate was issued
-        certificate_exists = Certificate.objects.filter(
+        cert = Certificate.objects.filter(
             user=self.user,
             course=self.expiring_course
-        ).exists()
-        self.assertTrue(certificate_exists)
+        ).first()
+        self.assertIsNotNone(cert)
+        
+        # Print status for debugging
+        print(f"\n--- CERTIFICATE HIERACHAIN STATUS: {cert.blockchain_status} ---")
+        print(f"TX Hash: {cert.blockchain_tx_hash}")
+        print(f"Block: {cert.blockchain_block_number}")
+        print(f"Crypto Hash: {cert.cryptographic_hash}")
+        
+        self.assertEqual(cert.blockchain_status, 'synced')
+        self.assertIsNotNone(cert.blockchain_tx_hash)
+        self.assertIsNotNone(cert.cryptographic_hash)
         
     def test_certificate_not_issued_after_expiration(self):
         """Test that certificate is not issued when course expires"""
